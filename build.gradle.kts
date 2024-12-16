@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    application
 }
 
 group = "fr.polytech.suuuuuuuuuuudoku"
@@ -7,6 +8,11 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+}
+
+application {
+    mainClass = "fr.polytech.suuuuuuuuuuudoku.Main"
+    applicationDefaultJvmArgs = listOf("-ea")
 }
 
 dependencies {

@@ -31,9 +31,9 @@ public class Main {
                 new BlockConstraint(SymbolSets.DIGITS, 3, 0, 6, 3),
                 new BlockConstraint(SymbolSets.DIGITS, 6, 0, 9, 3),
 
-                new BlockConstraint(SymbolSets.DIGITS, 0, 3, 3, 3),
-                new BlockConstraint(SymbolSets.DIGITS, 3, 3, 6, 3),
-                new BlockConstraint(SymbolSets.DIGITS, 6, 3, 9, 3),
+                new BlockConstraint(SymbolSets.DIGITS, 0, 3, 3, 6),
+                new BlockConstraint(SymbolSets.DIGITS, 3, 3, 6, 6),
+                new BlockConstraint(SymbolSets.DIGITS, 6, 3, 9, 6),
 
                 new BlockConstraint(SymbolSets.DIGITS, 0, 6, 3, 9),
                 new BlockConstraint(SymbolSets.DIGITS, 3, 6, 6, 9),

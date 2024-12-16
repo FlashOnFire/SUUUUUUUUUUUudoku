@@ -70,7 +70,7 @@ public class ColumnConstraint implements AbstractConstraint {
     public Optional<List<Character>> getPossibilities(Character[][] grid, Vec2i pos) {
         assert pos.getX() < grid[0].length;
         assert pos.getY() < grid.length;
-        assert grid[pos.getY()][pos.getX()] != ' ';
+        assert grid[pos.getY()][pos.getX()] == ' ';
 
         var column = Arrays.stream(grid)
                 .parallel()

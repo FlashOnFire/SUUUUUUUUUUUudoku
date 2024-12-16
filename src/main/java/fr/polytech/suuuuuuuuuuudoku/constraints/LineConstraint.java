@@ -51,7 +51,7 @@ public class LineConstraint implements AbstractConstraint {
     public Optional<List<Character>> getPossibilities(Character[][] grid, Vec2i pos) {
         assert pos.getY() < grid.length;
         assert pos.getX() < grid[0].length;
-        assert grid[pos.getX()][pos.getY()] != ' ';
+        assert grid[pos.getY()][pos.getX()] == ' ';
 
         var row = Arrays.stream(grid[pos.getY()]).filter(c -> c != ' ').toList();
         var list = symbols.stream().filter(c -> !row.contains(c)).toList();

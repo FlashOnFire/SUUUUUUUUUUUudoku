@@ -32,6 +32,20 @@ flowchart LR
 <!-- BEGIN_CLASS -->
 ```mermaid
 classDiagram
+class NotEmptyConstraint { 
++ boolean isSatisfied(Character[][])
+}
+
+class BlockConstraint { 
++ BlockConstraint BlockConstraint(Set~Character~,int,int,int,int)
++ boolean isSatisfied(Character[][])
+}
+
+class LineConstraint { 
++ LineConstraint LineConstraint(Set~Character~)
++ boolean isSatisfied(Character[][])
+}
+
 class AbstractConstraint { 
 <<interface>>
 }
@@ -42,37 +56,32 @@ class Grid {
 + boolean areConstraintsSatisfied()
 }
 
+class SymbolSets { 
++ Set~Character~ DIGITS$
+}
+
 class ColumnConstraint { 
 + ColumnConstraint ColumnConstraint(Set~Character~)
 + boolean isSatisfied(Character[][])
 }
 
-class BlockConstraint { 
-+ BlockConstraint BlockConstraint(Set~Character~,int,int,int,int)
-+ boolean isSatisfied(Character[][])
-}
-
-class SymbolSets { 
-+ Set~Character~ DIGITS$
-}
-
-class LineConstraint { 
-+ LineConstraint LineConstraint(Set~Character~)
-+ boolean isSatisfied(Character[][])
-}
-
-class NotEmptyConstraint { 
-+ boolean isSatisfied(Character[][])
+class ConstraintsTests { 
++ void testBlockConstraint()
++ void testBlockConstraintFail()
++ void testColumnConstraint()
++ void testColumnConstraintFail()
++ void testLineConstraint()
++ void testLineConstraintFail()
 }
 
 class Main { 
 + void main(String[])$
 }
 
-AbstractConstraint <|.. ColumnConstraint
+AbstractConstraint <|.. NotEmptyConstraint
 AbstractConstraint <|.. BlockConstraint
 AbstractConstraint <|.. LineConstraint
-AbstractConstraint <|.. NotEmptyConstraint
+AbstractConstraint <|.. ColumnConstraint
 ```
 <!-- END_CLASS -->
 

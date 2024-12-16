@@ -7,13 +7,27 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Represents a constraint that ensures each line in the grid satisfies certain conditions.
+ */
 public class LineConstraint implements AbstractConstraint {
     private final Set<Character> symbols;
 
+    /**
+     * Constructs a LineConstraint with the specified set of symbols.
+     *
+     * @param symbols the set of symbols that must be present in each line
+     */
     public LineConstraint(Set<Character> symbols) {
         this.symbols = symbols;
     }
 
+    /**
+     * Checks if the constraint is satisfied for the given grid.
+     *
+     * @param grid the grid to check
+     * @return true if the constraint is satisfied, false otherwise
+     */
     @Override
     public boolean isSatisfied(Character[][] grid) {
         assert grid.length == symbols.size();
@@ -26,6 +40,13 @@ public class LineConstraint implements AbstractConstraint {
         });
     }
 
+    /**
+     * Gets the possible symbols that can be placed at the specified position in the grid.
+     *
+     * @param grid the grid to check
+     * @param pos  the position to check
+     * @return an Optional containing a list of possible symbols, or an empty Optional if no symbols are possible
+     */
     @Override
     public Optional<List<Character>> getPossibilities(Character[][] grid, Vec2i pos) {
         assert pos.getY() < grid.length;

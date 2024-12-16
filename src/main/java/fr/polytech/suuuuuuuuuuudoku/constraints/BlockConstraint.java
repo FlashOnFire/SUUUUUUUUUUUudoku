@@ -55,6 +55,14 @@ public class BlockConstraint implements AbstractConstraint {
                 && list.stream().distinct().count() == list.size();
     }
 
+    /**
+     * Returns the possible symbols that can be placed at the given position in the grid.
+     *
+     * @param grid the grid to check the possibilities against
+     * @param pos  the position to check the possibilities for
+     * @return an Optional containing a list of possible symbols, or an empty Optional if the position is not within the block
+     * @throws AssertionError if the position is out of the grid bounds or the grid cell is empty
+     */
     @Override
     public Optional<List<Character>> getPossibilities(Character[][] grid, Vec2i pos) {
         assert pos.getX() < grid[0].length;
@@ -68,13 +76,18 @@ public class BlockConstraint implements AbstractConstraint {
 
         // Extract the block from the grid
         List<Character> list = extractBlock(grid);
-        ;
 
         // Return the symbols that are not present in the block
         var possibilities = symbols.stream().filter(c -> !list.contains(c)).toList();
         return possibilities.isEmpty() ? Optional.empty() : Optional.of(possibilities);
     }
 
+    /**
+     * Extracts the block of characters from the grid based on the defined coordinates.
+     *
+     * @param grid the grid from which to extract the block
+     * @return a list of characters within the block, excluding empty cells
+     */
     private List<Character> extractBlock(Character[][] grid) {
         List<Character> list = new ArrayList<>();
         for (int i = y; i < dy; i++) {

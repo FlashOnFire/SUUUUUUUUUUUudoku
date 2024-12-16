@@ -7,7 +7,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * The SudokuSolver class provides methods to solve a Sudoku puzzle.
+ */
 public class SudokuSolver {
+
+    /**
+     * Solves the given Sudoku grid.
+     *
+     * @param grid         the Sudoku grid to solve
+     * @param symbols      the set of symbols used in the Sudoku grid
+     * @param backtracking whether to use backtracking if deduction fails
+     * @return the solving state of the Sudoku grid
+     */
     public static SolvingState solve(Grid grid, Set<Character> symbols, boolean backtracking) {
         var constraints = grid.getConstraints();
 
@@ -25,10 +37,17 @@ public class SudokuSolver {
             return doBacktracking(grid, symbols, constraints);
         }
 
-
         return SolvingState.PARTIALLY_SOLVED;
     }
 
+    /**
+     * Performs backtracking to solve the Sudoku grid.
+     *
+     * @param grid        the Sudoku grid to solve
+     * @param symbols     the set of symbols used in the Sudoku grid
+     * @param constraints the list of constraints to satisfy
+     * @return the solving state of the Sudoku grid
+     */
     private static SolvingState doBacktracking(Grid grid, Set<Character> symbols, List<AbstractConstraint> constraints) {
         var emptyCells = grid.getEmptyCells();
         if (emptyCells.isEmpty()) {
@@ -51,6 +70,13 @@ public class SudokuSolver {
         return SolvingState.UNSOLVABLE;
     }
 
+    /**
+     * Solves the Sudoku grid using deduction.
+     *
+     * @param grid    the Sudoku grid to solve
+     * @param symbols the set of symbols used in the Sudoku grid
+     * @return the solving state of the Sudoku grid
+     */
     private static SolvingState solveDeduction(Grid grid, Set<Character> symbols) {
         boolean finished = false;
         while (!finished) {
@@ -76,6 +102,15 @@ public class SudokuSolver {
         return grid.isSolved() ? SolvingState.SOLVED : SolvingState.PARTIALLY_SOLVED;
     }
 
+    /**
+     * Tries to deduce the possible values for a cell in the Sudoku grid.
+     *
+     * @param grid        the Sudoku grid
+     * @param symbols     the set of symbols used in the Sudoku grid
+     * @param pos         the position of the cell
+     * @param constraints the list of constraints to satisfy
+     * @return the list of possible values for the cell
+     */
     private static List<Character> tryDeduce(Grid grid, Set<Character> symbols, Vec2i pos, List<AbstractConstraint> constraints) {
         var values = new ArrayList<>(symbols);
         for (AbstractConstraint constraint : constraints) {

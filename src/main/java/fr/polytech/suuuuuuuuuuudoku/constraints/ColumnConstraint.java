@@ -7,13 +7,27 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Represents a constraint that ensures each column in the grid satisfies the given symbols.
+ */
 public class ColumnConstraint implements AbstractConstraint {
     private final Set<Character> symbols;
 
+    /**
+     * Constructs a ColumnConstraint with the specified set of symbols.
+     *
+     * @param symbols the set of symbols that each column must contain
+     */
     public ColumnConstraint(Set<Character> symbols) {
         this.symbols = symbols;
     }
 
+    /**
+     * Checks if the constraint is satisfied for the given grid.
+     *
+     * @param grid the grid to check
+     * @return true if the constraint is satisfied, false otherwise
+     */
     @Override
     public boolean isSatisfied(Character[][] grid) {
         if (grid.length == 0) {
@@ -45,6 +59,13 @@ public class ColumnConstraint implements AbstractConstraint {
         return true;
     }
 
+    /**
+     * Gets the possible symbols that can be placed at the specified position in the grid.
+     *
+     * @param grid the grid to check
+     * @param pos  the position to check
+     * @return an Optional containing a list of possible symbols, or an empty Optional if no symbols are possible
+     */
     @Override
     public Optional<List<Character>> getPossibilities(Character[][] grid, Vec2i pos) {
         assert pos.getX() < grid[0].length;

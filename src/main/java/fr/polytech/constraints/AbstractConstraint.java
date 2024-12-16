@@ -1,5 +1,5 @@
 package fr.polytech.constraints;
 
 public interface AbstractConstraint {
-    boolean isSatisfied(char[][] grille);
+    boolean isSatisfied(Character[][] grid);
 }

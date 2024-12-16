@@ -12,18 +12,12 @@ public class LineConstraint implements AbstractConstraint {
     }
 
     @Override
-    public boolean isSatisfied(char[][] grille) {
-        assert grille.length == symbols.size();
+    public boolean isSatisfied(Character[][] grid) {
+        assert grid.length == symbols.size();
 
-        return Arrays.stream(grille).allMatch(line -> {
-            return CharBuffer.wrap(line)
-                    .chars()
-                    .allMatch(c -> symbols.contains((char) c))
-                    && CharBuffer
-                    .wrap(line)
-                    .chars()
-                    .distinct()
-                    .count() == line.length;
+        return Arrays.stream(grid).allMatch(line -> {
+            return symbols.containsAll(Arrays.stream(line).toList())
+                    && Arrays.stream(line).distinct().count() == line.length;
         });
     }
 }

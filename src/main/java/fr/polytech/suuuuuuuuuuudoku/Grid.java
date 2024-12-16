@@ -24,7 +24,13 @@ public class Grid {
     }
 
     public boolean areConstraintsSatisfied() {
-        return this.constraints.stream().allMatch(c -> c.isSatisfied(this.grid));
+        return this.constraints.stream().allMatch(c -> {
+            if (!c.isSatisfied(this.grid)) {
+                System.out.println("Constraint not satisfied: " + c);
+                return false;
+            }
+            return true;
+        });
     }
 
     public Character[][] getGrid() {
@@ -32,14 +38,17 @@ public class Grid {
     }
 
     public boolean tryPlace(Vec2i pos, char value) {
-        var oldValue = this.grid[pos.x()][pos.y()];
-        this.grid[pos.x()][pos.y()] = value;
+        var oldValue = this.grid[pos.y()][pos.x()];
+        this.grid[pos.y()][pos.x()] = value;
         if (!this.areConstraintsSatisfied()) {
             //revert
-            this.grid[pos.x()][pos.y()] = oldValue;
+            this.grid[pos.y()][pos.x()] = oldValue;
+
+            System.out.println("Invalid placement (" + value + ") at " + pos + ", reverting");
             return false;
         }
 
+        System.out.println("Placed " + value + " at " + pos);
         return true;
     }
 

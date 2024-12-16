@@ -19,16 +19,22 @@ public class LineConstraint implements AbstractConstraint {
         assert grid.length == symbols.size();
 
         return Arrays.stream(grid).allMatch(line -> {
-
             var list = Arrays.stream(line).filter(c -> c != ' ').toList();
+
             return symbols.containsAll(list)
-                    && list.stream().distinct().count() == line.length;
+                    && list.stream().distinct().count() == list.size();
         });
     }
 
     @Override
     public Optional<List<Character>> tryDeduce(Character[][] grid, Vec2i pos) {
-        var row = Arrays.stream(grid[pos.x()]).filter(c -> c != ' ').toList();
-        return Optional.of(symbols.stream().filter(c -> !row.contains(c)).toList());
+        assert pos.y() < grid.length;
+        assert pos.x() < grid[0].length;
+        assert grid[pos.x()][pos.y()] != ' ';
+
+        var row = Arrays.stream(grid[pos.y()]).filter(c -> c != ' ').toList();
+        var list = symbols.stream().filter(c -> !row.contains(c)).toList();
+
+        return list.isEmpty() ? Optional.empty() : Optional.of(list);
     }
 }

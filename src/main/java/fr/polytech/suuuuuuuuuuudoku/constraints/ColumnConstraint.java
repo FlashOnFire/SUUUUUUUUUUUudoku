@@ -47,11 +47,18 @@ public class ColumnConstraint implements AbstractConstraint {
 
     @Override
     public Optional<List<Character>> tryDeduce(Character[][] grid, Vec2i pos) {
+        assert pos.x() < grid[0].length;
+        assert pos.y() < grid.length;
+        assert grid[pos.y()][pos.x()] != ' ';
+
         var column = Arrays.stream(grid)
                 .parallel()
                 .map(line -> line[pos.x()])
                 .filter(c -> c != ' ')
                 .toList();
-        return Optional.of(symbols.stream().filter(c -> !column.contains(c)).toList());
+
+        var list = symbols.stream().filter(c -> !column.contains(c)).toList();
+
+        return list.isEmpty() ? Optional.empty() : Optional.of(list);
     }
 }

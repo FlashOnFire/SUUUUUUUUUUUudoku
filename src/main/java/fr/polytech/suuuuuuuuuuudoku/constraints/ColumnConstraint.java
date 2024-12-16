@@ -1,7 +1,10 @@
 package fr.polytech.suuuuuuuuuuudoku.constraints;
 
+import fr.polytech.suuuuuuuuuuudoku.solver.Vec2i;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class ColumnConstraint implements AbstractConstraint {
@@ -40,5 +43,15 @@ public class ColumnConstraint implements AbstractConstraint {
         }
 
         return true;
+    }
+
+    @Override
+    public Optional<List<Character>> tryDeduce(Character[][] grid, Vec2i pos) {
+        var column = Arrays.stream(grid)
+                .parallel()
+                .map(line -> line[pos.x()])
+                .filter(c -> c != ' ')
+                .toList();
+        return Optional.of(symbols.stream().filter(c -> !column.contains(c)).toList());
     }
 }

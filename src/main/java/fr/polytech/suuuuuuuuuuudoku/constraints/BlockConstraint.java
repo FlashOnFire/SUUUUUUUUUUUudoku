@@ -1,9 +1,8 @@
 package fr.polytech.suuuuuuuuuuudoku.constraints;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import fr.polytech.suuuuuuuuuuudoku.solver.Vec2i;
+
+import java.util.*;
 
 /**
  * Represents a constraint that checks for the presence of specific symbols within a defined block in a grid.
@@ -49,14 +48,34 @@ public class BlockConstraint implements AbstractConstraint {
     @Override
     public boolean isSatisfied(Character[][] grid) {
         // Extract the block from the grid
+        var list = extractBlock(grid);
+
+        // Check if the block contains all the symbols and has no duplicates
+        return symbols.containsAll(list)
+                && list.stream().distinct().count() == list.size();
+    }
+
+    @Override
+    public Optional<List<Character>> tryDeduce(Character[][] grid, Vec2i pos) {
+        // Check if the position is within the block
+        if (pos.x() < x || pos.x() >= dx || pos.y() < y || pos.y() >= dy) {
+            return Optional.empty();
+        }
+
+        // Extract the block from the grid
+        List<Character> list = extractBlock(grid);;
+
+        // Return the symbols that are not present in the block
+        return Optional.of(symbols.stream().filter(c -> !list.contains(c)).toList());
+    }
+
+    private List<Character> extractBlock(Character[][] grid) {
         List<Character> list = new ArrayList<>();
         for (int i = y; i < dy; i++) {
             list.addAll(Arrays.asList(grid[i]).subList(x, dx));
         }
         list = list.stream().filter(c -> c != ' ').toList();
 
-        // Check if the block contains all the symbols and has no duplicates
-        return symbols.containsAll(list)
-                && list.stream().distinct().count() == list.size();
+        return list;
     }
 }

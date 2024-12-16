@@ -1,6 +1,10 @@
 package fr.polytech.suuuuuuuuuuudoku.constraints;
 
+import fr.polytech.suuuuuuuuuuudoku.solver.Vec2i;
+
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class LineConstraint implements AbstractConstraint {
@@ -20,5 +24,11 @@ public class LineConstraint implements AbstractConstraint {
             return symbols.containsAll(list)
                     && list.stream().distinct().count() == line.length;
         });
+    }
+
+    @Override
+    public Optional<List<Character>> tryDeduce(Character[][] grid, Vec2i pos) {
+        var row = Arrays.stream(grid[pos.x()]).filter(c -> c != ' ').toList();
+        return Optional.of(symbols.stream().filter(c -> !row.contains(c)).toList());
     }
 }

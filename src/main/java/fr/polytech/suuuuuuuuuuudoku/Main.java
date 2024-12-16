@@ -1,8 +1,6 @@
-package fr.polytech;
+package fr.polytech.suuuuuuuuuuudoku;
 
-import fr.polytech.constraints.BlockConstraint;
-import fr.polytech.constraints.ColumnConstraint;
-import fr.polytech.constraints.LineConstraint;
+import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 
 import java.util.List;
 import java.util.Set;

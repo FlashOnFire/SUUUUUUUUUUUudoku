@@ -1,6 +1,5 @@
-package fr.polytech.constraints;
+package fr.polytech.suuuuuuuuuuudoku.constraints;
 
-import java.nio.CharBuffer;
 import java.util.Arrays;
 
 public class NotEmptyConstraint implements AbstractConstraint {

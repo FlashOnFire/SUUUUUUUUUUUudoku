@@ -1,6 +1,6 @@
-package fr.polytech;
+package fr.polytech.suuuuuuuuuuudoku;
 
-import fr.polytech.constraints.AbstractConstraint;
+import fr.polytech.suuuuuuuuuuudoku.constraints.AbstractConstraint;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ public class Grid {
 
     public void display() {
         for (Character[] lines : this.grid) {
-            for (Character cell: lines) {
+            for (Character cell : lines) {
                 System.out.print(cell + " ");
             }
             System.out.println();

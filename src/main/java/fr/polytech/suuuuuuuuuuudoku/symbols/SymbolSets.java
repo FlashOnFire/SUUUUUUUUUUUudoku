@@ -1,4 +1,4 @@
-package fr.polytech.symbols;
+package fr.polytech.suuuuuuuuuuudoku.symbols;
 
 import java.util.Set;
 

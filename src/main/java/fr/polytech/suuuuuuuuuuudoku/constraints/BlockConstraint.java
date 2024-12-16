@@ -1,4 +1,4 @@
-package fr.polytech.constraints;
+package fr.polytech.suuuuuuuuuuudoku.constraints;
 
 import java.util.ArrayList;
 import java.util.Arrays;

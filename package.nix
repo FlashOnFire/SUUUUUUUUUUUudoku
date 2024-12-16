@@ -1,28 +1,25 @@
 {
   lib,
-  self,
   stdenv,
   jdk23,
   gradle,
 }: let
   jdk = jdk23;
-in
-  stdenv.mkDerivation (finalAttrs: {
-    pname = "SUUUUUUUUUUudoku";
+  self = stdenv.mkDerivation (finalAttrs: {
+    pname = "SUUUUUUUUUUUudoku";
     version = "0.0.0";
 
-    src = ./.;
+    src = lib.cleanSource ./.;
 
     nativeBuildInputs = [
       (gradle.override {java = jdk;})
       jdk
     ];
 
-    # # if the package has dependencies, mitmCache must be set
-    # mitmCache = gradle.fetchDeps {
-    #   inherit (finalAttrs) pname;
-    #   data = ./deps.json;
-    # };
+    mitmCache = gradle.fetchDeps {
+      pkg = self;
+      data = ./deps.json;
+    };
 
     gradleFlags = ["-Dfile.encoding=utf-8"];
 
@@ -30,7 +27,6 @@ in
     # gradleBuildTask = "shadowJar";
     gradleBuildTask = "assemble";
 
-    # will run the gradleCheckTask (defaults to "test")
     doCheck = true;
 
     installPhase = ''
@@ -43,6 +39,8 @@ in
 
     meta.sourceProvenance = with lib.sourceTypes; [
       fromSource
-      # binaryBytecode # mitm cache
+      binaryBytecode # mitm cache
     ];
-  })
+  });
+in
+  self

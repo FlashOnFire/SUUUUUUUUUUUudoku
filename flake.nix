@@ -21,19 +21,16 @@
 
       perSystem = {
         self',
-        lib,
-        system,
         pkgs,
         ...
       }: {
         packages = {
-          default = self'.packages.SUUUUUUUUUUudoku;
-          SUUUUUUUUUUudoku = pkgs.callPackage ./package.nix {inherit self;};
+          default = self'.packages.SUUUUUUUUUUUudoku;
+          SUUUUUUUUUUUudoku = pkgs.callPackage ./package.nix {};
         };
 
         devShells.default = pkgs.mkShell {
-          inputsFrom = with self'.packages; [SUUUUUUUUUUudoku];
-          # packages = with pkgs; [];
+          inputsFrom = with self'.packages; [SUUUUUUUUUUUudoku];
         };
 
         formatter = pkgs.alejandra;

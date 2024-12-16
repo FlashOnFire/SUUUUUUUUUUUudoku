@@ -81,18 +81,6 @@ class ColumnConstraint {
 + Optional~List~Character~~ tryDeduce(Character[][],Vec2i)
 }
 
-class ConstraintsTests { 
-+ void testBlockConstraint()
-+ void testBlockConstraintEmpty()
-+ void testBlockConstraintFail()
-+ void testColumnConstraint()
-+ void testColumnConstraintEmpty()
-+ void testColumnConstraintFail()
-+ void testLineConstraint()
-+ void testLineConstraintEmpty()
-+ void testLineConstraintFail()
-}
-
 class Main { 
 + void main(String[])$
 }

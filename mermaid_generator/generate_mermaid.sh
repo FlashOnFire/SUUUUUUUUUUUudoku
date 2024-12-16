@@ -3,7 +3,7 @@
 # find project root using .git folder
 root=$(git rev-parse --show-toplevel)
 
-mermaid=$(java -jar "${root}"/mermaid_generator/java2umltext-0.1.0.jar mermaid "${root}")
+mermaid=$(java -jar "${root}"/mermaid_generator/java2umltext-0.1.0.jar mermaid "${root}/src/main")
 # clean the mermaid by remove get and set methods
 mermaid=$(echo "${mermaid}" | grep -v 'get' | grep -v 'set')
 md_ready="\`\`\`mermaid\n${mermaid}\n\`\`\`"

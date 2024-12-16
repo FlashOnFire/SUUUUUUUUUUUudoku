@@ -3,6 +3,7 @@
 Projet mené par Eymeric Dechelette, Thibaut Laracine et Guillaume Calderon
 
 ### Diagramme de cas d'utilisation :
+
 ```mermaid
 flowchart LR
     subgraph system["system"]
@@ -27,11 +28,52 @@ flowchart LR
 ```
 
 ### Diagramme de classes :
+
+<!-- BEGIN_CLASS -->
+```mermaid
+classDiagram
+class AbstractConstraint { 
+<<interface>>
+}
+
+class Grid { 
++ Grid Grid(char[][],List~AbstractConstraint~)
++ char[][] getGrid()
++ void setGrid(char[][])
++ void display()
++ boolean areConstraintsSatisfied()
+}
+
+class ColumnConstraint { 
++ ColumnConstraint ColumnConstraint(Set~Character~)
++ boolean isSatisfied(char[][])
+}
+
+class SymbolSets { 
++ Set~Character~ DIGITS$
+}
+
+class LineConstraint { 
++ LineConstraint LineConstraint(Set~Character~)
++ boolean isSatisfied(char[][])
+}
+
+class NotEmptyConstraint { 
++ boolean isSatisfied(char[][])
+}
+
+class Main { 
++ void main(String[])$
+}
+
+AbstractConstraint <|.. ColumnConstraint
+AbstractConstraint <|.. LineConstraint
+AbstractConstraint <|.. NotEmptyConstraint
 ```
-Todo
-```
+<!-- END_CLASS -->
 
 ### Diagramme de séquence :
+
 ```
 Todo
 ```

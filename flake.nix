@@ -1,28 +1,42 @@
 {
   description = "A Nix-flake-based Java development environment";
 
-  inputs.nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1.*.tar.gz";
+  inputs = {
+    nixpkgs.url = "nixpkgs/nixpkgs-unstable";
 
-  outputs = { self, nixpkgs }:
-    let
-      javaVersion = 23;
-      overlays = [
-        (final: prev: rec {
-          jdk = prev."jdk${toString javaVersion}";
-          gradle = prev.gradle.override { java = jdk; };
-          maven = prev.maven.override { inherit jdk; };
-        })
-      ];
-      supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
-      forEachSupportedSystem = f: nixpkgs.lib.genAttrs supportedSystems (system: f {
-        pkgs = import nixpkgs { inherit overlays system; };
-      });
-    in
-    {
-      devShells = forEachSupportedSystem ({ pkgs }: {
-        default = pkgs.mkShell {
-          packages = with pkgs; [ gradle jdk ];
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
+    };
+  };
+
+  outputs = {
+    self,
+    nixpkgs,
+    flake-parts,
+    ...
+  } @ inputs:
+    flake-parts.lib.mkFlake {inherit inputs;} {
+      systems = ["x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin"];
+
+      perSystem = {
+        self',
+        lib,
+        system,
+        pkgs,
+        ...
+      }: {
+        packages = {
+          default = self'.packages.SUUUUUUUUUUudoku;
+          SUUUUUUUUUUudoku = pkgs.callPackage ./package.nix {inherit self;};
         };
-      });
+
+        devShells.default = pkgs.mkShell {
+          inputsFrom = with self'.packages; [SUUUUUUUUUUudoku];
+          # packages = with pkgs; [];
+        };
+
+        formatter = pkgs.alejandra;
+      };
     };
 }

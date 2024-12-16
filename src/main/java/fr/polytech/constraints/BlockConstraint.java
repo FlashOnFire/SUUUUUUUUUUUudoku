@@ -23,8 +23,8 @@ public class BlockConstraint implements AbstractConstraint {
     @Override
     public boolean isSatisfied(Character[][] grid) {
         List<Character> list = new ArrayList<>();
-        for (int i = x; i < dx; i++) {
-            list.addAll(Arrays.asList(grid[i]).subList(y, dy));
+        for (int i = y; i < dy; i++) {
+            list.addAll(Arrays.asList(grid[i]).subList(x, dx));
         }
 
         return symbols.containsAll(list)

@@ -5,28 +5,32 @@ import fr.polytech.constraints.AbstractConstraint;
 import java.util.List;
 
 public class Grid {
-    private int[][] grid;
+    private char[][] grid;
     private List<AbstractConstraint> constraints;
 
-    public Grid(int[][] grid, List<AbstractConstraint> constraints) {
+    public Grid(char[][] grid, List<AbstractConstraint> constraints) {
         this.grid = grid;
         this.constraints = constraints;
     }
 
-    public int[][] getGrid() {
+    public char[][] getGrid() {
         return this.grid;
     }
 
-    public void setGrid(int[][] grid) {
+    public void setGrid(char[][] grid) {
         this.grid = grid;
     }
 
     public void display() {
-        for (int[] lines : this.grid) {
-            for (int n : lines) {
-                System.out.print(n + " ");
+        for (char[] lines : this.grid) {
+            for (char cell: lines) {
+                System.out.print(cell + " ");
             }
             System.out.println();
         }
+    }
+
+    public boolean areConstraintsSatisfied() {
+        return this.constraints.stream().allMatch(c -> c.isSatisfied(this.grid));
     }
 }

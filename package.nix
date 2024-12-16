@@ -3,6 +3,7 @@
   stdenv,
   jdk23,
   gradle,
+  makeWrapper,
 }: let
   jdk = jdk23;
   self = stdenv.mkDerivation (finalAttrs: {
@@ -14,6 +15,7 @@
     nativeBuildInputs = [
       (gradle.override {java = jdk;})
       jdk
+      makeWrapper
     ];
 
     mitmCache = gradle.fetchDeps {
@@ -22,10 +24,6 @@
     };
 
     gradleFlags = ["-Dfile.encoding=utf-8"];
-
-    # defaults to "assemble"
-    # gradleBuildTask = "shadowJar";
-    gradleBuildTask = "assemble";
 
     doCheck = true;
 

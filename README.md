@@ -31,7 +31,87 @@ flowchart LR
 
 <!-- BEGIN_CLASS -->
 ```mermaid
+classDiagram
+class NotEmptyConstraint { 
++ boolean isSatisfied(Character[][])
++ Optional~List~Character~~ tryDeduce(Character[][],Vec2i)
+}
 
+class BlockConstraint { 
++ BlockConstraint BlockConstraint(Set~Character~,int,int,int,int)
++ boolean isSatisfied(Character[][])
++ Optional~List~Character~~ tryDeduce(Character[][],Vec2i)
+}
+
+class LineConstraint { 
++ LineConstraint LineConstraint(Set~Character~)
++ boolean isSatisfied(Character[][])
++ Optional~List~Character~~ tryDeduce(Character[][],Vec2i)
+}
+
+class AbstractConstraint { 
+<<interface>>
+}
+
+class SudokuSolver { 
++ Optional~Grid~ solve(Grid,Set~Character~,boolean)$
+}
+
+class Grid { 
++ Grid Grid(Character[][],List~AbstractConstraint~)
++ void display()
++ boolean areConstraintsSatisfied()
++ Character[][] getGrid()
++ boolean tryPlace(Vec2i,char)
++ List~AbstractConstraint~ getConstraints()
+}
+
+class SymbolSets { 
++ Set~Character~ DIGITS$
+}
+
+class Vec2i { 
++ Vec2i Vec2i(int,int)
++ int getX()
++ int getY()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+
+class ColumnConstraint { 
++ ColumnConstraint ColumnConstraint(Set~Character~)
++ boolean isSatisfied(Character[][])
++ Optional~List~Character~~ tryDeduce(Character[][],Vec2i)
+}
+
+class ConstraintsTests { 
++ void testBlockConstraint()
++ void testBlockConstraintEmpty()
++ void testBlockConstraintFail()
++ void testColumnConstraint()
++ void testColumnConstraintEmpty()
++ void testColumnConstraintFail()
++ void testLineConstraint()
++ void testLineConstraintEmpty()
++ void testLineConstraintFail()
+}
+
+class Main { 
++ void main(String[])$
+}
+
+AbstractConstraint <|.. NotEmptyConstraint
+Vec2i .. NotEmptyConstraint
+AbstractConstraint <|.. BlockConstraint
+Vec2i .. BlockConstraint
+AbstractConstraint <|.. LineConstraint
+Vec2i .. LineConstraint
+Grid .. SudokuSolver
+Vec2i .. Grid
+AbstractConstraint .. Grid
+AbstractConstraint <|.. ColumnConstraint
+Vec2i .. ColumnConstraint
 ```
 <!-- END_CLASS -->
 

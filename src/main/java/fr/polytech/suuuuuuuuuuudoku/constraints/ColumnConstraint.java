@@ -27,6 +27,7 @@ public class ColumnConstraint implements AbstractConstraint {
             Character[] column = Arrays.stream(grid)
                     .parallel()
                     .map(line -> line[finalI])
+                    .filter(c -> c != ' ')
                     .toArray(Character[]::new);
 
             if (!symbols.containsAll(Arrays.asList(column))

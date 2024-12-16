@@ -53,6 +53,7 @@ public class BlockConstraint implements AbstractConstraint {
         for (int i = y; i < dy; i++) {
             list.addAll(Arrays.asList(grid[i]).subList(x, dx));
         }
+        list = list.stream().filter(c -> c != ' ').toList();
 
         // Check if the block contains all the symbols and has no duplicates
         return symbols.containsAll(list)

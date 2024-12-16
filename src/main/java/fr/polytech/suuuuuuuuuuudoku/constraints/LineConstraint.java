@@ -15,8 +15,10 @@ public class LineConstraint implements AbstractConstraint {
         assert grid.length == symbols.size();
 
         return Arrays.stream(grid).allMatch(line -> {
-            return symbols.containsAll(Arrays.stream(line).toList())
-                    && Arrays.stream(line).distinct().count() == line.length;
+
+            var list = Arrays.stream(line).filter(c -> c != ' ').toList();
+            return symbols.containsAll(list)
+                    && list.stream().distinct().count() == line.length;
         });
     }
 }

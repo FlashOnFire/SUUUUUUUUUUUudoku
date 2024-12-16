@@ -40,11 +40,11 @@ public class ConstraintsTests {
     @Test
     public void testColumnConstraint() {
         var grid = new Grid(new Character[][]{
-                {'4', '2', '3'},
-                {'3', '1', '2'},
-                {'2', '1', '3'}
+                {'1', '2', '3'},
+                {'3', '3', '2'},
+                {'2', '1', '1'}
         }, List.of(
-                new ColumnConstraint(Set.of('1', '2', '3', '4'))
+                new ColumnConstraint(Set.of('1', '2', '3'))
         ));
         assertTrue(grid.areConstraintsSatisfied());
     }
@@ -64,11 +64,11 @@ public class ConstraintsTests {
     @Test
     public void testLineConstraint() {
         var grid = new Grid(new Character[][]{
-                {'4', '2', '3'},
+                {'1', '2', '3'},
                 {'3', '1', '2'},
                 {'2', '1', '3'}
         }, List.of(
-                new LineConstraint(Set.of('1', '2', '3', '4'))
+                new LineConstraint(Set.of('1', '2', '3'))
         ));
         assertTrue(grid.areConstraintsSatisfied());
     }

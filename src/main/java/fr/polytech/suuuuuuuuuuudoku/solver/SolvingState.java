@@ -4,5 +4,4 @@ public enum SolvingState {
     SOLVED,
     PARTIALLY_SOLVED,
     UNSOLVABLE,
-    CONTINUE
 }

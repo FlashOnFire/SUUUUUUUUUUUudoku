@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Represents a Sudoku grid with constraints.
  */
-public class Grid {
+public class Grid implements Cloneable {
     /**
      * The list of constraints applied to the Sudoku grid.
      */

@@ -13,7 +13,7 @@ public class NotEmptyConstraint implements AbstractConstraint {
     }
 
     @Override
-    public Optional<List<Character>> tryDeduce(Character[][] grid, Vec2i pos) {
+    public Optional<List<Character>> getPossibilities(Character[][] grid, Vec2i pos) {
         return Optional.empty();
     }
 }

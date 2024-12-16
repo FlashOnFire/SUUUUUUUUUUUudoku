@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface AbstractConstraint {
     boolean isSatisfied(Character[][] grid);
-    Optional<List<Character>> tryDeduce(Character[][] grid, Vec2i pos);
+    Optional<List<Character>> getPossibilities(Character[][] grid, Vec2i pos);
 }

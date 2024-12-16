@@ -27,7 +27,7 @@ public class LineConstraint implements AbstractConstraint {
     }
 
     @Override
-    public Optional<List<Character>> tryDeduce(Character[][] grid, Vec2i pos) {
+    public Optional<List<Character>> getPossibilities(Character[][] grid, Vec2i pos) {
         assert pos.getY() < grid.length;
         assert pos.getX() < grid[0].length;
         assert grid[pos.getX()][pos.getY()] != ' ';

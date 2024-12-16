@@ -46,7 +46,7 @@ public class ColumnConstraint implements AbstractConstraint {
     }
 
     @Override
-    public Optional<List<Character>> tryDeduce(Character[][] grid, Vec2i pos) {
+    public Optional<List<Character>> getPossibilities(Character[][] grid, Vec2i pos) {
         assert pos.getX() < grid[0].length;
         assert pos.getY() < grid.length;
         assert grid[pos.getY()][pos.getX()] != ' ';

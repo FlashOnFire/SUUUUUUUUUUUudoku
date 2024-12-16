@@ -26,6 +26,18 @@ public class ConstraintsTests {
     }
 
     @Test
+    public void testBlockConstraintEmpty() {
+        var grid = new Grid(new Character[][]{
+                {' ', ' ', ' '},
+                {' ', ' ', ' '},
+                {' ', ' ', ' '}
+        }, List.of(
+                new BlockConstraint(Set.of('1', '2', '3', '4'), 0, 0, 2, 2)
+        ));
+        assertTrue(grid.areConstraintsSatisfied());
+    }
+
+    @Test
     public void testBlockConstraintFail() {
         var grid = new Grid(new Character[][]{
                 {'4', '2', '3'},
@@ -50,6 +62,18 @@ public class ConstraintsTests {
     }
 
     @Test
+    public void testColumnConstraintEmpty() {
+        var grid = new Grid(new Character[][]{
+                {' ', ' ', ' '},
+                {' ', ' ', ' '},
+                {' ', ' ', ' '}
+        }, List.of(
+                new ColumnConstraint(Set.of('1', '2', '3'))
+        ));
+        assertTrue(grid.areConstraintsSatisfied());
+    }
+
+    @Test
     public void testColumnConstraintFail() {
         var grid = new Grid(new Character[][]{
                 {'4', '2', '3'},
@@ -67,6 +91,18 @@ public class ConstraintsTests {
                 {'1', '2', '3'},
                 {'3', '1', '2'},
                 {'2', '1', '3'}
+        }, List.of(
+                new LineConstraint(Set.of('1', '2', '3'))
+        ));
+        assertTrue(grid.areConstraintsSatisfied());
+    }
+
+    @Test
+    public void testLineConstraintEmpty() {
+        var grid = new Grid(new Character[][]{
+                {' ', ' ', ' '},
+                {' ', ' ', ' '},
+                {' ', ' ', ' '}
         }, List.of(
                 new LineConstraint(Set.of('1', '2', '3'))
         ));

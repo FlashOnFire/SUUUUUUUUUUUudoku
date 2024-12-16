@@ -12,14 +12,13 @@ import java.util.List;
  */
 public class Grid {
     /**
+     * The list of constraints applied to the Sudoku grid.
+     */
+    private final List<AbstractConstraint> constraints;
+    /**
      * The Sudoku grid represented as a 2D array of Characters.
      */
     private Character[][] grid;
-
-    /**
-     * The list of constraints applied to the Sudoku grid.
-     */
-    private List<AbstractConstraint> constraints;
 
     /**
      * Constructs a Grid with the specified grid and constraints.

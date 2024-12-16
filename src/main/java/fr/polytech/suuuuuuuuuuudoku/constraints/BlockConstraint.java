@@ -57,17 +57,18 @@ public class BlockConstraint implements AbstractConstraint {
 
     @Override
     public Optional<List<Character>> tryDeduce(Character[][] grid, Vec2i pos) {
-        assert pos.x() < grid[0].length;
-        assert pos.y() < grid.length;
-        assert grid[pos.y()][pos.x()] != ' ';
+        assert pos.getX() < grid[0].length;
+        assert pos.getX() < grid.length;
+        assert grid[pos.getX()][pos.getX()] != ' ';
 
         // Check if the position is within the block
-        if (pos.x() < x || pos.x() >= dx || pos.y() < y || pos.y() >= dy) {
+        if (pos.getX() < x || pos.getX() >= dx || pos.getX() < y || pos.getX() >= dy) {
             return Optional.empty();
         }
 
         // Extract the block from the grid
-        List<Character> list = extractBlock(grid);;
+        List<Character> list = extractBlock(grid);
+        ;
 
         // Return the symbols that are not present in the block
         var possibilities = symbols.stream().filter(c -> !list.contains(c)).toList();

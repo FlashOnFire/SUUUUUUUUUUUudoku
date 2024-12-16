@@ -1,13 +1,9 @@
 package fr.polytech.suuuuuuuuuuudoku.graphics;
-import fr.polytech.suuuuuuuuuuudoku.Grid;
-
-import javax.swing.*;
-import java.awt.*;
-
 
 import fr.polytech.suuuuuuuuuuudoku.Grid;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.util.Arrays;
 
@@ -15,6 +11,7 @@ public class SudokuFrame extends JFrame {
     public SudokuFrame(Grid grid) {
         setTitle("Sudoku");
         setSize(1000, 1000);
+        setLayout(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         var value = grid.getGrid();
 
@@ -29,18 +26,22 @@ public class SudokuFrame extends JFrame {
         }
 
         JTable table = new JTable(data, columnNames);
-        table.setRowHeight(50);
+        table.getTableHeader().setUI(null);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        table.setBounds(50, 50, 900, 900);
+        table.setRowHeight(900/9);
+        DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer();
+        cellRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         for (int i = 0; i < value.length; i++) {
-            table.getColumnModel().getColumn(i).setPreferredWidth(50);
+            table.getColumnModel().getColumn(i).setWidth(900/9);
+            table.getColumnModel().getColumn(i).setCellRenderer(cellRenderer);
         }
-        table.setFont(new Font("Arial", Font.PLAIN, 20));
+        table.setFont(new Font("Arial", Font.PLAIN, 50));
 //        table.setDefaultEditor(Object.class, null); // Make cells non-editable
         table.setCellSelectionEnabled(true);
         table.setGridColor(Color.BLACK);
         table.setShowGrid(true);
-        table.setFillsViewportHeight(true);
 
-        JScrollPane scrollPane = new JScrollPane(table);
-        add(scrollPane, BorderLayout.CENTER);
+        add(table, BorderLayout.CENTER);
     }
 }

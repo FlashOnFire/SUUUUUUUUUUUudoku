@@ -61,9 +61,7 @@ class Grid {
 + Grid Grid(Character[][],List~AbstractConstraint~)
 + void display()
 + boolean areConstraintsSatisfied()
-+ Character[][] getGrid()
 + boolean tryPlace(Vec2i,char)
-+ List~AbstractConstraint~ getConstraints()
 }
 
 class SymbolSets { 
@@ -72,8 +70,6 @@ class SymbolSets {
 
 class Vec2i { 
 + Vec2i Vec2i(int,int)
-+ int getX()
-+ int getY()
 + boolean equals(Object)
 + int hashCode()
 + String toString()

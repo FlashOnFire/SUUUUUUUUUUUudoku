@@ -13,8 +13,6 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-
-        /*
         var grid = new Grid(new Character[][]{
                 {'5', ' ', ' ', '9', '2', ' ', ' ', '7', ' '},
                 {' ', ' ', ' ', ' ', ' ', '1', ' ', ' ', ' '},
@@ -42,29 +40,12 @@ public class Main {
                 new BlockConstraint(SymbolSets.DIGITS, 6, 6, 9, 9)
         ));
 
-        grid.display();
-        System.out.println(SudokuSolver.solve(grid, SymbolSets.DIGITS, true));
-
-        grid.display();
-        System.out.println(Arrays.deepEquals(grid.getGrid(), res));
-
-         */
-
-        Character[][] grid = {
-                {' ', '9', ' ', ' ', ' ', '2', ' ', '1', ' '},
-                {'2', ' ', '8', ' ', '4', ' ', '9', '3', ' '},
-                {'7', ' ', '3', '1', ' ', '6', '8', ' ', ' '},
-                {' ', ' ', ' ', '3', ' ', ' ', '1', '4', '5'},
-                {'1', '8', '5', ' ', '2', '9', '6', ' ', ' '},
-                {' ', '7', '4', ' ', ' ', '1', '2', ' ', '8'},
-                {' ', ' ', ' ', '2', ' ', ' ', ' ', '8', ' '},
-                {'5', ' ', ' ', '9', ' ', ' ', '7', '6', '2'},
-                {'8', ' ', ' ', '6', ' ', '3', ' ', ' ', ' '}
-        };
-
         SwingUtilities.invokeLater(() -> {
             SudokuFrame frame = new SudokuFrame(grid);
             frame.setVisible(true);
         });
+
+        System.out.println(SudokuSolver.solve(grid, SymbolSets.DIGITS, true));
+        grid.display();
     }
 }

@@ -28,11 +28,11 @@ public class LineConstraint implements AbstractConstraint {
 
     @Override
     public Optional<List<Character>> tryDeduce(Character[][] grid, Vec2i pos) {
-        assert pos.y() < grid.length;
-        assert pos.x() < grid[0].length;
-        assert grid[pos.x()][pos.y()] != ' ';
+        assert pos.getY() < grid.length;
+        assert pos.getX() < grid[0].length;
+        assert grid[pos.getX()][pos.getY()] != ' ';
 
-        var row = Arrays.stream(grid[pos.y()]).filter(c -> c != ' ').toList();
+        var row = Arrays.stream(grid[pos.getY()]).filter(c -> c != ' ').toList();
         var list = symbols.stream().filter(c -> !row.contains(c)).toList();
 
         return list.isEmpty() ? Optional.empty() : Optional.of(list);

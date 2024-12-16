@@ -38,11 +38,11 @@ public class Grid {
     }
 
     public boolean tryPlace(Vec2i pos, char value) {
-        var oldValue = this.grid[pos.y()][pos.x()];
-        this.grid[pos.y()][pos.x()] = value;
+        var oldValue = this.grid[pos.getY()][pos.getX()];
+        this.grid[pos.getY()][pos.getX()] = value;
         if (!this.areConstraintsSatisfied()) {
             //revert
-            this.grid[pos.y()][pos.x()] = oldValue;
+            this.grid[pos.getY()][pos.getX()] = oldValue;
 
             System.out.println("Invalid placement (" + value + ") at " + pos + ", reverting");
             return false;

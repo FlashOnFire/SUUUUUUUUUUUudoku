@@ -47,13 +47,13 @@ public class ColumnConstraint implements AbstractConstraint {
 
     @Override
     public Optional<List<Character>> tryDeduce(Character[][] grid, Vec2i pos) {
-        assert pos.x() < grid[0].length;
-        assert pos.y() < grid.length;
-        assert grid[pos.y()][pos.x()] != ' ';
+        assert pos.getX() < grid[0].length;
+        assert pos.getY() < grid.length;
+        assert grid[pos.getY()][pos.getX()] != ' ';
 
         var column = Arrays.stream(grid)
                 .parallel()
-                .map(line -> line[pos.x()])
+                .map(line -> line[pos.getX()])
                 .filter(c -> c != ' ')
                 .toList();
 

@@ -37,16 +37,19 @@ class AbstractConstraint {
 }
 
 class Grid { 
-+ Grid Grid(char[][],List~AbstractConstraint~)
-+ char[][] getGrid()
-+ void setGrid(char[][])
++ Grid Grid(Character[][],List~AbstractConstraint~)
 + void display()
 + boolean areConstraintsSatisfied()
 }
 
 class ColumnConstraint { 
 + ColumnConstraint ColumnConstraint(Set~Character~)
-+ boolean isSatisfied(char[][])
++ boolean isSatisfied(Character[][])
+}
+
+class BlockConstraint { 
++ BlockConstraint BlockConstraint(Set~Character~,int,int,int,int)
++ boolean isSatisfied(Character[][])
 }
 
 class SymbolSets { 
@@ -55,11 +58,11 @@ class SymbolSets {
 
 class LineConstraint { 
 + LineConstraint LineConstraint(Set~Character~)
-+ boolean isSatisfied(char[][])
++ boolean isSatisfied(Character[][])
 }
 
 class NotEmptyConstraint { 
-+ boolean isSatisfied(char[][])
++ boolean isSatisfied(Character[][])
 }
 
 class Main { 
@@ -67,6 +70,7 @@ class Main {
 }
 
 AbstractConstraint <|.. ColumnConstraint
+AbstractConstraint <|.. BlockConstraint
 AbstractConstraint <|.. LineConstraint
 AbstractConstraint <|.. NotEmptyConstraint
 ```

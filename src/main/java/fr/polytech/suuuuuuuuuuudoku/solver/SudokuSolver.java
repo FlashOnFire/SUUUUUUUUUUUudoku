@@ -83,7 +83,6 @@ public class SudokuSolver {
             var emptyCells = grid.getEmptyCells();
 
             if (emptyCells.isEmpty()) {
-                finished = true;
                 break;
             }
 

@@ -140,11 +140,18 @@ public class Grid {
      *
      * @return a new Grid object that is a clone of this grid
      */
+    @Override
     public Grid clone() {
-        var newGrid = new Character[this.grid.length][this.grid[0].length];
-        for (int y = 0; y < this.grid.length; y++) {
-            newGrid[y] = Arrays.copyOf(this.grid[y], this.grid[y].length);
+        try {
+            Grid cloned = (Grid) super.clone();
+            var newGrid = new Character[this.grid.length][this.grid[0].length];
+            for (int y = 0; y < this.grid.length; y++) {
+                newGrid[y] = Arrays.copyOf(this.grid[y], this.grid[y].length);
+            }
+            cloned.grid = newGrid;
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
         }
-        return new Grid(newGrid, this.constraints);
     }
 }

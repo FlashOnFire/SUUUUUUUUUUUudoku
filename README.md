@@ -34,19 +34,19 @@ flowchart LR
 classDiagram
 class NotEmptyConstraint { 
 + boolean isSatisfied(Character[][])
-+ Optional~List~Character~~ tryDeduce(Character[][],Vec2i)
+}
+
+class GraphicsSwing { 
 }
 
 class BlockConstraint { 
 + BlockConstraint BlockConstraint(Set~Character~,int,int,int,int)
 + boolean isSatisfied(Character[][])
-+ Optional~List~Character~~ tryDeduce(Character[][],Vec2i)
 }
 
 class LineConstraint { 
 + LineConstraint LineConstraint(Set~Character~)
 + boolean isSatisfied(Character[][])
-+ Optional~List~Character~~ tryDeduce(Character[][],Vec2i)
 }
 
 class AbstractConstraint { 
@@ -54,7 +54,7 @@ class AbstractConstraint {
 }
 
 class SudokuSolver { 
-+ Optional~Grid~ solve(Grid,Set~Character~,boolean)$
++ SolvingState solve(Grid,Set~Character~,boolean)$
 }
 
 class Grid { 
@@ -62,6 +62,8 @@ class Grid {
 + void display()
 + boolean areConstraintsSatisfied()
 + boolean tryPlace(Vec2i,char)
++ boolean isSolved()
++ Grid clone()
 }
 
 class SymbolSets { 
@@ -78,7 +80,14 @@ class Vec2i {
 class ColumnConstraint { 
 + ColumnConstraint ColumnConstraint(Set~Character~)
 + boolean isSatisfied(Character[][])
-+ Optional~List~Character~~ tryDeduce(Character[][],Vec2i)
+}
+
+class SolvingState { 
+<<enum>>
++ SOLVED$
++ PARTIALLY_SOLVED$
++ UNSOLVABLE$
++ CONTINUE$
 }
 
 class Main { 
@@ -91,9 +100,11 @@ AbstractConstraint <|.. BlockConstraint
 Vec2i .. BlockConstraint
 AbstractConstraint <|.. LineConstraint
 Vec2i .. LineConstraint
+SolvingState .. SudokuSolver
 Grid .. SudokuSolver
 Vec2i .. Grid
 AbstractConstraint .. Grid
+Grid .. Grid
 AbstractConstraint <|.. ColumnConstraint
 Vec2i .. ColumnConstraint
 ```

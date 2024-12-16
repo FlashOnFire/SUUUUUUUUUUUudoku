@@ -4,14 +4,14 @@ import fr.polytech.suuuuuuuuuuudoku.Grid;
 import fr.polytech.suuuuuuuuuuudoku.constraints.AbstractConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.LineConstraint;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public class SudokuSolver {
-    public static Grid solve(Grid grid, Set<Character> symbols, boolean backtracking) {
+    public static Optional<Grid> solve(Grid grid, Set<Character> symbols, boolean backtracking) {
         var constraints = grid.getConstraints();
-
-        System.out.println(new LineConstraint(symbols).tryDeduce(grid.getGrid(), new Vec2i(0, 2)));
-
 
         boolean finished = false;
         while (!finished) {
@@ -23,16 +23,19 @@ public class SudokuSolver {
             }
 
             finished = true;
-            for (var cell: emptyCells) {
-                var opt = solveDeduction(grid, symbols, cell, constraints);
-                if (opt.isPresent()) {
-                    grid.tryPlace(cell, opt.get());
+            for (var cell : emptyCells) {
+                var list = solveDeduction(grid, symbols, cell, constraints);
+                if (list.isEmpty()) {
+                    System.out.println("Unsolvable grid");
+                    return Optional.empty();
+                } else if (list.size() == 1) {
+                    grid.tryPlace(cell, list.getFirst());
                     finished = false;
                 }
             }
         }
 
-        return grid;
+        return Optional.of(grid);
     }
 
     private static ArrayList<Vec2i> getEmptyCells(Character[][] grid) {
@@ -49,16 +52,12 @@ public class SudokuSolver {
         return list;
     }
 
-    private static Optional<Character> solveDeduction(Grid grid, Set<Character> symbols, Vec2i pos, List<AbstractConstraint> constraints) {
+    private static List<Character> solveDeduction(Grid grid, Set<Character> symbols, Vec2i pos, List<AbstractConstraint> constraints) {
         var values = new ArrayList<>(symbols);
         for (AbstractConstraint constraint : constraints) {
             constraint.tryDeduce(grid.getGrid(), pos).ifPresent(values::retainAll);
         }
 
-        if (values.size() == 1) {
-            return Optional.of(values.getFirst());
-        }
-
-        return Optional.empty();
+        return values;
     }
 }

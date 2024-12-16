@@ -1,5 +1,7 @@
 package fr.polytech.suuuuuuuuuuudoku.solver;
 
+import java.util.Objects;
+
 public class Vec2i {
     private final int x;
     private final int y;

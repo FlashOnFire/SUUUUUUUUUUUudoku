@@ -39,32 +39,24 @@ public class SudokuFrame extends JFrame {
 //        table.setDefaultEditor(Object.class, null); // Make cells non-editable
         table.setCellSelectionEnabled(true);
         table.setGridColor(Color.BLACK);
-        var constraints = grid.getConstraints();
 
-        for (int i = 0; i < value.length; i++) {
-            table.getColumnModel().getColumn(i).setCellRenderer(new DefaultTableCellRenderer() {
-                @Override
-                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                    Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                    setHorizontalAlignment(SwingConstants.CENTER);
-                    var constr = grid.getConstraints();
-                    for (var constraint : constraints) {
-                        if (constraint instanceof BlockConstraint blockConstraint) {
-                            for (int i = blockConstraint.getX(); i < blockConstraint.getDx(); i++) {
-                                for (int j = blockConstraint.getY(); j < blockConstraint.getDy(); j++) {
-                                    if (i == row && j == column) {
-                                        c.setBackground(new Color(constraints.indexOf(constraint) * 1234567 % 0xFFFFFF));
-                                        return c;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    return c;
-                }
-            });
+for (int i = 0; i < value.length; i++) {
+    table.getColumnModel().getColumn(i).setCellRenderer(new DefaultTableCellRenderer() {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            setHorizontalAlignment(SwingConstants.CENTER);
+            var constraints = grid.getConstraints();
+            constraints.stream()
+                .filter(constraint -> constraint instanceof BlockConstraint)
+                .map(constraint -> (BlockConstraint) constraint)
+                .filter(blockConstraint -> row >= blockConstraint.getX() && row < blockConstraint.getDx() && column >= blockConstraint.getY() && column < blockConstraint.getDy())
+                .findFirst()
+                .ifPresent(blockConstraint -> c.setBackground(new Color(constraints.indexOf(blockConstraint) * 1234567 % 0xFFFFFF)));
+            return c;
         }
+    });
+}
         table.setShowGrid(true);
 
         add(table, BorderLayout.CENTER);

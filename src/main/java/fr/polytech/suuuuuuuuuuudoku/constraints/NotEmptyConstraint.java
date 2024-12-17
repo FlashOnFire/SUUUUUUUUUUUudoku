@@ -19,7 +19,7 @@ public class NotEmptyConstraint implements AbstractConstraint {
      */
     @Override
     public boolean isSatisfied(String[][] grid) {
-        return Arrays.stream(grid).allMatch(line -> Arrays.stream(line).noneMatch(cell -> cell == " "));
+        return Arrays.stream(grid).allMatch(line -> Arrays.stream(line).noneMatch(cell -> cell.equals(" ")));
     }
 
     /**

@@ -45,7 +45,7 @@ public class ColumnConstraint implements AbstractConstraint {
             String[] column = Arrays.stream(grid)
                     .parallel()
                     .map(line -> line[finalI])
-                    .filter(c -> c != " ")
+                    .filter(c -> !c.equals(" "))
                     .toArray(String[]::new);
 
             if (!symbols.containsAll(Arrays.asList(column))

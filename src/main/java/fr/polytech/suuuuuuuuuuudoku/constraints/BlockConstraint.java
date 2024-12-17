@@ -68,7 +68,7 @@ public class BlockConstraint implements AbstractConstraint {
     public Optional<Set<String>> getPossibilities(String[][] grid, Vec2i pos) {
         assert pos.getX() < grid[0].length;
         assert pos.getY() < grid.length;
-        assert grid[pos.getY()][pos.getX()] == " ";
+        assert grid[pos.getY()][pos.getX()].equals(" ");
 
         // Check if the position is within the block
         if (pos.getX() < x || pos.getX() >= dx || pos.getY() < y || pos.getY() >= dy) {
@@ -94,7 +94,7 @@ public class BlockConstraint implements AbstractConstraint {
         for (int i = y; i < dy; i++) {
             list.addAll(Arrays.asList(grid[i]).subList(x, dx));
         }
-        list = list.stream().filter(c -> c != " ").toList();
+        list = list.stream().filter(c -> !c.equals(" ")).toList();
 
         return list;
     }

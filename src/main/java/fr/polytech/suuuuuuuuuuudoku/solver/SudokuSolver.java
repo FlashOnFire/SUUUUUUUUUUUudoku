@@ -58,8 +58,8 @@ public class SudokuSolver {
     /**
      * Performs backtracking to solve the Sudoku grid.
      *
-     * @param grid        the Sudoku grid to solve
-     * @param symbols     the set of symbols used in the Sudoku grid
+     * @param grid    the Sudoku grid to solve
+     * @param symbols the set of symbols used in the Sudoku grid
      * @return the solving state of the Sudoku grid
      */
     private static List<Grid> doBacktracking(Grid grid, Set<String> symbols) {
@@ -71,10 +71,8 @@ public class SudokuSolver {
             return lst;
         }
 
-        HashMap<Vec2i, List<String>> emptyCellMap = new HashMap<>();
-        for (Vec2i vec2i : emptyCells) {
-            emptyCellMap.put(vec2i, tryDeduce(grid, symbols, vec2i));
-        }
+        HashMap<Vec2i, Set<String>> emptyCellMap = new HashMap<>();
+        emptyCells.stream().parallel().forEach(cell -> emptyCellMap.put(cell, tryDeduce(grid, symbols, cell)));
 
         var cell = emptyCellMap.entrySet().stream()
                 .min(Comparator.comparingInt(e -> e.getValue().size()))
@@ -108,11 +106,11 @@ public class SudokuSolver {
             while (!emptyCellsQueue.isEmpty()) {
                 var cell = emptyCellsQueue.pop();
 
-                var list = tryDeduce(grid, symbols, cell);
-                if (list.isEmpty()) {
+                var set = tryDeduce(grid, symbols, cell);
+                if (set.isEmpty()) {
                     return SolvingState.UNSOLVABLE;
-                } else if (list.size() == 1) {
-                    grid.placeUnchecked(cell, list.getFirst());
+                } else if (set.size() == 1) {
+                    grid.placeUnchecked(cell, set.stream().findFirst().orElseThrow());
                     emptyCells.remove(cell);
                     finished = false;
                 }
@@ -125,18 +123,22 @@ public class SudokuSolver {
     /**
      * Tries to deduce the possible values for a cell in the Sudoku grid.
      *
-     * @param grid        the Sudoku grid
-     * @param symbols     the set of symbols used in the Sudoku grid
-     * @param pos         the position of the cell
-     * @return the list of possible values for the cell
+     * @param grid    the Sudoku grid
+     * @param symbols the set of symbols used in the Sudoku grid
+     * @param pos     the position of the cell
+     * @return the set of possible values for the cell
      */
-    private static List<String> tryDeduce(Grid grid, Set<String> symbols, Vec2i pos) {
-        var values = new ArrayList<>(symbols);
-        for (AbstractConstraint constraint : grid.getConstraints()) {
-            constraint.getPossibilities(grid.getGrid(), pos).ifPresent(values::retainAll);
-        }
-
-        return values;
+    private static Set<String> tryDeduce(Grid grid, Set<String> symbols, Vec2i pos) {
+        return grid.getConstraints()
+                .stream()
+                .parallel()
+                .map(constraint -> constraint.getPossibilities(grid.getGrid(), pos))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .reduce((acc, set) -> {
+                    acc.retainAll(set);
+                    return acc;
+                }).orElse(new HashSet<>(symbols));
     }
 
 

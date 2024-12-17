@@ -2,7 +2,11 @@ package fr.polytech.suuuuuuuuuuudoku.constraints;
 
 import fr.polytech.suuuuuuuuuuudoku.solver.Vec2i;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Represents a constraint that ensures each column in the grid satisfies the given symbols.
@@ -64,7 +68,7 @@ public class ColumnConstraint implements AbstractConstraint {
      * @return an Optional containing a list of possible symbols, or an empty Optional if no symbols are possible
      */
     @Override
-    public Optional<List<String>> getPossibilities(String[][] grid, Vec2i pos) {
+    public Optional<Set<String>> getPossibilities(String[][] grid, Vec2i pos) {
         assert pos.getX() < grid[0].length;
         assert pos.getY() < grid.length;
         assert Objects.equals(grid[pos.getY()][pos.getX()], " ");
@@ -75,7 +79,7 @@ public class ColumnConstraint implements AbstractConstraint {
                 .filter(c -> !Objects.equals(c, " "))
                 .toList();
 
-        var list = symbols.stream().filter(c -> !column.contains(c)).toList();
+        var list = symbols.stream().filter(c -> !column.contains(c)).collect(Collectors.toSet());
 
         return list.isEmpty() ? Optional.empty() : Optional.of(list);
     }

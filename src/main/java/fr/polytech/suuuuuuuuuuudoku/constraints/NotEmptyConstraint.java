@@ -3,8 +3,8 @@ package fr.polytech.suuuuuuuuuuudoku.constraints;
 import fr.polytech.suuuuuuuuuuudoku.solver.Vec2i;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * This class represents a constraint that ensures no cell in the grid is empty.
@@ -30,7 +30,7 @@ public class NotEmptyConstraint implements AbstractConstraint {
      * @return an empty Optional as this constraint does not provide possibilities
      */
     @Override
-    public Optional<List<String>> getPossibilities(String[][] grid, Vec2i pos) {
+    public Optional<Set<String>> getPossibilities(String[][] grid, Vec2i pos) {
         return Optional.empty();
     }
 }

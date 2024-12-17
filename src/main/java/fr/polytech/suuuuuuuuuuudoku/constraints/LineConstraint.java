@@ -3,9 +3,9 @@ package fr.polytech.suuuuuuuuuuudoku.constraints;
 import fr.polytech.suuuuuuuuuuudoku.solver.Vec2i;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Represents a constraint that ensures each line in the grid satisfies certain conditions.
@@ -48,13 +48,13 @@ public class LineConstraint implements AbstractConstraint {
      * @return an Optional containing a list of possible symbols, or an empty Optional if no symbols are possible
      */
     @Override
-    public Optional<List<String>> getPossibilities(String[][] grid, Vec2i pos) {
+    public Optional<Set<String>> getPossibilities(String[][] grid, Vec2i pos) {
         assert pos.getY() < grid.length;
         assert pos.getX() < grid[0].length;
-        assert grid[pos.getY()][pos.getX()] == " ";
+        assert grid[pos.getY()][pos.getX()].equals(" ");
 
-        var row = Arrays.stream(grid[pos.getY()]).filter(c -> c != " ").toList();
-        var list = symbols.stream().filter(c -> !row.contains(c)).toList();
+        var row = Arrays.stream(grid[pos.getY()]).filter(c -> !c.equals(" ")).toList();
+        var list = symbols.stream().filter(c -> !row.contains(c)).collect(Collectors.toSet());
 
         return list.isEmpty() ? Optional.empty() : Optional.of(list);
     }

@@ -2,8 +2,8 @@ package fr.polytech.suuuuuuuuuuudoku.constraints;
 
 import fr.polytech.suuuuuuuuuuudoku.solver.Vec2i;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Interface representing a constraint in the Sudoku solver.
@@ -25,5 +25,5 @@ public interface AbstractConstraint {
      * @param pos  the position in the grid
      * @return an Optional containing a list of possible values, or an empty Optional if no possibilities
      */
-    Optional<List<String>> getPossibilities(String[][] grid, Vec2i pos);
+    Optional<Set<String>> getPossibilities(String[][] grid, Vec2i pos);
 }

@@ -3,6 +3,7 @@ package fr.polytech.suuuuuuuuuuudoku.constraints;
 import fr.polytech.suuuuuuuuuuudoku.solver.Vec2i;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Represents a constraint that checks for the presence of specific symbols within a defined block in a grid.
@@ -64,7 +65,7 @@ public class BlockConstraint implements AbstractConstraint {
      * @throws AssertionError if the position is out of the grid bounds or the grid cell is empty
      */
     @Override
-    public Optional<List<String>> getPossibilities(String[][] grid, Vec2i pos) {
+    public Optional<Set<String>> getPossibilities(String[][] grid, Vec2i pos) {
         assert pos.getX() < grid[0].length;
         assert pos.getY() < grid.length;
         assert grid[pos.getY()][pos.getX()] == " ";
@@ -78,7 +79,7 @@ public class BlockConstraint implements AbstractConstraint {
         List<String> list = extractBlock(grid);
 
         // Return the symbols that are not present in the block
-        var possibilities = symbols.stream().filter(c -> !list.contains(c)).toList();
+        var possibilities = symbols.stream().filter(c -> !list.contains(c)).collect(Collectors.toSet());
         return possibilities.isEmpty() ? Optional.empty() : Optional.of(possibilities);
     }
 

@@ -42,27 +42,28 @@ public class SudokuFrame extends JFrame {
         var constraints = grid.getConstraints();
 
         for (int i = 0; i < value.length; i++) {
-        table.getColumnModel().getColumn(i).setCellRenderer(new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                var constr = grid.getConstraints();
-                for (var constraint : constraints) {
-                    if (constraint instanceof BlockConstraint blockConstraint) {
-                        for (int i = blockConstraint.getX(); i < blockConstraint.getDx(); i++) {
-                            for (int j = blockConstraint.getY(); j < blockConstraint.getDy(); j++) {
-                                if (i == row && j == column) {
-                                    c.setBackground(new Color(constraints.indexOf(constraint) * 1234567 % 0xFFFFFF));
-                                    return c;
+            table.getColumnModel().getColumn(i).setCellRenderer(new DefaultTableCellRenderer() {
+                @Override
+                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                    Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                    setHorizontalAlignment(SwingConstants.CENTER);
+                    var constr = grid.getConstraints();
+                    for (var constraint : constraints) {
+                        if (constraint instanceof BlockConstraint blockConstraint) {
+                            for (int i = blockConstraint.getX(); i < blockConstraint.getDx(); i++) {
+                                for (int j = blockConstraint.getY(); j < blockConstraint.getDy(); j++) {
+                                    if (i == row && j == column) {
+                                        c.setBackground(new Color(constraints.indexOf(constraint) * 1234567 % 0xFFFFFF));
+                                        return c;
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                return c;
-            }
-        });
+                    return c;
+                }
+            });
         }
         table.setShowGrid(true);
 

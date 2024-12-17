@@ -3,8 +3,8 @@ package fr.polytech.suuuuuuuuuuudoku;
 import fr.polytech.suuuuuuuuuuudoku.constraints.*;
 import fr.polytech.suuuuuuuuuuudoku.solver.Vec2i;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -60,8 +60,10 @@ public class Grid {
      */
     static public Grid fromCsv(String file, boolean classicConstraints, Set<String> symbols) throws FileNotFoundException {
         var csv = (new Scanner(new File(file))).useDelimiter("\\Z").next();
+
         String[] lines = csv.split("\n");
         String[][] grid = new String[lines.length][];
+
         for (int i = 0; i < lines.length; i++) {
             grid[i] = lines[i].split(",(?<!\\r)");
             grid[i] = Arrays.stream(grid[i])
@@ -69,21 +71,20 @@ public class Grid {
                     .toArray(String[]::new);
         }
 
-//        var symbols = SymbolSets.generateSymbols(grid.length);
+        List<AbstractConstraint> constraintList = new ArrayList<>();
         if (classicConstraints) {
-            List<AbstractConstraint> constraints = new ArrayList<>();
             var blockSize = (int) Math.sqrt(grid.length);
             for (int i = 0; i < grid.length; i += blockSize) {
                 for (int j = 0; j < grid.length; j += blockSize) {
-                    constraints.add(new BlockConstraint(symbols, i, j, i + blockSize, j + blockSize));
+                    constraintList.add(new BlockConstraint(symbols, i, j, i + blockSize, j + blockSize));
                 }
             }
-            constraints.add(new LineConstraint(symbols));
-            constraints.add(new ColumnConstraint(symbols));
-            constraints.add(new NotEmptyConstraint());
-            return new Grid(grid, constraints);
+            constraintList.add(new LineConstraint(symbols));
+            constraintList.add(new ColumnConstraint(symbols));
+            constraintList.add(new NotEmptyConstraint());
         }
-        return new Grid(grid, new ArrayList<>());
+
+        return new Grid(grid, constraintList);
     }
 
     /**
@@ -91,16 +92,17 @@ public class Grid {
      *
      * @param path the path to save the CSV file to
      */
-    public void toCsv(String path) {
-        try {
-            var file = new File(path);
-            var writer = new java.io.FileWriter(file);
-            writer.write(Arrays.stream(this.grid)
-                    .map(lines -> String.join(",", lines))
-                    .collect(Collectors.joining("\n")));
-            writer.close();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    public void toCsv(Path path) {
+        var csvData = Arrays.stream(this.grid)
+                .map(line -> Arrays.stream(line)
+                        .map(cell -> cell.equals(" ") ? "." : cell)
+                        .collect(Collectors.joining(",")))
+                .collect(Collectors.joining("\n"));
+
+        try (var writer = new BufferedWriter(new FileWriter(path.toFile()))) {
+            writer.write(csvData);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

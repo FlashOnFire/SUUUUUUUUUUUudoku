@@ -24,4 +24,16 @@ public class SymbolSets {
             "80", "81", "82", "83", "84", "85", "86", "87", "88", "89",
             "90", "91", "92", "93", "94", "95", "96", "97", "98", "99",
             "100");
+
+    /**
+     * Generates a set of symbols from 1 to the specified length.
+     *
+     * @param length the maximum number to include in the set
+     * @return a set of strings representing the numbers from 1 to the specified length
+     */
+    public static Set<String> generateSymbols(int length) {
+        return java.util.stream.IntStream.rangeClosed(1, length)
+                .mapToObj(String::valueOf)
+                .collect(java.util.stream.Collectors.toSet());
+    }
 }

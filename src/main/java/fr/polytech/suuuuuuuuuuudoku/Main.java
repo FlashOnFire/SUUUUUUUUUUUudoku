@@ -38,7 +38,7 @@ public class Main {
                 new BlockConstraint(SymbolSets.DIGITS, 6, 6, 9, 9),
 
                 new NotEmptyConstraint()
-        ));
+        ), SymbolSets.DIGITS);
 
         /*SwingUtilities.invokeLater(() ->
         {
@@ -47,7 +47,7 @@ public class Main {
         });*/
 
         var start = System.currentTimeMillis();
-        System.out.println(SudokuSolver.solve(grid, SymbolSets.DIGITS, true, true));
+        System.out.println(SudokuSolver.solve(grid, true, true));
         var end = System.currentTimeMillis();
 
         System.out.println("Time: " + (end - start) + "ms");

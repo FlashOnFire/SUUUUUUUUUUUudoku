@@ -2,6 +2,7 @@ package fr.polytech.suuuuuuuuuuudoku;
 
 import fr.polytech.suuuuuuuuuuudoku.constraints.*;
 import fr.polytech.suuuuuuuuuuudoku.solver.Vec2i;
+import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -17,10 +18,16 @@ public class Grid {
      */
     private final List<AbstractConstraint> constraints;
     /**
+     * The set of symbols used in the grid.
+     */
+    private final Set<String> symbols;
+    /**
      * The Sudoku grid represented as a 2D array of Strings.
      */
     private String[][] grid;
-
+    /**
+     * The list of empty cells in the grid.
+     */
     private List<Vec2i> emptyCells = new ArrayList<>();
 
     /**
@@ -29,14 +36,16 @@ public class Grid {
      * @param grid        the initial grid
      * @param constraints the list of constraints
      */
-    public Grid(String[][] grid, List<AbstractConstraint> constraints) {
+    public Grid(String[][] grid, List<AbstractConstraint> constraints, Set<String> symbols) {
         this.grid = grid;
         this.constraints = constraints;
+        this.symbols = symbols;
         this.computeEmptyCells();
     }
 
     public Grid(Grid otherGrid) {
         this.constraints = otherGrid.constraints;
+        this.symbols = otherGrid.symbols;
 
         if (otherGrid.grid.length == 0) {
             this.grid = new String[0][0];
@@ -58,7 +67,7 @@ public class Grid {
      * @param classicConstraints whether to apply classic Sudoku constraints
      * @return the created Grid
      */
-    static public Grid fromCsv(String file, boolean classicConstraints, Set<String> symbols) throws FileNotFoundException {
+    static public Grid fromCsv(String file, boolean classicConstraints) throws FileNotFoundException {
         var csv = (new Scanner(new File(file))).useDelimiter("\\Z").next();
 
         String[] lines = csv.split("\n");
@@ -71,6 +80,7 @@ public class Grid {
                     .toArray(String[]::new);
         }
 
+        var symbols = SymbolSets.generateSymbols(grid.length);
         List<AbstractConstraint> constraintList = new ArrayList<>();
         if (classicConstraints) {
             var blockSize = (int) Math.sqrt(grid.length);
@@ -82,9 +92,9 @@ public class Grid {
             constraintList.add(new LineConstraint(symbols));
             constraintList.add(new ColumnConstraint(symbols));
             constraintList.add(new NotEmptyConstraint());
+            return new Grid(grid, constraintList, symbols);
         }
-
-        return new Grid(grid, constraintList);
+        return new Grid(grid, constraintList, symbols);
     }
 
     /**
@@ -224,5 +234,14 @@ public class Grid {
      */
     public List<Vec2i> getEmptyCells() {
         return this.emptyCells;
+    }
+
+    /**
+     * Returns the set of symbols used in the grid.
+     *
+     * @return the set of symbols
+     */
+    public Set<String> getSymbols() {
+        return this.symbols;
     }
 }

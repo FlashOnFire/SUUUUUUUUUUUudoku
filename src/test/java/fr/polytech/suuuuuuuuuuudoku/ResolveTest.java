@@ -39,7 +39,7 @@ public class ResolveTest {
                 {" ", " ", " ", "2", " ", " ", " ", "8", " "},
                 {"5", " ", " ", "9", " ", " ", "7", "6", "2"},
                 {"8", " ", " ", "6", " ", "3", " ", " ", " "}
-        }, constraintsTests);
+        }, constraintsTests, SymbolSets.DIGITS);
 
         var res = new String[][]{
                 {"4", "9", "6", "8", "3", "2", "5", "1", "7"},
@@ -55,7 +55,7 @@ public class ResolveTest {
 
         assertFalse(grid.areConstraintsSatisfied());
 
-        var isSolved = SudokuSolver.solve(grid, SymbolSets.DIGITS, true, false);
+        var isSolved = SudokuSolver.solve(grid, true, false);
         assertEquals(SolvingState.SOLVED, isSolved);
         assertTrue(grid.areConstraintsSatisfied());
 
@@ -91,7 +91,7 @@ public class ResolveTest {
                 {" ", " ", " ", " ", "8", " ", "1", " ", "2"},
                 {" ", "6", " ", "7", " ", " ", " ", " ", " "},
                 {" ", " ", " ", " ", " ", " ", " ", " ", "4"}
-        }, constraintsTests);
+        }, constraintsTests, SymbolSets.DIGITS);
 
         var res = new String[][]{
                 {"5", "4", "3", "9", "2", "6", "8", "7", "1",},
@@ -108,9 +108,9 @@ public class ResolveTest {
 
         assertFalse(grid.areConstraintsSatisfied());
 
-        var pastialSolve = SudokuSolver.solve(grid, SymbolSets.DIGITS, true, false);
+        var pastialSolve = SudokuSolver.solve(grid, true, false);
         assertEquals(SolvingState.PARTIALLY_SOLVED, pastialSolve);
-        var isSolved = SudokuSolver.solve(grid, SymbolSets.DIGITS, false, true);
+        var isSolved = SudokuSolver.solve(grid, false, true);
         assertEquals(SolvingState.SOLVED, isSolved);
         assertTrue(grid.areConstraintsSatisfied());
 
@@ -147,7 +147,7 @@ public class ResolveTest {
                 {" ", " ", " ", " ", "8", " ", "1", " ", "2"},
                 {" ", "6", " ", "7", " ", " ", " ", " ", " "},
                 {" ", " ", " ", " ", " ", " ", " ", " ", "4"}
-        }, constraintsTests);
+        }, constraintsTests, SymbolSets.DIGITS);
 
         var res = new String[][]{
                 {"5", "4", "3", "9", "2", "6", "8", "7", "1",},
@@ -164,9 +164,9 @@ public class ResolveTest {
 
         assertFalse(grid.areConstraintsSatisfied());
 
-        var pastialSolve = SudokuSolver.solve(grid, SymbolSets.DIGITS, true, false);
+        var pastialSolve = SudokuSolver.solve(grid, true, false);
         assertEquals(SolvingState.PARTIALLY_SOLVED, pastialSolve);
-        var isSolved = SudokuSolver.solve(grid, SymbolSets.DIGITS, true, true);
+        var isSolved = SudokuSolver.solve(grid, true, true);
         assertEquals(SolvingState.SOLVED, isSolved);
         assertTrue(grid.areConstraintsSatisfied());
 
@@ -187,7 +187,7 @@ public class ResolveTest {
                 {"2", "1", "3"}
         }, List.of(
                 new BlockConstraint(Set.of("1", "2", "3"), 0, 0, 2, 2)
-        ));
+        ), SymbolSets.DIGITS);
         assertFalse(grid.areConstraintsSatisfied());
     }
 
@@ -199,19 +199,18 @@ public class ResolveTest {
                 {"2", "1", "3"}
         }, List.of(
                 new BlockConstraint(Set.of("1", "2", "3"), 0, 0, 2, 2)
-        ));
+        ), SymbolSets.DIGITS);
         assertFalse(grid.areConstraintsSatisfied());
-        assertThrows(AssertionError.class, () -> SudokuSolver.solve(grid, Set.of("1", "2", "3"), false, false));
+        assertThrows(AssertionError.class, () -> SudokuSolver.solve(grid, false, false));
         assertFalse(grid.areConstraintsSatisfied());
     }
 
     @Test
     public void testSolveBig() throws FileNotFoundException {
-        var symbols = SymbolSets.DIGITS_1_100;
-        var grid = Grid.fromCsv(resoucesPath + "100x100.csv", true, symbols);
+        var grid = Grid.fromCsv(resoucesPath + "100x100.csv", true);
         assertFalse(grid.areConstraintsSatisfied());
 
-        var isSolved = SudokuSolver.solve(grid, symbols, true, true);
+        var isSolved = SudokuSolver.solve(grid, true, true);
         assertEquals(SolvingState.SOLVED, isSolved);
         assertTrue(grid.areConstraintsSatisfied());
     }

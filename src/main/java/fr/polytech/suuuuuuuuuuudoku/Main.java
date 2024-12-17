@@ -40,7 +40,8 @@ public class Main {
                 new BlockConstraint(SymbolSets.DIGITS, 6, 6, 9, 9)
         ));
 
-        SwingUtilities.invokeLater(() -> {
+        SwingUtilities.invokeLater(() ->
+        {
             SudokuFrame frame = new SudokuFrame(grid);
             frame.setVisible(true);
         });

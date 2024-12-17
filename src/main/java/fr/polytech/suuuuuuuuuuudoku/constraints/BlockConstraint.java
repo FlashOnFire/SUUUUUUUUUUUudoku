@@ -94,7 +94,7 @@ public class BlockConstraint implements AbstractConstraint {
         for (int i = y; i < dy; i++) {
             list.addAll(Arrays.asList(grid[i]).subList(x, dx));
         }
-        list = list.stream().filter(c -> !c.equals(" ")).toList();
+        list.removeIf(c -> c.equals(" "));
 
         return list;
     }

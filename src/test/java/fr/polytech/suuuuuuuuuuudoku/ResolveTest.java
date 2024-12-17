@@ -207,11 +207,11 @@ public class ResolveTest {
         List<AbstractConstraint> constraintsTests = new ArrayList<>();
         for (int i = 0; i < 100; i += 10) {
             for (int j = 0; j < 100; j += 10) {
-                constraintsTests.add(new BlockConstraint(SymbolSets.DIGITS_0_100, i, j, i + 10, j + 10));
+                constraintsTests.add(new BlockConstraint(SymbolSets.DIGITS_1_100, i, j, i + 10, j + 10));
             }
         }
-        constraintsTests.add(new LineConstraint(SymbolSets.DIGITS_0_100));
-        constraintsTests.add(new ColumnConstraint(SymbolSets.DIGITS_0_100));
+        constraintsTests.add(new LineConstraint(SymbolSets.DIGITS_1_100));
+        constraintsTests.add(new ColumnConstraint(SymbolSets.DIGITS_1_100));
         constraintsTests.add(new NotEmptyConstraint());
 
 
@@ -322,7 +322,7 @@ public class ResolveTest {
 
         assertFalse(grid.areConstraintsSatisfied());
 
-        var isSolved = SudokuSolver.solve(grid, SymbolSets.DIGITS_0_100, true, true);
+        var isSolved = SudokuSolver.solve(grid, SymbolSets.DIGITS_1_100, true, true);
         assertEquals(SolvingState.SOLVED, isSolved);
         assertTrue(grid.areConstraintsSatisfied());
         grid.display();

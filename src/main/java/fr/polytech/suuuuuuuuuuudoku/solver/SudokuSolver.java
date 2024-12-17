@@ -64,15 +64,23 @@ public class SudokuSolver {
      * @return the solving state of the Sudoku grid
      */
     private static List<Character[][]> doBacktracking(Character[][] grid, Set<Character> symbols, List<AbstractConstraint> constraints) {
-        var emptyCell = getFirstEmptyCell(grid);
+        var emptyCells = getEmptyCells(grid);
 
-        if (emptyCell.isEmpty()) {
+        if (emptyCells.isEmpty()) {
             List<Character[][]> lst = new ArrayList<>();
             lst.add(grid);
             return lst;
         }
 
-        var cell = emptyCell.get();
+        HashMap<Vec2i, List<Character>> emptyCellMap = new HashMap<>();
+        for (Vec2i vec2i : emptyCells) {
+            emptyCellMap.put(vec2i, tryDeduce(grid, symbols, vec2i, constraints));
+        }
+
+        var cell = emptyCellMap.entrySet().stream()
+                .min(Comparator.comparingInt(e -> e.getValue().size()))
+                .map(Map.Entry::getKey)
+                .orElseThrow();
         return tryDeduce(grid, symbols, cell, constraints).stream().map(c -> {
             Character[][] newgrid = cloneGrid(grid);
             newgrid[cell.getY()][cell.getX()] = c;
@@ -170,17 +178,5 @@ public class SudokuSolver {
         }
 
         return emptyCells;
-    }
-
-    private static Optional<Vec2i> getFirstEmptyCell(Character[][] grid) {
-        for (int y = 0; y < grid.length; y++) {
-            for (int x = 0; x < grid[y].length; x++) {
-                if (grid[y][x] == ' ') {
-                    return Optional.of(new Vec2i(x, y));
-                }
-            }
-        }
-
-        return Optional.empty();
     }
 }

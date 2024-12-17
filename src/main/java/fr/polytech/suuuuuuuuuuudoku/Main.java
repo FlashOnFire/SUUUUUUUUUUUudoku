@@ -3,12 +3,10 @@ package fr.polytech.suuuuuuuuuuudoku;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.ColumnConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.LineConstraint;
-import fr.polytech.suuuuuuuuuuudoku.graphics.SudokuFrame;
+import fr.polytech.suuuuuuuuuuudoku.constraints.NotEmptyConstraint;
 import fr.polytech.suuuuuuuuuuudoku.solver.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
-import javax.swing.*;
-import java.util.Arrays;
 import java.util.List;
 
 public class Main {
@@ -37,16 +35,22 @@ public class Main {
 
                 new BlockConstraint(SymbolSets.DIGITS, 0, 6, 3, 9),
                 new BlockConstraint(SymbolSets.DIGITS, 3, 6, 6, 9),
-                new BlockConstraint(SymbolSets.DIGITS, 6, 6, 9, 9)
+                new BlockConstraint(SymbolSets.DIGITS, 6, 6, 9, 9),
+
+                new NotEmptyConstraint()
         ));
 
-        SwingUtilities.invokeLater(() ->
+        /*SwingUtilities.invokeLater(() ->
         {
             SudokuFrame frame = new SudokuFrame(grid);
             frame.setVisible(true);
-        });
+        });*/
 
-        System.out.println(SudokuSolver.solve(grid, SymbolSets.DIGITS, true));
+        var start = System.currentTimeMillis();
+        System.out.println(SudokuSolver.solve(grid, SymbolSets.DIGITS, true, true));
+        var end = System.currentTimeMillis();
+
+        System.out.println("Time: " + (end - start) + "ms");
         grid.display();
     }
 }

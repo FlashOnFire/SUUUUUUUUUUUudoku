@@ -1,6 +1,18 @@
 plugins {
-    id("java")
+    java
     application
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(23)
+    }
+}
+
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = application.mainClass
+    }
 }
 
 group = "fr.polytech.suuuuuuuuuuudoku"

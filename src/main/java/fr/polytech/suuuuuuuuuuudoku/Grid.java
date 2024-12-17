@@ -81,11 +81,7 @@ public class Grid {
      */
     public boolean areConstraintsSatisfied() {
         return this.constraints.stream().allMatch(c -> {
-            if (!c.isSatisfied(this.grid)) {
-                System.out.println("Constraint not satisfied: " + c);
-                return false;
-            }
-            return true;
+            return c.isSatisfied(this.grid);
         });
     }
 

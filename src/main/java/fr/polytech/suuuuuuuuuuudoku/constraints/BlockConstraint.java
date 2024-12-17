@@ -11,7 +11,7 @@ public class BlockConstraint implements AbstractConstraint {
     /**
      * The set of symbols to be checked within the block.
      */
-    private final Set<Character> symbols;
+    private final Set<String> symbols;
 
     /**
      * The starting and ending coordinates of the block.
@@ -28,7 +28,7 @@ public class BlockConstraint implements AbstractConstraint {
      * @param dy      the ending y-coordinate of the block
      * @throws IllegalArgumentException if dx is less than or equal to x or dy is less than or equal to y
      */
-    public BlockConstraint(Set<Character> symbols, int x, int y, int dx, int dy) {
+    public BlockConstraint(Set<String> symbols, int x, int y, int dx, int dy) {
         this.symbols = symbols;
         assert dx != 0 || dy != 0;
         assert dx > x && dy > y;
@@ -46,7 +46,7 @@ public class BlockConstraint implements AbstractConstraint {
      * @return true if the constraint is satisfied, false otherwise
      */
     @Override
-    public boolean isSatisfied(Character[][] grid) {
+    public boolean isSatisfied(String[][] grid) {
         // Extract the block from the grid
         var list = extractBlock(grid);
 
@@ -64,10 +64,10 @@ public class BlockConstraint implements AbstractConstraint {
      * @throws AssertionError if the position is out of the grid bounds or the grid cell is empty
      */
     @Override
-    public Optional<List<Character>> getPossibilities(Character[][] grid, Vec2i pos) {
+    public Optional<List<String>> getPossibilities(String[][] grid, Vec2i pos) {
         assert pos.getX() < grid[0].length;
         assert pos.getY() < grid.length;
-        assert grid[pos.getY()][pos.getX()] == ' ';
+        assert grid[pos.getY()][pos.getX()] == " ";
 
         // Check if the position is within the block
         if (pos.getX() < x || pos.getX() >= dx || pos.getY() < y || pos.getY() >= dy) {
@@ -75,7 +75,7 @@ public class BlockConstraint implements AbstractConstraint {
         }
 
         // Extract the block from the grid
-        List<Character> list = extractBlock(grid);
+        List<String> list = extractBlock(grid);
 
         // Return the symbols that are not present in the block
         var possibilities = symbols.stream().filter(c -> !list.contains(c)).toList();
@@ -88,12 +88,12 @@ public class BlockConstraint implements AbstractConstraint {
      * @param grid the grid from which to extract the block
      * @return a list of characters within the block, excluding empty cells
      */
-    private List<Character> extractBlock(Character[][] grid) {
-        List<Character> list = new ArrayList<>();
+    private List<String> extractBlock(String[][] grid) {
+        List<String> list = new ArrayList<>();
         for (int i = y; i < dy; i++) {
             list.addAll(Arrays.asList(grid[i]).subList(x, dx));
         }
-        list = list.stream().filter(c -> c != ' ').toList();
+        list = list.stream().filter(c -> c != " ").toList();
 
         return list;
     }

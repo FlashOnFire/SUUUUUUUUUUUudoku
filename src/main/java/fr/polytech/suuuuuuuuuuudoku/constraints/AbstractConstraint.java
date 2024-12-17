@@ -16,7 +16,7 @@ public interface AbstractConstraint {
      * @param grid the Sudoku grid
      * @return true if the constraint is satisfied, false otherwise
      */
-    boolean isSatisfied(Character[][] grid);
+    boolean isSatisfied(String[][] grid);
 
     /**
      * Gets the possible values for a given position in the grid.
@@ -25,5 +25,5 @@ public interface AbstractConstraint {
      * @param pos  the position in the grid
      * @return an Optional containing a list of possible values, or an empty Optional if no possibilities
      */
-    Optional<List<Character>> getPossibilities(Character[][] grid, Vec2i pos);
+    Optional<List<String>> getPossibilities(String[][] grid, Vec2i pos);
 }

@@ -18,10 +18,10 @@ public class SudokuSolver {
      * @param backtracking whether to use backtracking if deduction fails
      * @return the solving state of the Sudoku grid
      */
-    public static SolvingState solve(Grid grid, Set<Character> symbols, boolean deducing, boolean backtracking) {
+    public static SolvingState solve(Grid grid, Set<String> symbols, boolean deducing, boolean backtracking) {
         assert deducing || backtracking : "At least one of deducing or backtracking must be enabled";
 
-        ArrayDeque<Character[][]> currentList = new ArrayDeque<>();
+        ArrayDeque<String[][]> currentList = new ArrayDeque<>();
         currentList.add(grid.getGrid());
 
         var constraints = grid.getConstraints();
@@ -63,16 +63,16 @@ public class SudokuSolver {
      * @param constraints the list of constraints to satisfy
      * @return the solving state of the Sudoku grid
      */
-    private static List<Character[][]> doBacktracking(Character[][] grid, Set<Character> symbols, List<AbstractConstraint> constraints) {
+    private static List<String[][]> doBacktracking(String[][] grid, Set<String> symbols, List<AbstractConstraint> constraints) {
         var emptyCells = getEmptyCells(grid);
 
         if (emptyCells.isEmpty()) {
-            List<Character[][]> lst = new ArrayList<>();
+            List<String[][]> lst = new ArrayList<>();
             lst.add(grid);
             return lst;
         }
 
-        HashMap<Vec2i, List<Character>> emptyCellMap = new HashMap<>();
+        HashMap<Vec2i, List<String>> emptyCellMap = new HashMap<>();
         for (Vec2i vec2i : emptyCells) {
             emptyCellMap.put(vec2i, tryDeduce(grid, symbols, vec2i, constraints));
         }
@@ -82,7 +82,7 @@ public class SudokuSolver {
                 .map(Map.Entry::getKey)
                 .orElseThrow();
         return tryDeduce(grid, symbols, cell, constraints).stream().map(c -> {
-            Character[][] newgrid = cloneGrid(grid);
+            String[][] newgrid = cloneGrid(grid);
             newgrid[cell.getY()][cell.getX()] = c;
             return newgrid;
         }).toList();
@@ -95,7 +95,7 @@ public class SudokuSolver {
      * @param symbols the set of symbols used in the Sudoku grid
      * @return the solving state of the Sudoku grid
      */
-    private static SolvingState solveDeduction(Character[][] grid, Set<Character> symbols, List<AbstractConstraint> constraints) {
+    private static SolvingState solveDeduction(String[][] grid, Set<String> symbols, List<AbstractConstraint> constraints) {
         boolean finished = false;
 
         List<Vec2i> emptyCells = getEmptyCells(grid);
@@ -133,7 +133,7 @@ public class SudokuSolver {
      * @param constraints the list of constraints to satisfy
      * @return the list of possible values for the cell
      */
-    private static List<Character> tryDeduce(Character[][] grid, Set<Character> symbols, Vec2i pos, List<AbstractConstraint> constraints) {
+    private static List<String> tryDeduce(String[][] grid, Set<String> symbols, Vec2i pos, List<AbstractConstraint> constraints) {
         var values = new ArrayList<>(symbols);
         for (AbstractConstraint constraint : constraints) {
             constraint.getPossibilities(grid, pos).ifPresent(values::retainAll);
@@ -143,7 +143,7 @@ public class SudokuSolver {
     }
 
 
-    private static boolean isSolved(Character[][] grid, List<AbstractConstraint> constraints) {
+    private static boolean isSolved(String[][] grid, List<AbstractConstraint> constraints) {
         for (var constraint : constraints) {
             if (!constraint.isSatisfied(grid)) {
                 return false;
@@ -153,12 +153,12 @@ public class SudokuSolver {
         return true;
     }
 
-    private static Character[][] cloneGrid(Character[][] grid) {
+    private static String[][] cloneGrid(String[][] grid) {
         if (grid.length == 0) {
-            return new Character[0][0];
+            return new String[0][0];
         }
 
-        Character[][] newGrid = new Character[grid.length][grid[0].length];
+        String[][] newGrid = new String[grid.length][grid[0].length];
 
         for (int i = 0; i < grid.length; i++) {
             newGrid[i] = (Arrays.copyOf(grid[i], grid[i].length));
@@ -167,11 +167,11 @@ public class SudokuSolver {
         return newGrid;
     }
 
-    private static List<Vec2i> getEmptyCells(Character[][] grid) {
+    private static List<Vec2i> getEmptyCells(String[][] grid) {
         List<Vec2i> emptyCells = new ArrayList<>();
         for (int y = 0; y < grid.length; y++) {
             for (int x = 0; x < grid[y].length; x++) {
-                if (grid[y][x] == ' ') {
+                if (Objects.equals(grid[y][x], " ")) {
                     emptyCells.add(new Vec2i(x, y));
                 }
             }

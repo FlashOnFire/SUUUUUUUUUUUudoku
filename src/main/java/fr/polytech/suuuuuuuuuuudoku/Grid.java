@@ -6,6 +6,7 @@ import fr.polytech.suuuuuuuuuuudoku.solver.Vec2i;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a Sudoku grid with constraints.
@@ -16,9 +17,9 @@ public class Grid implements Cloneable {
      */
     private final List<AbstractConstraint> constraints;
     /**
-     * The Sudoku grid represented as a 2D array of Characters.
+     * The Sudoku grid represented as a 2D array of Strings.
      */
-    private Character[][] grid;
+    private String[][] grid;
 
     /**
      * Constructs a Grid with the specified grid and constraints.
@@ -26,7 +27,7 @@ public class Grid implements Cloneable {
      * @param grid        the initial grid
      * @param constraints the list of constraints
      */
-    public Grid(Character[][] grid, List<AbstractConstraint> constraints) {
+    public Grid(String[][] grid, List<AbstractConstraint> constraints) {
         this.grid = grid;
         this.constraints = constraints;
     }
@@ -35,8 +36,8 @@ public class Grid implements Cloneable {
      * Displays the grid to the console.
      */
     public void display() {
-        for (Character[] lines : this.grid) {
-            for (Character cell : lines) {
+        for (String[] lines : this.grid) {
+            for (String cell : lines) {
                 System.out.print(cell + " ");
             }
             System.out.println();
@@ -63,7 +64,7 @@ public class Grid implements Cloneable {
      *
      * @return the grid
      */
-    public Character[][] getGrid() {
+    public String[][] getGrid() {
         return grid;
     }
 
@@ -72,7 +73,7 @@ public class Grid implements Cloneable {
      *
      * @param grid the new grid
      */
-    public void setGrid(Character[][] grid) {
+    public void setGrid(String[][] grid) {
         this.grid = grid;
     }
 
@@ -83,7 +84,7 @@ public class Grid implements Cloneable {
      * @param value the value to place
      * @return true if the placement is valid, false otherwise
      */
-    public boolean tryPlace(Vec2i pos, char value) {
+    public boolean tryPlace(Vec2i pos, String value) {
         var oldValue = this.grid[pos.getY()][pos.getX()];
         this.grid[pos.getY()][pos.getX()] = value;
         if (!this.areConstraintsSatisfied()) {
@@ -126,7 +127,7 @@ public class Grid implements Cloneable {
 
         for (int y = 0; y < grid.length; y++) {
             for (int x = 0; x < grid[0].length; x++) {
-                if (grid[y][x] == ' ') {
+                if (Objects.equals(grid[y][x], " ")) {
                     list.add(new Vec2i(x, y));
                 }
             }
@@ -144,7 +145,7 @@ public class Grid implements Cloneable {
     public Grid clone() {
         try {
             Grid cloned = (Grid) super.clone();
-            var newGrid = new Character[this.grid.length][this.grid[0].length];
+            var newGrid = new String[this.grid.length][this.grid[0].length];
             for (int y = 0; y < this.grid.length; y++) {
                 newGrid[y] = Arrays.copyOf(this.grid[y], this.grid[y].length);
             }

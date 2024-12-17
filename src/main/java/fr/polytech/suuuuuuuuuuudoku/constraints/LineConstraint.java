@@ -11,14 +11,14 @@ import java.util.Set;
  * Represents a constraint that ensures each line in the grid satisfies certain conditions.
  */
 public class LineConstraint implements AbstractConstraint {
-    private final Set<Character> symbols;
+    private final Set<String> symbols;
 
     /**
      * Constructs a LineConstraint with the specified set of symbols.
      *
      * @param symbols the set of symbols that must be present in each line
      */
-    public LineConstraint(Set<Character> symbols) {
+    public LineConstraint(Set<String> symbols) {
         this.symbols = symbols;
     }
 
@@ -29,11 +29,11 @@ public class LineConstraint implements AbstractConstraint {
      * @return true if the constraint is satisfied, false otherwise
      */
     @Override
-    public boolean isSatisfied(Character[][] grid) {
+    public boolean isSatisfied(String[][] grid) {
         assert grid.length == symbols.size();
 
         return Arrays.stream(grid).allMatch(line -> {
-            var list = Arrays.stream(line).filter(c -> c != ' ').toList();
+            var list = Arrays.stream(line).filter(c -> c != " ").toList();
 
             return symbols.containsAll(list)
                     && list.stream().distinct().count() == list.size();
@@ -48,12 +48,12 @@ public class LineConstraint implements AbstractConstraint {
      * @return an Optional containing a list of possible symbols, or an empty Optional if no symbols are possible
      */
     @Override
-    public Optional<List<Character>> getPossibilities(Character[][] grid, Vec2i pos) {
+    public Optional<List<String>> getPossibilities(String[][] grid, Vec2i pos) {
         assert pos.getY() < grid.length;
         assert pos.getX() < grid[0].length;
-        assert grid[pos.getY()][pos.getX()] == ' ';
+        assert grid[pos.getY()][pos.getX()] == " ";
 
-        var row = Arrays.stream(grid[pos.getY()]).filter(c -> c != ' ').toList();
+        var row = Arrays.stream(grid[pos.getY()]).filter(c -> c != " ").toList();
         var list = symbols.stream().filter(c -> !row.contains(c)).toList();
 
         return list.isEmpty() ? Optional.empty() : Optional.of(list);

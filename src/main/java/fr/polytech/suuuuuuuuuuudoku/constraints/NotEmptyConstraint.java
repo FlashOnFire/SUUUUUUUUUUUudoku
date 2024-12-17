@@ -18,8 +18,8 @@ public class NotEmptyConstraint implements AbstractConstraint {
      * @return true if no cell in the grid is empty, false otherwise
      */
     @Override
-    public boolean isSatisfied(Character[][] grid) {
-        return Arrays.stream(grid).allMatch(line -> Arrays.stream(line).noneMatch(cell -> cell == ' '));
+    public boolean isSatisfied(String[][] grid) {
+        return Arrays.stream(grid).allMatch(line -> Arrays.stream(line).noneMatch(cell -> cell == " "));
     }
 
     /**
@@ -30,7 +30,7 @@ public class NotEmptyConstraint implements AbstractConstraint {
      * @return an empty Optional as this constraint does not provide possibilities
      */
     @Override
-    public Optional<List<Character>> getPossibilities(Character[][] grid, Vec2i pos) {
+    public Optional<List<String>> getPossibilities(String[][] grid, Vec2i pos) {
         return Optional.empty();
     }
 }

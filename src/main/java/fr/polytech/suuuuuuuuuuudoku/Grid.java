@@ -48,7 +48,7 @@ public class Grid {
             this.grid[y] = Arrays.copyOf(otherGrid.grid[y], otherGrid.grid[y].length);
         }
 
-        this.computeEmptyCells();
+        this.emptyCells = new ArrayList<>(otherGrid.emptyCells);
     }
 
     /**

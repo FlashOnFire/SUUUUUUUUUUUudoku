@@ -7,6 +7,7 @@ import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -207,7 +208,7 @@ public class ResolveTest {
 
     @Test
     public void testSolveBig() throws FileNotFoundException {
-        var grid = Grid.fromCsv(resoucesPath + "100x100.csv");
+        var grid = Grid.fromCsv(Path.of(resoucesPath + "100x100.csv"));
         assertFalse(grid.areConstraintsSatisfied());
 
         var isSolved = SudokuSolver.solve(grid, true, true);

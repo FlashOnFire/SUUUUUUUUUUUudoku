@@ -77,18 +77,11 @@ public class Grid {
      * @param file the CSV string representing the grid
      * @return the created Grid
      */
-    static public Grid fromCsv(String file) throws FileNotFoundException {
-        var csv = (new Scanner(new File(file))).useDelimiter("\\Z").next();
-
-        String[] lines = csv.split("\n");
-        String[][] grid = new String[lines.length][];
-
-        for (int i = 0; i < lines.length; i++) {
-            grid[i] = lines[i].split(",(?<!\\r)");
-            grid[i] = Arrays.stream(grid[i])
-                    .map(cell -> cell.equals(".") ? " " : cell)
-                    .toArray(String[]::new);
-        }
+    static public Grid fromCsv(Path file) throws FileNotFoundException {
+        String[][] grid = new BufferedReader(new FileReader(file.toFile()))
+                .lines()
+                .map(line -> Arrays.stream(line.split(",(?<!\\r)")).map(cell -> cell.equals(".") ? " " : cell).toArray(String[]::new))
+                .toArray(String[][]::new);
 
         var symbols = SymbolSets.generateSymbols(grid.length);
         return new Grid(grid, symbols);

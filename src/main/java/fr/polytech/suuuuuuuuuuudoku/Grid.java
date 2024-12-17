@@ -1,6 +1,6 @@
 package fr.polytech.suuuuuuuuuuudoku;
 
-import fr.polytech.suuuuuuuuuuudoku.constraints.*;
+import fr.polytech.suuuuuuuuuuudoku.constraints.AbstractConstraint;
 import fr.polytech.suuuuuuuuuuudoku.solver.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
@@ -43,6 +43,17 @@ public class Grid {
         this.computeEmptyCells();
     }
 
+    /**
+     * Constructs a Grid with the specified grid and symbols.
+     * The constraints are generated automatically.
+     *
+     * @param grid    the initial grid
+     * @param symbols the set of symbols
+     */
+    public Grid(String[][] grid, Set<String> symbols) {
+        this(grid, AbstractConstraint.getClassicConstrainters(grid.length, symbols), symbols);
+    }
+
     public Grid(Grid otherGrid) {
         this.constraints = otherGrid.constraints;
         this.symbols = otherGrid.symbols;
@@ -63,11 +74,10 @@ public class Grid {
     /**
      * Creates a Grid from a CSV string.
      *
-     * @param file               the CSV string representing the grid
-     * @param classicConstraints whether to apply classic Sudoku constraints
+     * @param file the CSV string representing the grid
      * @return the created Grid
      */
-    static public Grid fromCsv(String file, boolean classicConstraints) throws FileNotFoundException {
+    static public Grid fromCsv(String file) throws FileNotFoundException {
         var csv = (new Scanner(new File(file))).useDelimiter("\\Z").next();
 
         String[] lines = csv.split("\n");
@@ -81,20 +91,7 @@ public class Grid {
         }
 
         var symbols = SymbolSets.generateSymbols(grid.length);
-        List<AbstractConstraint> constraintList = new ArrayList<>();
-        if (classicConstraints) {
-            var blockSize = (int) Math.sqrt(grid.length);
-            for (int i = 0; i < grid.length; i += blockSize) {
-                for (int j = 0; j < grid.length; j += blockSize) {
-                    constraintList.add(new BlockConstraint(symbols, i, j, i + blockSize, j + blockSize));
-                }
-            }
-            constraintList.add(new LineConstraint(symbols));
-            constraintList.add(new ColumnConstraint(symbols));
-            constraintList.add(new NotEmptyConstraint());
-            return new Grid(grid, constraintList, symbols);
-        }
-        return new Grid(grid, constraintList, symbols);
+        return new Grid(grid, symbols);
     }
 
     /**

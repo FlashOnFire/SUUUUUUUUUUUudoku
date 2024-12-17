@@ -207,7 +207,7 @@ public class ResolveTest {
 
     @Test
     public void testSolveBig() throws FileNotFoundException {
-        var grid = Grid.fromCsv(resoucesPath + "100x100.csv", true);
+        var grid = Grid.fromCsv(resoucesPath + "100x100.csv");
         assertFalse(grid.areConstraintsSatisfied());
 
         var isSolved = SudokuSolver.solve(grid, true, true);

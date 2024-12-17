@@ -15,15 +15,15 @@ public class GridTest {
     @Test
     public void testImportExport() throws FileNotFoundException {
 
-        var grid = Grid.fromCsv(RESSOURCES_PATH + "100x100.csv", true);
+        var grid = Grid.fromCsv(RESSOURCES_PATH + "100x100.csv");
         grid.toCsv(Path.of(RESSOURCES_PATH + "100x100_export.csv"));
 
-            var grid2 = Grid.fromCsv(RESSOURCES_PATH + "100x100_export.csv", true);
-            for (int i = 0; i < grid.getGrid().length; i++) {
-                for (int j = 0; j < grid.getGrid()[0].length; j++) {
-                    assertEquals(grid.getGrid()[i][j], grid2.getGrid()[i][j]);
-                }
+        var grid2 = Grid.fromCsv(RESSOURCES_PATH + "100x100_export.csv");
+        for (int i = 0; i < grid.getGrid().length; i++) {
+            for (int j = 0; j < grid.getGrid()[0].length; j++) {
+                assertEquals(grid.getGrid()[i][j], grid2.getGrid()[i][j]);
             }
+        }
 
         //delete the exported file
         assertTrue(new File(RESSOURCES_PATH + "100x100_export.csv").delete());

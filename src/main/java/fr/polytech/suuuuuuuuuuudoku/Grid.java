@@ -80,9 +80,9 @@ public class Grid {
      * @return true if all constraints are satisfied, false otherwise
      */
     public boolean areConstraintsSatisfied() {
-        return this.constraints.stream().allMatch(c -> {
-            return c.isSatisfied(this.grid);
-        });
+        return this.constraints.stream()
+                .parallel()
+                .allMatch(c -> c.isSatisfied(this.grid));
     }
 
     /**

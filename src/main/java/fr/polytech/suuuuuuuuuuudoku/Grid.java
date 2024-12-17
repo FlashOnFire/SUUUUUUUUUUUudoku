@@ -11,7 +11,7 @@ import java.util.Objects;
 /**
  * Represents a Sudoku grid with constraints.
  */
-public class Grid implements Cloneable {
+public class Grid {
     /**
      * The list of constraints applied to the Sudoku grid.
      */
@@ -20,6 +20,8 @@ public class Grid implements Cloneable {
      * The Sudoku grid represented as a 2D array of Strings.
      */
     private String[][] grid;
+
+    private List<Vec2i> emptyCells = new ArrayList<>();
 
     /**
      * Constructs a Grid with the specified grid and constraints.
@@ -30,6 +32,23 @@ public class Grid implements Cloneable {
     public Grid(String[][] grid, List<AbstractConstraint> constraints) {
         this.grid = grid;
         this.constraints = constraints;
+        this.computeEmptyCells();
+    }
+
+    public Grid(Grid otherGrid) {
+        this.constraints = otherGrid.constraints;
+
+        if (otherGrid.grid.length == 0) {
+            this.grid = new String[0][0];
+            return;
+        }
+
+        this.grid = new String[otherGrid.grid.length][otherGrid.grid[0].length];
+        for (int y = 0; y < otherGrid.grid.length; y++) {
+            this.grid[y] = Arrays.copyOf(otherGrid.grid[y], otherGrid.grid[y].length);
+        }
+
+        this.computeEmptyCells();
     }
 
     /**
@@ -41,6 +60,17 @@ public class Grid implements Cloneable {
                 System.out.print(cell + " ");
             }
             System.out.println();
+        }
+    }
+
+    private void computeEmptyCells() {
+        this.emptyCells.clear();
+        for (int y = 0; y < grid.length; y++) {
+            for (int x = 0; x < grid[y].length; x++) {
+                if (grid[y][x].equals(" ")) {
+                    this.emptyCells.add(new Vec2i(x, y));
+                }
+            }
         }
     }
 
@@ -75,6 +105,7 @@ public class Grid implements Cloneable {
      */
     public void setGrid(String[][] grid) {
         this.grid = grid;
+        this.computeEmptyCells();
     }
 
     /**
@@ -95,8 +126,26 @@ public class Grid implements Cloneable {
             return false;
         }
 
+        if (this.grid[pos.getY()][pos.getX()].equals(" ") && !value.equals(" ")) {
+            this.emptyCells.remove(pos);
+        } else if (!this.grid[pos.getY()][pos.getX()].equals(" ") && value.equals(" ")) {
+            this.emptyCells.add(pos);
+        }
+
         // System.out.println("Placed " + value + " at " + pos);
         return true;
+    }
+
+    public void placeUnchecked(Vec2i pos, String value) {
+        if (this.grid[pos.getY()][pos.getX()].equals(" ")) {
+            this.emptyCells.remove(pos);
+        }
+
+        this.grid[pos.getY()][pos.getX()] = value;
+
+        if (value.equals(" ")) {
+            this.emptyCells.add(pos);
+        }
     }
 
     /**
@@ -123,36 +172,6 @@ public class Grid implements Cloneable {
      * @return the list of empty cells
      */
     public List<Vec2i> getEmptyCells() {
-        var list = new ArrayList<Vec2i>();
-
-        for (int y = 0; y < grid.length; y++) {
-            for (int x = 0; x < grid[0].length; x++) {
-                if (Objects.equals(grid[y][x], " ")) {
-                    list.add(new Vec2i(x, y));
-                }
-            }
-        }
-
-        return list;
-    }
-
-    /**
-     * Creates a clone of the grid.
-     *
-     * @return a new Grid object that is a clone of this grid
-     */
-    @Override
-    public Grid clone() {
-        try {
-            Grid cloned = (Grid) super.clone();
-            var newGrid = new String[this.grid.length][this.grid[0].length];
-            for (int y = 0; y < this.grid.length; y++) {
-                newGrid[y] = Arrays.copyOf(this.grid[y], this.grid[y].length);
-            }
-            cloned.grid = newGrid;
-            return cloned;
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException(e);
-        }
+        return this.emptyCells;
     }
 }

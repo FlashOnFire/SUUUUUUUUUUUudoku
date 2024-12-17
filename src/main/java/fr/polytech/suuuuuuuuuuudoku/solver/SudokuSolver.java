@@ -21,14 +21,14 @@ public class SudokuSolver {
     public static SolvingState solve(Grid grid, Set<String> symbols, boolean deducing, boolean backtracking) {
         assert deducing || backtracking : "At least one of deducing or backtracking must be enabled";
 
-        ArrayDeque<String[][]> currentList = new ArrayDeque<>();
-        currentList.add(grid.getGrid());
+        ArrayDeque<Grid> currentList = new ArrayDeque<>();
+        currentList.add(grid);
 
         var constraints = grid.getConstraints();
         while (!currentList.isEmpty()) {
             var currentGrid = currentList.removeLast();
-            if (isSolved(currentGrid, constraints)) {
-                grid.setGrid(currentGrid);
+            if (currentGrid.isSolved()) {
+                grid.setGrid(currentGrid.getGrid());
                 return SolvingState.SOLVED;
             }
 
@@ -36,20 +36,20 @@ public class SudokuSolver {
                 var state = solveDeduction(currentGrid, symbols, constraints);
 
                 if (state == SolvingState.SOLVED) {
-                    grid.setGrid(currentGrid);
+                    grid.setGrid(currentGrid.getGrid());
                     return SolvingState.SOLVED;
                 } else if (!backtracking) {
                     if (state == SolvingState.UNSOLVABLE) {
-                        grid.setGrid(currentGrid);
+                        grid.setGrid(currentGrid.getGrid());
                         return SolvingState.UNSOLVABLE;
                     }
 
-                    grid.setGrid(currentGrid);
+                    grid.setGrid(currentGrid.getGrid());
                     return SolvingState.PARTIALLY_SOLVED;
                 }
             }
 
-            currentList.addAll(doBacktracking(currentGrid, symbols, constraints));
+            currentList.addAll(doBacktracking(currentGrid, symbols));
         }
 
         return SolvingState.UNSOLVABLE;
@@ -60,30 +60,29 @@ public class SudokuSolver {
      *
      * @param grid        the Sudoku grid to solve
      * @param symbols     the set of symbols used in the Sudoku grid
-     * @param constraints the list of constraints to satisfy
      * @return the solving state of the Sudoku grid
      */
-    private static List<String[][]> doBacktracking(String[][] grid, Set<String> symbols, List<AbstractConstraint> constraints) {
-        var emptyCells = getEmptyCells(grid);
+    private static List<Grid> doBacktracking(Grid grid, Set<String> symbols) {
+        var emptyCells = grid.getEmptyCells();
 
         if (emptyCells.isEmpty()) {
-            List<String[][]> lst = new ArrayList<>();
+            List<Grid> lst = new ArrayList<>();
             lst.add(grid);
             return lst;
         }
 
         HashMap<Vec2i, List<String>> emptyCellMap = new HashMap<>();
         for (Vec2i vec2i : emptyCells) {
-            emptyCellMap.put(vec2i, tryDeduce(grid, symbols, vec2i, constraints));
+            emptyCellMap.put(vec2i, tryDeduce(grid, symbols, vec2i));
         }
 
         var cell = emptyCellMap.entrySet().stream()
                 .min(Comparator.comparingInt(e -> e.getValue().size()))
                 .map(Map.Entry::getKey)
                 .orElseThrow();
-        return tryDeduce(grid, symbols, cell, constraints).stream().map(c -> {
-            String[][] newgrid = cloneGrid(grid);
-            newgrid[cell.getY()][cell.getX()] = c;
+        return tryDeduce(grid, symbols, cell).stream().map(c -> {
+            Grid newgrid = new Grid(grid);
+            newgrid.placeUnchecked(cell, c);
             return newgrid;
         }).toList();
     }
@@ -95,33 +94,32 @@ public class SudokuSolver {
      * @param symbols the set of symbols used in the Sudoku grid
      * @return the solving state of the Sudoku grid
      */
-    private static SolvingState solveDeduction(String[][] grid, Set<String> symbols, List<AbstractConstraint> constraints) {
+    private static SolvingState solveDeduction(Grid grid, Set<String> symbols, List<AbstractConstraint> constraints) {
         boolean finished = false;
 
-        List<Vec2i> emptyCells = getEmptyCells(grid);
+        List<Vec2i> emptyCells = grid.getEmptyCells();
         while (!finished) {
             if (emptyCells.isEmpty()) {
                 break;
             }
             ArrayDeque<Vec2i> emptyCellsQueue = new ArrayDeque<>(emptyCells);
 
-
             finished = true;
             while (!emptyCellsQueue.isEmpty()) {
                 var cell = emptyCellsQueue.pop();
 
-                var list = tryDeduce(grid, symbols, cell, constraints);
+                var list = tryDeduce(grid, symbols, cell);
                 if (list.isEmpty()) {
                     return SolvingState.UNSOLVABLE;
                 } else if (list.size() == 1) {
-                    grid[cell.getY()][cell.getX()] = list.getFirst();
+                    grid.placeUnchecked(cell, list.getFirst());
                     emptyCells.remove(cell);
                     finished = false;
                 }
             }
         }
 
-        return isSolved(grid, constraints) ? SolvingState.SOLVED : SolvingState.PARTIALLY_SOLVED;
+        return grid.isSolved() ? SolvingState.SOLVED : SolvingState.PARTIALLY_SOLVED;
     }
 
     /**
@@ -130,13 +128,12 @@ public class SudokuSolver {
      * @param grid        the Sudoku grid
      * @param symbols     the set of symbols used in the Sudoku grid
      * @param pos         the position of the cell
-     * @param constraints the list of constraints to satisfy
      * @return the list of possible values for the cell
      */
-    private static List<String> tryDeduce(String[][] grid, Set<String> symbols, Vec2i pos, List<AbstractConstraint> constraints) {
+    private static List<String> tryDeduce(Grid grid, Set<String> symbols, Vec2i pos) {
         var values = new ArrayList<>(symbols);
-        for (AbstractConstraint constraint : constraints) {
-            constraint.getPossibilities(grid, pos).ifPresent(values::retainAll);
+        for (AbstractConstraint constraint : grid.getConstraints()) {
+            constraint.getPossibilities(grid.getGrid(), pos).ifPresent(values::retainAll);
         }
 
         return values;

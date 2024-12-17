@@ -140,42 +140,4 @@ public class SudokuSolver {
                     return acc;
                 }).orElse(new HashSet<>(symbols));
     }
-
-
-    private static boolean isSolved(String[][] grid, List<AbstractConstraint> constraints) {
-        for (var constraint : constraints) {
-            if (!constraint.isSatisfied(grid)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private static String[][] cloneGrid(String[][] grid) {
-        if (grid.length == 0) {
-            return new String[0][0];
-        }
-
-        String[][] newGrid = new String[grid.length][grid[0].length];
-
-        for (int i = 0; i < grid.length; i++) {
-            newGrid[i] = (Arrays.copyOf(grid[i], grid[i].length));
-        }
-
-        return newGrid;
-    }
-
-    private static List<Vec2i> getEmptyCells(String[][] grid) {
-        List<Vec2i> emptyCells = new ArrayList<>();
-        for (int y = 0; y < grid.length; y++) {
-            for (int x = 0; x < grid[y].length; x++) {
-                if (Objects.equals(grid[y][x], " ")) {
-                    emptyCells.add(new Vec2i(x, y));
-                }
-            }
-        }
-
-        return emptyCells;
-    }
 }

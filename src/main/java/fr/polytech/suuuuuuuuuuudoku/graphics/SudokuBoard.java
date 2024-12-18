@@ -63,4 +63,14 @@ public class SudokuBoard extends JPanel {
         table.setShowGrid(true);
         add(table);
     }
+
+    public void update(Grid grid) {
+        var value = grid.getGrid().getInner();
+        var table = (JTable) getComponent(0);
+        for (int i = 0; i < value.length; i++) {
+            for (int j = 0; j < value[i].length; j++) {
+                table.setValueAt(value[i][j], i, j);
+            }
+        }
+    }
 }

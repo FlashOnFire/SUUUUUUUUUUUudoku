@@ -100,4 +100,18 @@ public class InnerGrid {
         return grid.length;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        InnerGrid innerGrid = (InnerGrid) o;
+        return emptyCells.equals(innerGrid.emptyCells) && Arrays.deepEquals(grid, innerGrid.grid);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = emptyCells.hashCode();
+        result = 31 * result + Arrays.deepHashCode(grid);
+        return result;
+    }
 }

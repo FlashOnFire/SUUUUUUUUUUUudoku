@@ -12,7 +12,7 @@ import java.util.Arrays;
 
 public class SudokuBoard extends JPanel {
     SudokuBoard(Grid grid) {
-        var value = grid.getGrid();
+        var value = grid.getGrid().getInner();
 
         String[] columnNames = new String[value[0].length];
         Arrays.fill(columnNames, "");
@@ -31,17 +31,18 @@ public class SudokuBoard extends JPanel {
             System.arraycopy(value[i], 0, data[i], 0, value[i].length);
             table.getColumnModel().getColumn(i).setCellRenderer(new DefaultTableCellRenderer() {
                 @Override
-                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                                                               boolean hasFocus, int row, int column) {
                     Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                     setHorizontalAlignment(SwingConstants.CENTER);
                     grid.getConstraints().stream()
-                            .filter(BlockConstraint.class::isInstance)
-                            .map(BlockConstraint.class::cast)
-                            .filter(blockConstraint -> row >= blockConstraint.getX() && row < blockConstraint.getDx() && column >= blockConstraint.getY() && column < blockConstraint.getDy())
-                            .findFirst()
-                            .ifPresent(blockConstraint -> c.setBackground(
-                                    new Color(grid.getConstraints().indexOf(blockConstraint) * 123456 % 0x888888 + 0x777777)
-                            ));
+                        .filter(BlockConstraint.class::isInstance)
+                        .map(BlockConstraint.class::cast)
+                        .filter(blockConstraint -> row >= blockConstraint.getX() && row < blockConstraint.getDx() && column >= blockConstraint.getY() && column < blockConstraint.getDy())
+                        .findFirst()
+                        .ifPresent(blockConstraint -> c.setBackground(
+                                new Color(grid.getConstraints().indexOf(blockConstraint) * 123456 % 0x888888 + 0x777777)
+                        ));
                     return c;
                 }
             });

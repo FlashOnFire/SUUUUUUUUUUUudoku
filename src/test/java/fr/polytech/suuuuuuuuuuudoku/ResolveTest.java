@@ -60,7 +60,7 @@ public class ResolveTest {
         assertEquals(SolvingState.SOLVED, isSolved);
         assertTrue(grid.areConstraintsSatisfied());
 
-        var solvedGrid = grid.getGrid();
+        var solvedGrid = grid.getGrid().getInner();
         for (int i = 0; i < solvedGrid.length; i++) {
             for (int j = 0; j < solvedGrid[i].length; j++) {
                 assertEquals(res[i][j], solvedGrid[i][j]);
@@ -116,7 +116,7 @@ public class ResolveTest {
         assertTrue(grid.areConstraintsSatisfied());
 
 
-        var solvedGrid = grid.getGrid();
+        var solvedGrid = grid.getGrid().getInner();
         for (int i = 0; i < solvedGrid.length; i++) {
             for (int j = 0; j < solvedGrid[i].length; j++) {
                 assertEquals(res[i][j], solvedGrid[i][j]);
@@ -172,7 +172,7 @@ public class ResolveTest {
         assertTrue(grid.areConstraintsSatisfied());
 
 
-        var solvedGrid = grid.getGrid();
+        var solvedGrid = grid.getGrid().getInner();
         for (int i = 0; i < solvedGrid.length; i++) {
             for (int j = 0; j < solvedGrid[i].length; j++) {
                 assertEquals(res[i][j], solvedGrid[i][j]);
@@ -208,7 +208,7 @@ public class ResolveTest {
 
     @Test
     public void testSolveBig() throws FileNotFoundException {
-        var grid = Grid.fromCsv(Path.of(resoucesPath + "100x100.csv"));
+        var grid = CsvUtils.importGrid(Path.of(resoucesPath + "100x100.csv"));
         assertFalse(grid.areConstraintsSatisfied());
 
         var isSolved = SudokuSolver.solve(grid, true, true);

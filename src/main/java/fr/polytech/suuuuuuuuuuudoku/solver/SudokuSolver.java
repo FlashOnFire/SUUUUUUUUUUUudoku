@@ -73,9 +73,9 @@ public class SudokuSolver {
         emptyCells.stream().parallel().forEach(cell -> emptyCellMap.put(cell, tryDeduce(grid, cell)));
 
         var cell = emptyCellMap.entrySet().stream()
-                .min(Comparator.comparingInt(e -> e.getValue().size()))
-                .map(Map.Entry::getKey)
-                .orElseThrow();
+                               .min(Comparator.comparingInt(e -> e.getValue().size()))
+                               .map(Map.Entry::getKey)
+                               .orElseThrow();
         return tryDeduce(grid, cell).stream().map(c -> {
             Grid newgrid = new Grid(grid);
             newgrid.placeUnchecked(cell, c);
@@ -126,14 +126,14 @@ public class SudokuSolver {
      */
     private static Set<String> tryDeduce(Grid grid, Vec2i pos) {
         return grid.getConstraints()
-                .stream()
-                .parallel()
-                .map(constraint -> constraint.getPossibilities(grid.getGrid(), pos))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .reduce((acc, set) -> {
-                    acc.retainAll(set);
-                    return acc;
-                }).orElse(new HashSet<>(grid.getSymbols()));
+                   .stream()
+                   .parallel()
+                   .map(constraint -> constraint.getPossibilities(grid.getGrid().getInner(), pos))
+                   .filter(Optional::isPresent)
+                   .map(Optional::get)
+                   .reduce((acc, set) -> {
+                       acc.retainAll(set);
+                       return acc;
+                   }).orElse(new HashSet<>(grid.getSymbols()));
     }
 }

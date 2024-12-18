@@ -146,7 +146,7 @@ public class Grid {
      * @return true if the grid is solved, false otherwise
      */
     public boolean isSolved() {
-        return this.getEmptyCells().isEmpty() && this.areConstraintsSatisfied();
+        return this.areConstraintsSatisfied();
     }
 
     /**

@@ -6,7 +6,10 @@ import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
 import java.io.*;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -51,7 +54,7 @@ public class Grid {
      * @param symbols the set of symbols
      */
     public Grid(String[][] grid, Set<String> symbols) {
-        this(grid, AbstractConstraint.getClassicConstrainters(grid.length, symbols), symbols);
+        this(grid, AbstractConstraint.getClassicConstraints(grid.length, symbols), symbols);
     }
 
     public Grid(Grid otherGrid) {
@@ -94,10 +97,10 @@ public class Grid {
      */
     public void toCsv(Path path) {
         var csvData = Arrays.stream(this.grid)
-                .map(line -> Arrays.stream(line)
-                        .map(cell -> cell.equals(" ") ? "." : cell)
-                        .collect(Collectors.joining(",")))
-                .collect(Collectors.joining("\n"));
+                            .map(line -> Arrays.stream(line)
+                                               .map(cell -> cell.equals(" ") ? "." : cell)
+                                               .collect(Collectors.joining(",")))
+                            .collect(Collectors.joining("\n"));
 
         try (var writer = new BufferedWriter(new FileWriter(path.toFile()))) {
             writer.write(csvData);
@@ -136,8 +139,8 @@ public class Grid {
      */
     public boolean areConstraintsSatisfied() {
         return this.constraints.stream()
-                .parallel()
-                .allMatch(c -> c.isSatisfied(this.grid));
+                               .parallel()
+                               .allMatch(c -> c.isSatisfied(this.grid));
     }
 
     /**

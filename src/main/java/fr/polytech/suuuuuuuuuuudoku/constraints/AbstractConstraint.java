@@ -19,17 +19,20 @@ public interface AbstractConstraint {
      * @param symbols the set of symbols used in the grid
      * @return a list of classic constraints
      */
-    static List<AbstractConstraint> getClassicConstrainters(int size, Set<String> symbols) {
+    static List<AbstractConstraint> getClassicConstraints(int size, Set<String> symbols) {
         List<AbstractConstraint> constraintList = new ArrayList<>();
         var blockSize = (int) Math.sqrt(size);
+
         for (int i = 0; i < size; i += blockSize) {
             for (int j = 0; j < size; j += blockSize) {
                 constraintList.add(new BlockConstraint(symbols, i, j, i + blockSize, j + blockSize));
             }
         }
+
         constraintList.add(new LineConstraint(symbols));
         constraintList.add(new ColumnConstraint(symbols));
         constraintList.add(new NotEmptyConstraint());
+
         return constraintList;
     }
 

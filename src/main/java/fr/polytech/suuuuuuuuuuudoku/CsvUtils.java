@@ -42,7 +42,7 @@ public class CsvUtils {
         try (var writer = new BufferedWriter(new FileWriter(path.toFile()))) {
             writer.write(csvData);
         } catch (IOException e) {
-            e.printStackTrace();
+            e.printStackTrace(System.err);
         }
     }
 }

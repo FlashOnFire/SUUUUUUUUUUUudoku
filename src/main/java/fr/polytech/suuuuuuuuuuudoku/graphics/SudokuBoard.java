@@ -1,7 +1,7 @@
 package fr.polytech.suuuuuuuuuuudoku.graphics;
 
-import fr.polytech.suuuuuuuuuuudoku.Grid;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
+import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;

@@ -1,6 +1,7 @@
 package fr.polytech.suuuuuuuuuuudoku;
 
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
+import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.solver.SolvingState;
 import fr.polytech.suuuuuuuuuuudoku.solver.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;

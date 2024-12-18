@@ -4,11 +4,10 @@ import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.ColumnConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.LineConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.NotEmptyConstraint;
-import fr.polytech.suuuuuuuuuuudoku.graphics.SudokuFrame;
+import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.solver.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
-import javax.swing.*;
 import java.util.List;
 
 public class Main {

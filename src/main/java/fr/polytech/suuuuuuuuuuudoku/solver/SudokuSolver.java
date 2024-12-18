@@ -1,7 +1,7 @@
 package fr.polytech.suuuuuuuuuuudoku.solver;
 
-import fr.polytech.suuuuuuuuuuudoku.Grid;
 import fr.polytech.suuuuuuuuuuudoku.constraints.AbstractConstraint;
+import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 
 import java.util.*;
 

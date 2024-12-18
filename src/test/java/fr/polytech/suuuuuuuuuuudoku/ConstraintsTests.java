@@ -3,6 +3,7 @@ package fr.polytech.suuuuuuuuuuudoku;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.ColumnConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.LineConstraint;
+import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

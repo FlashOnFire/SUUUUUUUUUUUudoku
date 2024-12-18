@@ -1,4 +1,4 @@
-package fr.polytech.suuuuuuuuuuudoku;
+package fr.polytech.suuuuuuuuuuudoku.grid;
 
 import fr.polytech.suuuuuuuuuuudoku.constraints.AbstractConstraint;
 import fr.polytech.suuuuuuuuuuudoku.solver.Vec2i;

@@ -1,6 +1,5 @@
 package fr.polytech.suuuuuuuuuuudoku.algorithm;
 
-import fr.polytech.suuuuuuuuuuudoku.constraints.AbstractConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 
 import java.util.*;
@@ -23,7 +22,6 @@ public class SudokuSolver {
         ArrayDeque<Grid> currentList = new ArrayDeque<>();
         currentList.add(grid);
 
-        var constraints = grid.getConstraints();
         while (!currentList.isEmpty()) {
             var currentGrid = currentList.removeLast();
             if (currentGrid.isSolved()) {
@@ -32,7 +30,7 @@ public class SudokuSolver {
             }
 
             if (deducing) {
-                var state = solveDeduction(currentGrid, constraints);
+                var state = solveDeduction(currentGrid);
 
                 if (state == SolvingState.SOLVED) {
                     grid.setGrid(currentGrid.getGrid());
@@ -89,7 +87,7 @@ public class SudokuSolver {
      * @param grid the Sudoku grid to solve
      * @return the solving state of the Sudoku grid
      */
-    private static SolvingState solveDeduction(Grid grid, List<AbstractConstraint> constraints) {
+    private static SolvingState solveDeduction(Grid grid) {
         boolean finished = false;
 
         List<Vec2i> emptyCells = grid.getEmptyCells();
@@ -108,7 +106,6 @@ public class SudokuSolver {
                     return SolvingState.UNSOLVABLE;
                 } else if (set.size() == 1) {
                     grid.placeUnchecked(cell, set.stream().findFirst().orElseThrow());
-                    emptyCells.remove(cell);
                     finished = false;
                 }
             }

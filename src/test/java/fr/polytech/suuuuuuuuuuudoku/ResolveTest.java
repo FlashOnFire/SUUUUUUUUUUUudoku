@@ -2,8 +2,8 @@ package fr.polytech.suuuuuuuuuuudoku;
 
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
-import fr.polytech.suuuuuuuuuuudoku.solver.SolvingState;
-import fr.polytech.suuuuuuuuuuudoku.solver.SudokuSolver;
+import fr.polytech.suuuuuuuuuuudoku.algorithm.SolvingState;
+import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 import org.junit.jupiter.api.Test;
 

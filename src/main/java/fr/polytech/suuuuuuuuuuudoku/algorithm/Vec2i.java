@@ -1,4 +1,4 @@
-package fr.polytech.suuuuuuuuuuudoku.solver;
+package fr.polytech.suuuuuuuuuuudoku.algorithm;
 
 import java.util.Objects;
 

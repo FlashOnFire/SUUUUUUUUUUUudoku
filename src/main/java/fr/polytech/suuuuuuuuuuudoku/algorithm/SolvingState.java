@@ -1,4 +1,4 @@
-package fr.polytech.suuuuuuuuuuudoku.solver;
+package fr.polytech.suuuuuuuuuuudoku.algorithm;
 
 /**
  * Enum representing the state of the Sudoku solving process.

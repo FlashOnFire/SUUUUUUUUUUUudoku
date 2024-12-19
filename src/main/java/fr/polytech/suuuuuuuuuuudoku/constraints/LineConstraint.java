@@ -1,6 +1,6 @@
 package fr.polytech.suuuuuuuuuuudoku.constraints;
 
-import fr.polytech.suuuuuuuuuuudoku.solver.Vec2i;
+import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 
 import java.util.Arrays;
 import java.util.Optional;

@@ -1,6 +1,6 @@
 package fr.polytech.suuuuuuuuuuudoku.grid;
 
-import fr.polytech.suuuuuuuuuuudoku.solver.Vec2i;
+import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 
 import java.util.ArrayList;
 import java.util.Arrays;

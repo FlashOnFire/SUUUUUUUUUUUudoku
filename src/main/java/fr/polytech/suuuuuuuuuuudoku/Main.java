@@ -1,5 +1,6 @@
 package fr.polytech.suuuuuuuuuuudoku;
 
+import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.ColumnConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.LineConstraint;
@@ -13,7 +14,7 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        var grid = new Grid(new String[][]{
+        /*var grid = new Grid(new String[][]{
                 {"5", " ", " ", "9", "2", " ", " ", "7", " "},
                 {" ", " ", " ", " ", " ", "1", " ", " ", " "},
                 {"1", " ", " ", " ", " ", " ", " ", "5", "6"},
@@ -40,7 +41,9 @@ public class Main {
                 new BlockConstraint(SymbolSets.DIGITS, 6, 6, 9, 9),
 
                 new NotEmptyConstraint()
-        ), SymbolSets.DIGITS);
+        ), SymbolSets.DIGITS);*/
+
+        var grid = Generator.generate9x9();
 
         SwingUtilities.invokeLater(() ->
         {

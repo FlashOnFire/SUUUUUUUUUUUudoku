@@ -13,9 +13,7 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 
 public class SudokuBoard extends JPanel {
-    // Todo : see if data is a necessary value to stock
     Grid grid;
-    Object[][] data;
     boolean[][] trace;
     JTable table;
 
@@ -25,9 +23,13 @@ public class SudokuBoard extends JPanel {
         String[] columnNames = new String[value[0].length];
         Arrays.fill(columnNames, "");
         this.grid = grid;
-        data = new Object[value.length][value[0].length];
+        Object[][] data = new Object[value.length][value[0].length];
 
-        table = new JTable(data, columnNames);
+        table = new JTable(data, columnNames) {
+            public boolean isCellEditable(int row, int col) {
+                return trace[row][col];
+            }
+        };
         table.setFont(new Font("Arial", Font.PLAIN, 50));
         table.setGridColor(Color.BLACK);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -46,8 +48,7 @@ public class SudokuBoard extends JPanel {
             System.arraycopy(value[i], 0, data[i], 0, value[i].length);
             table.getColumnModel().getColumn(i).setCellRenderer(new DefaultTableCellRenderer() {
                 @Override
-                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                               boolean hasFocus, int row, int column) {
+                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                     Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                     setHorizontalAlignment(SwingConstants.CENTER);
                     grid.getConstraints().stream()
@@ -76,48 +77,31 @@ public class SudokuBoard extends JPanel {
             }
         });
 
+
         table.setShowGrid(true);
         add(table);
     }
 
-    public void update(Object[][] data) {
-        IntStream.range(0, data.length).forEach(i -> System.arraycopy(data[i],
-                0, this.data[i], 0, data[i].length));
 
-        for (Object[] lines : data) {
-            for (Object cell : lines) {
-                System.out.print(cell + " ");
+    public void update(String[][] newData) {
+        for (int i = 0; i < newData.length; i++) {
+            for (int j = 0; j < newData[i].length; j++) {
+                table.setValueAt(newData[i][j], i, j);
             }
-            System.out.println();
         }
-        grid.setGrid(new InnerGrid(transformObjectToString(data)));
+
+        grid.setGrid(new InnerGrid(newData));
 
         table.repaint();
     }
 
     public void recoverPreviousSudoku(Grid grid) {
         var value = grid.getGrid().getInner();
-        IntStream.range(0, data.length).forEach(i ->
-                IntStream.range(0, data[i].length).forEach(j -> {
-                    if (trace[i][j]) {
-                        data[i][j] = " ";
-                    } else {
-                        data[i][j] = value[i][j];
-                    }
-                })
-        );
-
-        update(data);
-    }
-
-    static public String[][] transformObjectToString(Object[][] data) {
-        String[][] res = new String[data.length][data.length];
-        for (int i = 0; i < data.length; i++) {
-            for (int j = 0; j < data.length; j++) {
-                res[i][j] = (String) data[i][j];
+        IntStream.range(0, value.length).forEach(i -> IntStream.range(0, value[i].length).forEach(j -> {
+            if (trace[i][j]) {
+                value[i][j] = " ";
             }
-        }
-
-        return res;
+        }));
+        update(value);
     }
 }

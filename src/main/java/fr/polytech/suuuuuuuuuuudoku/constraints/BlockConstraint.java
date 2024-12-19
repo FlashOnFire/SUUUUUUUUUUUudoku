@@ -25,19 +25,18 @@ public class BlockConstraint implements AbstractConstraint {
      * @param symbols the set of symbols to be checked within the block
      * @param x       the starting x-coordinate of the block
      * @param y       the starting y-coordinate of the block
-     * @param dx      the ending x-coordinate of the block
-     * @param dy      the ending y-coordinate of the block
+     * @param width      the width of the block
+     * @param height      the height of the block
      * @throws IllegalArgumentException if dx is less than or equal to x or dy is less than or equal to y
      */
-    public BlockConstraint(Set<String> symbols, int x, int y, int dx, int dy) {
+    public BlockConstraint(Set<String> symbols, int x, int y, int width, int height) {
         this.symbols = symbols;
-        assert dx != 0 || dy != 0;
-        assert dx > x && dy > y;
+        assert width != 0 || height != 0;
 
         this.x = x;
         this.y = y;
-        this.dx = dx;
-        this.dy = dy;
+        this.dx = x + width;
+        this.dy = y + height;
     }
 
     /**

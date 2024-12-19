@@ -25,7 +25,7 @@ public interface AbstractConstraint {
 
         for (int i = 0; i < size; i += blockSize) {
             for (int j = 0; j < size; j += blockSize) {
-                constraintList.add(new BlockConstraint(symbols, i, j, i + blockSize, j + blockSize));
+                constraintList.add(new BlockConstraint(symbols, i, j, blockSize, blockSize));
             }
         }
 

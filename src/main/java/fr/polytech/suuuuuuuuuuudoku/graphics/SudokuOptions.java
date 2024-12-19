@@ -1,17 +1,12 @@
 package fr.polytech.suuuuuuuuuuudoku.graphics;
 
-import fr.polytech.suuuuuuuuuuudoku.solver.SudokuSolver;
-
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.util.function.Function;
 
 public class SudokuOptions extends JPanel {
-    public SudokuOptions(Color background_color, Runnable solve) {
+    public SudokuOptions(Color background_color, Runnable solve, Runnable reset) {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
         buttonPanel.setBackground(background_color);
@@ -21,12 +16,8 @@ public class SudokuOptions extends JPanel {
         JButton button3 = new JButton("Reset");
         JButton button4 = new JButton("Hint");
 
-        button2.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                solve.run();
-            }
-        });
+        button2.addActionListener(_ -> solve.run());
+        button3.addActionListener(_ -> reset.run());
 
         applyMaterialDesign(button1);
         applyMaterialDesign(button2);
@@ -43,26 +34,27 @@ public class SudokuOptions extends JPanel {
         buttonPanel.add(button4);
         buttonPanel.add(Box.createVerticalStrut(10));
 
-addComponentListener(new ComponentAdapter() {
-    @Override
-    public void componentResized(ComponentEvent e) {
-        //TODO : fix problem of resizing height which resize the width of the buttons
-        int newSize = getHeight() / 5;
-        buttonPanel.setPreferredSize(new Dimension(newSize, getHeight()));
-        for (Component component : buttonPanel.getComponents()) {
-            if (component instanceof Box.Filler filler) {
-                filler.changeShape(filler.getMinimumSize(), new Dimension(component.getWidth(), newSize), filler.getMaximumSize());
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                //TODO : fix problem of resizing height which resize the width of the buttons
+                int newSize = getHeight() / 5;
+                buttonPanel.setPreferredSize(new Dimension(newSize, getHeight()));
+                for (Component component : buttonPanel.getComponents()) {
+                    if (component instanceof Box.Filler filler) {
+                        filler.changeShape(filler.getMinimumSize(), new Dimension(component.getWidth(), newSize), filler.getMaximumSize());
+                    }
+                }
+                revalidate();
+                repaint();
             }
-        }
-        revalidate();
-        repaint();
-    }
-});
+        });
         add(buttonPanel, BorderLayout.CENTER);
 
 
     }
-private void applyMaterialDesign(JButton button) {
+
+    private void applyMaterialDesign(JButton button) {
         button.setFocusPainted(false);
         button.setBackground(new Color(144, 226, 226));
         button.setFont(new Font("Arial", Font.BOLD, 16));

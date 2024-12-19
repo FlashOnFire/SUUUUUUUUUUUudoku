@@ -17,13 +17,21 @@ public class SudokuFrame extends JFrame {
 
         JPanel buttonPanel = new SudokuOptions(background_color, () -> {
             System.out.println("Solving...");
+
+            grid.getGrid().display();
+
             if (grid.isSolved()) {
                 JOptionPane.showMessageDialog(null, "The grid is already solved", "Sudoku", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 SudokuSolver.solve(grid, true, true);
-                board.update(grid);
+                board.update(grid.getGrid().getInner());
             }
-        });
+        },
+                () -> {
+                    System.out.println("Resetting...");
+                    board.recoverPreviousSudoku(grid);
+                    grid.display();
+                });
 
         getContentPane().add(board, BorderLayout.CENTER);
         getContentPane().add(buttonPanel, BorderLayout.EAST);

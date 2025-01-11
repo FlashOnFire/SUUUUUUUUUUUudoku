@@ -1,9 +1,16 @@
 package fr.polytech.suuuuuuuuuuudoku;
 
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
+import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
+import fr.polytech.suuuuuuuuuuudoku.constraints.ColumnConstraint;
+import fr.polytech.suuuuuuuuuuudoku.constraints.LineConstraint;
+import fr.polytech.suuuuuuuuuuudoku.constraints.NotEmptyConstraint;
 import fr.polytech.suuuuuuuuuuudoku.graphics.SudokuFrame;
+import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
+import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
 import javax.swing.*;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
@@ -22,16 +29,16 @@ public class Main {
                 new ColumnConstraint(SymbolSets.DIGITS),
 
                 new BlockConstraint(SymbolSets.DIGITS, 0, 0, 3, 3),
-                new BlockConstraint(SymbolSets.DIGITS, 3, 0, 6, 3),
-                new BlockConstraint(SymbolSets.DIGITS, 6, 0, 9, 3),
+                new BlockConstraint(SymbolSets.DIGITS, 3, 0, 3, 3),
+                new BlockConstraint(SymbolSets.DIGITS, 6, 0, 3, 3),
 
-                new BlockConstraint(SymbolSets.DIGITS, 0, 3, 3, 6),
-                new BlockConstraint(SymbolSets.DIGITS, 3, 3, 6, 6),
-                new BlockConstraint(SymbolSets.DIGITS, 6, 3, 9, 6),
+                new BlockConstraint(SymbolSets.DIGITS, 0, 3, 3, 3),
+                new BlockConstraint(SymbolSets.DIGITS, 3, 3, 3, 3),
+                new BlockConstraint(SymbolSets.DIGITS, 6, 3, 3, 3),
 
-                new BlockConstraint(SymbolSets.DIGITS, 0, 6, 3, 9),
-                new BlockConstraint(SymbolSets.DIGITS, 3, 6, 6, 9),
-                new BlockConstraint(SymbolSets.DIGITS, 6, 6, 9, 9),
+                new BlockConstraint(SymbolSets.DIGITS, 0, 6, 3, 3),
+                new BlockConstraint(SymbolSets.DIGITS, 3, 6, 3, 3),
+                new BlockConstraint(SymbolSets.DIGITS, 6, 6, 3, 3),
 
                 new NotEmptyConstraint()
         ), SymbolSets.DIGITS);*/

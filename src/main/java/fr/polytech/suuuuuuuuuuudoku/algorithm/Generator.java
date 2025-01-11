@@ -11,9 +11,9 @@ public class Generator {
     public static Grid generate9x9() {
         var symbols = SymbolSets.generateSymbols(9);
 
-        var innerGrid = new String[9][9];
+        var innerGrid = new Integer[9][9];
         for (var i = 0; i < 9; i++) {
-            Arrays.fill(innerGrid[i], " ");
+            Arrays.fill(innerGrid[i], null);
         }
 
         var grid = new Grid(innerGrid, symbols);
@@ -26,7 +26,7 @@ public class Generator {
         }
 
         var posArray = pos.toArray(Vec2i[]::new);
-        var symbolsArray = symbols.toArray(String[]::new);
+        var symbolsArray = symbols.toArray(Integer[]::new);
 
         IntStream.range(0, 9).forEach(i -> grid.placeUnchecked(posArray[i], symbolsArray[i], false));
         grid.computeAllEmptyCellsPossibilities();

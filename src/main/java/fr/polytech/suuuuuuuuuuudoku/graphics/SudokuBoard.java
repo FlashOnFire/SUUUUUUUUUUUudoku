@@ -39,7 +39,7 @@ public class SudokuBoard extends JPanel {
         for (int i = 0; i < value.length; i++) {
             for (int j = 0; j < value[i].length; j++) {
                 // In order to change the color of the editable cells
-                trace[i][j] = value[i][j].equals(" ");
+                trace[i][j] = value[i][j] == null;
             }
         }
 
@@ -83,7 +83,7 @@ public class SudokuBoard extends JPanel {
     }
 
 
-    public void update(String[][] newData) {
+    public void update(Integer[][] newData) {
         for (int i = 0; i < newData.length; i++) {
             for (int j = 0; j < newData[i].length; j++) {
                 table.setValueAt(newData[i][j], i, j);
@@ -99,7 +99,7 @@ public class SudokuBoard extends JPanel {
         var value = grid.getGrid().getInner();
         IntStream.range(0, value.length).forEach(i -> IntStream.range(0, value[i].length).forEach(j -> {
             if (trace[i][j]) {
-                value[i][j] = " ";
+                value[i][j] = null;
             }
         }));
         update(value);

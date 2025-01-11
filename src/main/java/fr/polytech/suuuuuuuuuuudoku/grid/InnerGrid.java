@@ -12,25 +12,25 @@ public class InnerGrid {
     /**
      * The Sudoku grid represented as a 2D array of Strings.
      */
-    private String[][] grid;
+    private Integer[][] grid;
 
     /**
      * Constructs a Grid with the specified grid and constraints.
      *
      * @param grid the initial grid
      */
-    public InnerGrid(String[][] grid) {
+    public InnerGrid(Integer[][] grid) {
         this.grid = grid;
     }
 
 
     public InnerGrid(InnerGrid otherGrid) {
         if (otherGrid.grid.length == 0) {
-            this.grid = new String[0][0];
+            this.grid = new Integer[0][0];
             return;
         }
 
-        this.grid = new String[otherGrid.grid.length][otherGrid.grid[0].length];
+        this.grid = new Integer[otherGrid.grid.length][otherGrid.grid[0].length];
         for (int y = 0; y < otherGrid.grid.length; y++) {
             this.grid[y] = Arrays.copyOf(otherGrid.grid[y], otherGrid.grid[y].length);
         }
@@ -40,9 +40,13 @@ public class InnerGrid {
      * Displays the grid to the console.
      */
     public void display() {
-        for (String[] lines : this.grid) {
-            for (String cell : lines) {
-                System.out.print(cell + " ");
+        for (Integer[] lines : this.grid) {
+            for (Integer cell : lines) {
+                if (cell == null) {
+                    System.out.print(" ");
+                } else{
+                    System.out.print(cell + " ");
+                }
             }
             System.out.println();
         }
@@ -53,7 +57,7 @@ public class InnerGrid {
 
         for (int y = 0; y < grid.length; y++) {
             for (int x = 0; x < grid[y].length; x++) {
-                if (grid[y][x].equals(" ")) {
+                if (grid[y][x] == null) {
                     emptyCells.add(new Vec2i(x, y));
                 }
             }
@@ -67,7 +71,7 @@ public class InnerGrid {
      *
      * @return the grid
      */
-    public String[][] getInner() {
+    public Integer[][] getInner() {
         return grid;
     }
 
@@ -76,7 +80,7 @@ public class InnerGrid {
      *
      * @param grid the new grid
      */
-    public void setGrid(String[][] grid) {
+    public void setGrid(Integer[][] grid) {
         this.grid = grid;
         this.computeEmptyCells();
     }

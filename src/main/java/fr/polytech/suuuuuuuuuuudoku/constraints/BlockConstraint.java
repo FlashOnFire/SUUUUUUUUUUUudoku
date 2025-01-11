@@ -12,7 +12,7 @@ public class BlockConstraint implements AbstractConstraint {
     /**
      * The set of symbols to be checked within the block.
      */
-    private final Set<String> symbols;
+    private final Set<Integer> symbols;
 
     /**
      * The starting and ending coordinates of the block.
@@ -29,7 +29,7 @@ public class BlockConstraint implements AbstractConstraint {
      * @param height  the height of the block
      * @throws IllegalArgumentException if dx is less than or equal to x or dy is less than or equal to y
      */
-    public BlockConstraint(Set<String> symbols, int x, int y, int width, int height) {
+    public BlockConstraint(Set<Integer> symbols, int x, int y, int width, int height) {
         this.symbols = symbols;
         assert width != 0 || height != 0;
 
@@ -46,7 +46,7 @@ public class BlockConstraint implements AbstractConstraint {
      * @return true if the constraint is satisfied, false otherwise
      */
     @Override
-    public boolean isSatisfied(String[][] grid) {
+    public boolean isSatisfied(Integer[][] grid) {
         // Extract the block from the grid
         var set = extractBlock(grid);
 
@@ -63,10 +63,10 @@ public class BlockConstraint implements AbstractConstraint {
      * @throws AssertionError if the position is out of the grid bounds or the grid cell is empty
      */
     @Override
-    public Optional<Set<String>> getPossibilities(String[][] grid, Vec2i pos) {
+    public Optional<Set<Integer>> getPossibilities(Integer[][] grid, Vec2i pos) {
         assert pos.getX() < grid[0].length;
         assert pos.getY() < grid.length;
-        assert grid[pos.getY()][pos.getX()].equals(" ");
+        assert grid[pos.getY()][pos.getX()] == null;
 
         // Check if the position is within the block
         if (pos.getX() < x || pos.getX() >= dx || pos.getY() < y || pos.getY() >= dy) {
@@ -74,7 +74,7 @@ public class BlockConstraint implements AbstractConstraint {
         }
 
         // Extract the block from the grid
-        Set<String> set = extractBlock(grid);
+        Set<Integer> set = extractBlock(grid);
 
         // Return the symbols that are not present in the block
         var possibilities = symbols.stream()
@@ -115,12 +115,12 @@ public class BlockConstraint implements AbstractConstraint {
      * @param grid the grid from which to extract the block
      * @return a set of characters within the block, excluding empty cells
      */
-    private Set<String> extractBlock(String[][] grid) {
-        HashSet<String> set = new HashSet<>();
+    private Set<Integer> extractBlock(Integer[][] grid) {
+        HashSet<Integer> set = new HashSet<>();
         for (int i = y; i < dy; i++) {
             set.addAll(Arrays.asList(grid[i]).subList(x, dx));
         }
-        set.removeIf(c -> c.equals(" "));
+        set.removeIf(Objects::isNull);
 
         return set;
     }

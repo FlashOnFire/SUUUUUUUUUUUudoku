@@ -3,6 +3,7 @@ package fr.polytech.suuuuuuuuuuudoku.constraints;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,8 +19,8 @@ public class NotEmptyConstraint implements AbstractConstraint {
      * @return true if no cell in the grid is empty, false otherwise
      */
     @Override
-    public boolean isSatisfied(String[][] grid) {
-        return Arrays.stream(grid).allMatch(line -> Arrays.stream(line).noneMatch(cell -> cell.equals(" ")));
+    public boolean isSatisfied(Integer[][] grid) {
+        return Arrays.stream(grid).allMatch(line -> Arrays.stream(line).noneMatch(Objects::isNull));
     }
 
     /**
@@ -30,7 +31,7 @@ public class NotEmptyConstraint implements AbstractConstraint {
      * @return an empty Optional as this constraint does not provide possibilities
      */
     @Override
-    public Optional<Set<String>> getPossibilities(String[][] grid, Vec2i pos) {
+    public Optional<Set<Integer>> getPossibilities(Integer[][] grid, Vec2i pos) {
         return Optional.empty();
     }
 

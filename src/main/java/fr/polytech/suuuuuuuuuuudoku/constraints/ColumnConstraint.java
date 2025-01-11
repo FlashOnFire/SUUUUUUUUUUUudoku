@@ -3,6 +3,7 @@ package fr.polytech.suuuuuuuuuuudoku.constraints;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -11,14 +12,14 @@ import java.util.stream.Collectors;
  * Represents a constraint that ensures each column in the grid satisfies the given symbols.
  */
 public class ColumnConstraint implements AbstractConstraint {
-    private final Set<String> symbols;
+    private final Set<Integer> symbols;
 
     /**
      * Constructs a ColumnConstraint with the specified set of symbols.
      *
      * @param symbols the set of symbols that each column must contain
      */
-    public ColumnConstraint(Set<String> symbols) {
+    public ColumnConstraint(Set<Integer> symbols) {
         this.symbols = symbols;
     }
 
@@ -29,7 +30,7 @@ public class ColumnConstraint implements AbstractConstraint {
      * @return true if the constraint is satisfied, false otherwise
      */
     @Override
-    public boolean isSatisfied(String[][] grid) {
+    public boolean isSatisfied(Integer[][] grid) {
         if (grid.length == 0) {
             return true;
         }
@@ -41,10 +42,10 @@ public class ColumnConstraint implements AbstractConstraint {
         for (int i = 0; i < grid.length; i++) {
             // This is a workaround to use the variable i in the lambda
             int finalI = i;
-            String[] column = Arrays.stream(grid)
+            Integer[] column = Arrays.stream(grid)
                     .map(line -> line[finalI])
-                    .filter(c -> !c.equals(" "))
-                    .toArray(String[]::new);
+                    .filter(Objects::nonNull)
+                    .toArray(Integer[]::new);
 
             if (!symbols.containsAll(Arrays.asList(column))
                     || Arrays.stream(column)
@@ -65,14 +66,14 @@ public class ColumnConstraint implements AbstractConstraint {
      * @return an Optional containing a list of possible symbols, or an empty Optional if no symbols are possible
      */
     @Override
-    public Optional<Set<String>> getPossibilities(String[][] grid, Vec2i pos) {
+    public Optional<Set<Integer>> getPossibilities(Integer[][] grid, Vec2i pos) {
         assert pos.getX() < grid[0].length;
         assert pos.getY() < grid.length;
-        assert grid[pos.getY()][pos.getX()].equals(" ");
+        assert grid[pos.getY()][pos.getX()] == null;
 
         var column = Arrays.stream(grid)
                 .map(line -> line[pos.getX()])
-                .filter(c -> !c.equals(" "))
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
         var list = symbols.stream().filter(c -> !column.contains(c)).collect(Collectors.toSet());

@@ -17,11 +17,11 @@ public class CsvUtils {
      * @return the created Grid
      */
     static public Grid importGrid(Path file) throws FileNotFoundException {
-        String[][] grid = new BufferedReader(new FileReader(file.toFile()))
+        Integer[][] grid = new BufferedReader(new FileReader(file.toFile()))
                 .lines()
-                .map(line -> Arrays.stream(line.split(",(?<!\\r)")).map(cell -> cell.equals(".") ? " " : cell)
-                                   .toArray(String[]::new))
-                .toArray(String[][]::new);
+                .map(line -> Arrays.stream(line.split(",(?<!\\r)")).map(cell -> cell.equals(".") ? null : Integer.parseInt(cell))
+                                   .toArray(Integer[]::new))
+                .toArray(Integer[][]::new);
 
         var symbols = SymbolSets.generateSymbols(grid.length);
         return new Grid(grid, symbols);
@@ -35,7 +35,7 @@ public class CsvUtils {
     static public void exportGrid(Path path, Grid grid) {
         var csvData = Arrays.stream(grid.getGrid().getInner())
                             .map(line -> Arrays.stream(line)
-                                               .map(cell -> cell.equals(" ") ? "." : cell)
+                                               .map(cell -> cell == null ? "." : cell.toString())
                                                .collect(Collectors.joining(",")))
                             .collect(Collectors.joining("\n"));
 

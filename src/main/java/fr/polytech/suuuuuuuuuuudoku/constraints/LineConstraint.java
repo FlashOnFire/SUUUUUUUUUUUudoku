@@ -3,6 +3,7 @@ package fr.polytech.suuuuuuuuuuudoku.constraints;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -11,14 +12,14 @@ import java.util.stream.Collectors;
  * Represents a constraint that ensures each line in the grid satisfies certain conditions.
  */
 public class LineConstraint implements AbstractConstraint {
-    private final Set<String> symbols;
+    private final Set<Integer> symbols;
 
     /**
      * Constructs a LineConstraint with the specified set of symbols.
      *
      * @param symbols the set of symbols that must be present in each line
      */
-    public LineConstraint(Set<String> symbols) {
+    public LineConstraint(Set<Integer> symbols) {
         this.symbols = symbols;
     }
 
@@ -29,11 +30,11 @@ public class LineConstraint implements AbstractConstraint {
      * @return true if the constraint is satisfied, false otherwise
      */
     @Override
-    public boolean isSatisfied(String[][] grid) {
+    public boolean isSatisfied(Integer[][] grid) {
         assert grid.length == symbols.size();
 
         return Arrays.stream(grid).allMatch(line -> {
-            var list = Arrays.stream(line).filter(c -> !c.equals(" ")).toList();
+            var list = Arrays.stream(line).filter(Objects::nonNull).toList();
 
             return symbols.containsAll(list)
                     && list.stream().distinct().count() == list.size();
@@ -48,13 +49,13 @@ public class LineConstraint implements AbstractConstraint {
      * @return an Optional containing a list of possible symbols, or an empty Optional if no symbols are possible
      */
     @Override
-    public Optional<Set<String>> getPossibilities(String[][] grid, Vec2i pos) {
+    public Optional<Set<Integer>> getPossibilities(Integer[][] grid, Vec2i pos) {
         assert pos.getY() < grid.length;
         assert pos.getX() < grid[0].length;
-        assert grid[pos.getY()][pos.getX()].equals(" ");
+        assert grid[pos.getY()][pos.getX()] == null;
 
         var row = Arrays.stream(grid[pos.getY()])
-                .filter(c -> !c.equals(" "))
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
         var list = symbols

@@ -19,13 +19,13 @@ public class Grid {
     /**
      * The set of symbols used in the grid.
      */
-    private final Set<String> symbols;
+    private final Set<Integer> symbols;
     /**
      * The Sudoku grid represented as a 2D array of Strings.
      */
     private InnerGrid grid;
 
-    private HashMap<Vec2i, Set<String>> emptyCellsPossibilities = new HashMap<>();
+    private HashMap<Vec2i, Set<Integer>> emptyCellsPossibilities = new HashMap<>();
 
     /**
      * Constructs a Grid with the specified grid, constraints, and symbols.
@@ -33,7 +33,7 @@ public class Grid {
      * @param grid        the initial grid
      * @param constraints the list of constraints
      */
-    public Grid(String[][] grid, List<AbstractConstraint> constraints, Set<String> symbols) {
+    public Grid(Integer[][] grid, List<AbstractConstraint> constraints, Set<Integer> symbols) {
         this.grid = new InnerGrid(grid);
         this.constraints = constraints;
         this.symbols = symbols;
@@ -48,7 +48,7 @@ public class Grid {
      * @param grid    the initial grid
      * @param symbols the set of symbols
      */
-    public Grid(String[][] grid, Set<String> symbols) {
+    public Grid(Integer[][] grid, Set<Integer> symbols) {
         this(grid, AbstractConstraint.getClassicConstraints(grid.length, symbols), symbols);
     }
 
@@ -155,11 +155,11 @@ public class Grid {
         // Iterate over blocks
         blockToEmptyCells.forEach((constraint, cells) -> {
             // Create a map of possibilities to cells within this block
-            Map<Set<String>, List<Vec2i>> possibilitiesToCells = new HashMap<>();
+            Map<Set<Integer>, List<Vec2i>> possibilitiesToCells = new HashMap<>();
             for (Vec2i cell : cells) {
                 var possibilities = this.emptyCellsPossibilities.get(cell);
                 if (possibilities.size() == 2) { // Only consider cells with size 2
-                    possibilitiesToCells.computeIfAbsent(possibilities, k -> new ArrayList<>()).add(cell);
+                    possibilitiesToCells.computeIfAbsent(possibilities, _ -> new ArrayList<>()).add(cell);
                 }
             }
 
@@ -184,7 +184,7 @@ public class Grid {
         return changed.get();
     }
 
-    public HashMap<Vec2i, Set<String>> getEmptyCellsPossibilities() {
+    public HashMap<Vec2i, Set<Integer>> getEmptyCellsPossibilities() {
         return this.emptyCellsPossibilities;
     }
 
@@ -214,7 +214,7 @@ public class Grid {
      * @param value the value to place
      * @return true if the placement is valid, false otherwise
      */
-    public boolean tryPlace(Vec2i pos, String value, boolean updatePossibilities) {
+    public boolean tryPlace(Vec2i pos, Integer value, boolean updatePossibilities) {
         var oldValue = this.grid.getInner()[pos.getY()][pos.getX()];
         this.grid.getInner()[pos.getY()][pos.getX()] = value;
         if (!this.areConstraintsSatisfied(true)) {
@@ -225,7 +225,7 @@ public class Grid {
             return false;
         }
 
-        if (oldValue.equals(" ") && !value.equals(" ")) {
+        if (oldValue == null && value != null) {
             this.emptyCellsPossibilities.remove(pos);
         }
 
@@ -237,8 +237,8 @@ public class Grid {
         return true;
     }
 
-    public void placeUnchecked(Vec2i pos, String value, boolean updatePossibilities) {
-        if (this.grid.getInner()[pos.getY()][pos.getX()].equals(" ")) {
+    public void placeUnchecked(Vec2i pos, Integer value, boolean updatePossibilities) {
+        if (this.grid.getInner()[pos.getY()][pos.getX()] == null) {
             this.emptyCellsPossibilities.remove(pos);
         }
 
@@ -272,7 +272,7 @@ public class Grid {
      *
      * @return the set of symbols
      */
-    public Set<String> getSymbols() {
+    public Set<Integer> getSymbols() {
         return this.symbols;
     }
 

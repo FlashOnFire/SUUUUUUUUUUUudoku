@@ -19,7 +19,7 @@ public interface AbstractConstraint {
      * @param symbols the set of symbols used in the grid
      * @return a list of classic constraints
      */
-    static List<AbstractConstraint> getClassicConstraints(int size, Set<String> symbols) {
+    static List<AbstractConstraint> getClassicConstraints(int size, Set<Integer> symbols) {
         List<AbstractConstraint> constraintList = new ArrayList<>();
         var blockSize = (int) Math.sqrt(size);
 
@@ -42,7 +42,7 @@ public interface AbstractConstraint {
      * @param grid the Sudoku grid
      * @return true if the constraint is satisfied, false otherwise
      */
-    boolean isSatisfied(String[][] grid);
+    boolean isSatisfied(Integer[][] grid);
 
     /**
      * Gets the possible values for a given position in the grid.
@@ -51,7 +51,7 @@ public interface AbstractConstraint {
      * @param pos  the position in the grid
      * @return an Optional containing a list of possible values, or an empty Optional if this constraint does not affect the position
      */
-    Optional<Set<String>> getPossibilities(String[][] grid, Vec2i pos);
+    Optional<Set<Integer>> getPossibilities(Integer[][] grid, Vec2i pos);
 
     /**
      * Checks if the two given positions have an effect on each other with respect to the constraint.
@@ -63,7 +63,7 @@ public interface AbstractConstraint {
     /**
      * Checks if the given position is affected by the constraint.
      * @param pos the position to check
-     * @return
+     * @return true if the position is affected by the constraint, false otherwise
      */
     boolean isPosAffected(Vec2i pos);
 }

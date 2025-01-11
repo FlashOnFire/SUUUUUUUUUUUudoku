@@ -53,9 +53,32 @@ public class LineConstraint implements AbstractConstraint {
         assert pos.getX() < grid[0].length;
         assert grid[pos.getY()][pos.getX()].equals(" ");
 
-        var row = Arrays.stream(grid[pos.getY()]).filter(c -> !c.equals(" ")).toList();
-        var list = symbols.stream().filter(c -> !row.contains(c)).collect(Collectors.toSet());
+        var row = Arrays.stream(grid[pos.getY()])
+                .filter(c -> !c.equals(" "))
+                .collect(Collectors.toSet());
 
-        return list.isEmpty() ? Optional.empty() : Optional.of(list);
+        var list = symbols
+                .stream()
+                .filter(c -> !row.contains(c))
+                .collect(Collectors.toSet());
+
+        return Optional.of(list);
+    }
+
+    /**
+     * Checks if the two given positions have an effect on each other with respect to the constraint.
+     */
+    public boolean isAffectedBy(Vec2i pos1, Vec2i pos2) {
+        return pos1.getY() == pos2.getY();
+    }
+
+    /**
+     * Checks if the given position is affected by the constraint.
+     *
+     * @param pos the position to check
+     * @return true if the position is affected by the constraint, false otherwise
+     */
+    public boolean isPosAffected(Vec2i pos) {
+        return true;
     }
 }

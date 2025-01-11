@@ -1,16 +1,9 @@
 package fr.polytech.suuuuuuuuuuudoku;
 
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
-import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
-import fr.polytech.suuuuuuuuuuudoku.constraints.ColumnConstraint;
-import fr.polytech.suuuuuuuuuuudoku.constraints.LineConstraint;
-import fr.polytech.suuuuuuuuuuudoku.constraints.NotEmptyConstraint;
 import fr.polytech.suuuuuuuuuuudoku.graphics.SudokuFrame;
-import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
-import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
 import javax.swing.*;
-import java.util.List;
 
 public class Main {
     public static void main(String[] args) {

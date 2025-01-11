@@ -2,18 +2,13 @@ package fr.polytech.suuuuuuuuuuudoku.grid;
 
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
 
 /**
  * Represents a Sudoku grid with constraints.
  */
 public class InnerGrid {
-    /**
-     * The list of empty cells in the grid.
-     */
-    protected List<Vec2i> emptyCells = new ArrayList<>();
     /**
      * The Sudoku grid represented as a 2D array of Strings.
      */
@@ -26,7 +21,6 @@ public class InnerGrid {
      */
     public InnerGrid(String[][] grid) {
         this.grid = grid;
-        this.computeEmptyCells();
     }
 
 
@@ -40,8 +34,6 @@ public class InnerGrid {
         for (int y = 0; y < otherGrid.grid.length; y++) {
             this.grid[y] = Arrays.copyOf(otherGrid.grid[y], otherGrid.grid[y].length);
         }
-
-        this.emptyCells = new ArrayList<>(otherGrid.emptyCells);
     }
 
     /**
@@ -56,15 +48,18 @@ public class InnerGrid {
         }
     }
 
-    protected void computeEmptyCells() {
-        this.emptyCells.clear();
+    public HashSet<Vec2i> computeEmptyCells() {
+        var emptyCells = new HashSet<Vec2i>();
+
         for (int y = 0; y < grid.length; y++) {
             for (int x = 0; x < grid[y].length; x++) {
                 if (grid[y][x].equals(" ")) {
-                    this.emptyCells.add(new Vec2i(x, y));
+                    emptyCells.add(new Vec2i(x, y));
                 }
             }
         }
+
+        return emptyCells;
     }
 
     /**
@@ -86,16 +81,6 @@ public class InnerGrid {
         this.computeEmptyCells();
     }
 
-
-    /**
-     * Returns the list of empty cells.
-     *
-     * @return the list of empty cells
-     */
-    public List<Vec2i> getEmptyCells() {
-        return this.emptyCells;
-    }
-
     public int length() {
         return grid.length;
     }
@@ -105,13 +90,11 @@ public class InnerGrid {
         if (o == null || getClass() != o.getClass()) return false;
 
         InnerGrid innerGrid = (InnerGrid) o;
-        return emptyCells.equals(innerGrid.emptyCells) && Arrays.deepEquals(grid, innerGrid.grid);
+        return Arrays.deepEquals(grid, innerGrid.grid);
     }
 
     @Override
     public int hashCode() {
-        int result = emptyCells.hashCode();
-        result = 31 * result + Arrays.deepHashCode(grid);
-        return result;
+        return Arrays.deepHashCode(grid);
     }
 }

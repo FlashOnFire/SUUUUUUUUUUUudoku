@@ -59,24 +59,23 @@ public class SudokuSolver {
      * @return the solving state of the Sudoku grid
      */
     private static List<Grid> doBacktracking(Grid grid) {
-        var emptyCells = grid.getEmptyCells();
+        System.out.println("Backtracking");
 
-        if (emptyCells.isEmpty()) {
-            List<Grid> lst = new ArrayList<>();
-            lst.add(grid);
-            return lst;
+        assert !grid.getEmptyCellsPossibilities().isEmpty() : "No empty cells";
+
+        var cell = grid.getEmptyCellsPossibilities().entrySet().stream()
+                .min(Comparator.comparingInt(e -> e.getValue().size()))
+                .orElseThrow();
+        System.out.println("Trying " + cell.getKey() + " with " + cell.getValue());
+        if (cell.getValue().isEmpty()) {
+            return List.of();
         }
 
-        HashMap<Vec2i, Set<String>> emptyCellMap = new HashMap<>();
-        emptyCells.stream().parallel().forEach(cell -> emptyCellMap.put(cell, tryDeduce(grid, cell)));
+        //assert cell.getValue().stream().count() > 1 : "Cell has less than two possibilities";
 
-        var cell = emptyCellMap.entrySet().stream()
-                               .min(Comparator.comparingInt(e -> e.getValue().size()))
-                               .map(Map.Entry::getKey)
-                               .orElseThrow();
-        return tryDeduce(grid, cell).stream().map(c -> {
+        return cell.getValue().stream().map(c -> {
             Grid newgrid = new Grid(grid);
-            newgrid.placeUnchecked(cell, c);
+            newgrid.placeUnchecked(cell.getKey(), c, true);
             return newgrid;
         }).toList();
     }
@@ -88,49 +87,35 @@ public class SudokuSolver {
      * @return the solving state of the Sudoku grid
      */
     private static SolvingState solveDeduction(Grid grid) {
+        System.out.println("Deduction");
+
         boolean finished = false;
 
-        List<Vec2i> emptyCells = grid.getEmptyCells();
         while (!finished) {
+            finished = true;
+
+            var emptyCells = new ArrayDeque<>(grid.getEmptyCellsPossibilities().keySet());
             if (emptyCells.isEmpty()) {
                 break;
             }
-            ArrayDeque<Vec2i> emptyCellsQueue = new ArrayDeque<>(emptyCells);
 
-            finished = true;
-            while (!emptyCellsQueue.isEmpty()) {
-                var cell = emptyCellsQueue.pop();
+            while (!emptyCells.isEmpty()) {
+                var cell = emptyCells.pop();
 
-                var set = tryDeduce(grid, cell);
-                if (set.isEmpty()) {
+                var possibilities = grid.getEmptyCellsPossibilities().get(cell);
+                if (possibilities.isEmpty()) {
                     return SolvingState.UNSOLVABLE;
-                } else if (set.size() == 1) {
-                    grid.placeUnchecked(cell, set.stream().findFirst().orElseThrow());
+                }
+
+                if (possibilities.size() == 1) {
+                    grid.placeUnchecked(cell, possibilities.iterator().next(), true);
                     finished = false;
+                } else if (possibilities.isEmpty()) {
+                    return SolvingState.UNSOLVABLE;
                 }
             }
         }
 
         return grid.isSolved() ? SolvingState.SOLVED : SolvingState.PARTIALLY_SOLVED;
-    }
-
-    /**
-     * Tries to deduce the possible values for a cell in the Sudoku grid.
-     *
-     * @param grid the Sudoku grid
-     * @param pos  the position of the cell
-     * @return the set of possible values for the cell
-     */
-    private static Set<String> tryDeduce(Grid grid, Vec2i pos) {
-        return grid.getConstraints()
-                   .stream()
-                   .parallel()
-                   .map(constraint -> constraint.getPossibilities(grid.getGrid().getInner(), pos))
-                   .filter(Optional::isPresent)
-                   .map(Optional::get)
-                   .reduce((acc, set) -> {
-                       acc.retainAll(set);
-                       return acc;
-                   }).orElse(new HashSet<>(grid.getSymbols()));
     }
 }

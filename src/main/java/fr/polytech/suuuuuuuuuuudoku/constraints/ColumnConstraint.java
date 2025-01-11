@@ -3,7 +3,6 @@ package fr.polytech.suuuuuuuuuuudoku.constraints;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -43,14 +42,12 @@ public class ColumnConstraint implements AbstractConstraint {
             // This is a workaround to use the variable i in the lambda
             int finalI = i;
             String[] column = Arrays.stream(grid)
-                    .parallel()
                     .map(line -> line[finalI])
                     .filter(c -> !c.equals(" "))
                     .toArray(String[]::new);
 
             if (!symbols.containsAll(Arrays.asList(column))
                     || Arrays.stream(column)
-                    .parallel()
                     .distinct()
                     .count() != column.length) {
                 return false;
@@ -71,16 +68,32 @@ public class ColumnConstraint implements AbstractConstraint {
     public Optional<Set<String>> getPossibilities(String[][] grid, Vec2i pos) {
         assert pos.getX() < grid[0].length;
         assert pos.getY() < grid.length;
-        assert Objects.equals(grid[pos.getY()][pos.getX()], " ");
+        assert grid[pos.getY()][pos.getX()].equals(" ");
 
         var column = Arrays.stream(grid)
-                .parallel()
                 .map(line -> line[pos.getX()])
-                .filter(c -> !Objects.equals(c, " "))
-                .toList();
+                .filter(c -> !c.equals(" "))
+                .collect(Collectors.toSet());
 
         var list = symbols.stream().filter(c -> !column.contains(c)).collect(Collectors.toSet());
 
-        return list.isEmpty() ? Optional.empty() : Optional.of(list);
+        return Optional.of(list);
+    }
+
+    /**
+     * Checks if the two given positions have an effect on each other with respect to the constraint.
+     */
+    public boolean isAffectedBy(Vec2i pos1, Vec2i pos2) {
+        return pos1.getX() == pos2.getX();
+    }
+
+    /**
+     * Checks if the given position is affected by the constraint.
+     *
+     * @param pos the position to check
+     * @return true if the position is affected by the constraint, false otherwise
+     */
+    public boolean isPosAffected(Vec2i pos) {
+        return true;
     }
 }

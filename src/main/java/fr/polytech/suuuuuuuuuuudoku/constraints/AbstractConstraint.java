@@ -49,7 +49,21 @@ public interface AbstractConstraint {
      *
      * @param grid the Sudoku grid
      * @param pos  the position in the grid
-     * @return an Optional containing a list of possible values, or an empty Optional if no possibilities
+     * @return an Optional containing a list of possible values, or an empty Optional if this constraint does not affect the position
      */
     Optional<Set<String>> getPossibilities(String[][] grid, Vec2i pos);
+
+    /**
+     * Checks if the two given positions have an effect on each other with respect to the constraint.
+     * @param pos1 the first position
+     * @param pos2 the second position
+     */
+    boolean isAffectedBy(Vec2i pos1, Vec2i pos2);
+
+    /**
+     * Checks if the given position is affected by the constraint.
+     * @param pos the position to check
+     * @return
+     */
+    boolean isPosAffected(Vec2i pos);
 }

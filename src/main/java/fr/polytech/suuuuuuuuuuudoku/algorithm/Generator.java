@@ -1,6 +1,5 @@
 package fr.polytech.suuuuuuuuuuudoku.algorithm;
 
-import fr.polytech.suuuuuuuuuuudoku.constraints.AbstractConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
@@ -29,7 +28,8 @@ public class Generator {
         var posArray = pos.toArray(Vec2i[]::new);
         var symbolsArray = symbols.toArray(String[]::new);
 
-        IntStream.range(0, 9).forEach(i -> grid.placeUnchecked(posArray[i], symbolsArray[i]));
+        IntStream.range(0, 9).forEach(i -> grid.placeUnchecked(posArray[i], symbolsArray[i], false));
+        grid.computeAllEmptyCellsPossibilities();
 
         SudokuSolver.solve(grid, true, true);
         assert grid.isSolved();

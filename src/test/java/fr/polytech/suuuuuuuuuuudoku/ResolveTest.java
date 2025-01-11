@@ -1,9 +1,9 @@
 package fr.polytech.suuuuuuuuuuudoku;
 
-import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
-import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.SolvingState;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
+import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
+import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 import org.junit.jupiter.api.Test;
 
@@ -22,10 +22,10 @@ public class ResolveTest {
         var grid = CsvUtils.importGrid(Path.of(resoucesPath + "deduce.csv"));
         var res = CsvUtils.importGrid(Path.of(resoucesPath + "deduceSolved.csv"));
 
-        assertFalse(grid.areConstraintsSatisfied());
+        assertFalse(grid.areConstraintsSatisfied(false));
         var isSolved = SudokuSolver.solve(grid, true, false);
         assertEquals(SolvingState.SOLVED, isSolved);
-        assertTrue(grid.areConstraintsSatisfied());
+        assertTrue(grid.areConstraintsSatisfied(false));
         assertEquals(grid.getGrid(), res.getGrid());
     }
 
@@ -34,10 +34,10 @@ public class ResolveTest {
         var grid = CsvUtils.importGrid(Path.of(resoucesPath + "backtrack.csv"));
         var res = CsvUtils.importGrid(Path.of(resoucesPath + "backtrackSolved.csv"));
 
-        assertFalse(grid.areConstraintsSatisfied());
+        assertFalse(grid.areConstraintsSatisfied(false));
         var isSolved = SudokuSolver.solve(grid, false, true);
         assertEquals(SolvingState.SOLVED, isSolved);
-        assertTrue(grid.areConstraintsSatisfied());
+        assertTrue(grid.areConstraintsSatisfied(false));
         assertEquals(grid.getGrid(), res.getGrid());
     }
 
@@ -46,10 +46,10 @@ public class ResolveTest {
         var grid = CsvUtils.importGrid(Path.of(resoucesPath + "backtrackAndDeduce.csv"));
         var res = CsvUtils.importGrid(Path.of(resoucesPath + "backtrackAndDeduceSolved.csv"));
 
-        assertFalse(grid.areConstraintsSatisfied());
+        assertFalse(grid.areConstraintsSatisfied(false));
         var isSolved = SudokuSolver.solve(grid, true, true);
         assertEquals(SolvingState.SOLVED, isSolved);
-        assertTrue(grid.areConstraintsSatisfied());
+        assertTrue(grid.areConstraintsSatisfied(true));
         assertEquals(grid.getGrid(), res.getGrid());
     }
 
@@ -62,7 +62,7 @@ public class ResolveTest {
         }, List.of(
                 new BlockConstraint(Set.of("1", "2", "3"), 0, 0, 2, 2)
         ), SymbolSets.DIGITS);
-        assertFalse(grid.areConstraintsSatisfied());
+        assertFalse(grid.areConstraintsSatisfied(false));
     }
 
     @Test
@@ -74,9 +74,9 @@ public class ResolveTest {
         }, List.of(
                 new BlockConstraint(Set.of("1", "2", "3"), 0, 0, 2, 2)
         ), SymbolSets.DIGITS);
-        assertFalse(grid.areConstraintsSatisfied());
+        assertFalse(grid.areConstraintsSatisfied(false));
         assertThrows(AssertionError.class, () -> SudokuSolver.solve(grid, false, false));
-        assertFalse(grid.areConstraintsSatisfied());
+        assertFalse(grid.areConstraintsSatisfied(false));
     }
 
     @Test
@@ -84,10 +84,10 @@ public class ResolveTest {
         var grid = CsvUtils.importGrid(Path.of(resoucesPath + "100x100.csv"));
         var res = CsvUtils.importGrid(Path.of(resoucesPath + "100x100Solved.csv"));
 
-        assertFalse(grid.areConstraintsSatisfied());
+        assertFalse(grid.areConstraintsSatisfied(false));
         var isSolved = SudokuSolver.solve(grid, true, true);
         assertEquals(SolvingState.SOLVED, isSolved);
-        assertTrue(grid.areConstraintsSatisfied());
+        assertTrue(grid.areConstraintsSatisfied(false));
         assertEquals(grid.getGrid(), res.getGrid());
     }
 }

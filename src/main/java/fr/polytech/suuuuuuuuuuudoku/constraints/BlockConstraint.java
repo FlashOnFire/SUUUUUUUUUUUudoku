@@ -25,8 +25,8 @@ public class BlockConstraint implements AbstractConstraint {
      * @param symbols the set of symbols to be checked within the block
      * @param x       the starting x-coordinate of the block
      * @param y       the starting y-coordinate of the block
-     * @param width      the width of the block
-     * @param height      the height of the block
+     * @param width   the width of the block
+     * @param height  the height of the block
      * @throws IllegalArgumentException if dx is less than or equal to x or dy is less than or equal to y
      */
     public BlockConstraint(Set<String> symbols, int x, int y, int width, int height) {
@@ -48,11 +48,10 @@ public class BlockConstraint implements AbstractConstraint {
     @Override
     public boolean isSatisfied(String[][] grid) {
         // Extract the block from the grid
-        var list = extractBlock(grid);
+        var set = extractBlock(grid);
 
         // Check if the block contains all the symbols and has no duplicates
-        return symbols.containsAll(list)
-                && list.stream().distinct().count() == list.size();
+        return symbols.containsAll(set) && set.size() == symbols.size();
     }
 
     /**
@@ -75,27 +74,55 @@ public class BlockConstraint implements AbstractConstraint {
         }
 
         // Extract the block from the grid
-        List<String> list = extractBlock(grid);
+        Set<String> set = extractBlock(grid);
 
         // Return the symbols that are not present in the block
-        var possibilities = symbols.stream().filter(c -> !list.contains(c)).collect(Collectors.toSet());
-        return possibilities.isEmpty() ? Optional.empty() : Optional.of(possibilities);
+        var possibilities = symbols.stream()
+                .filter(c -> !set.contains(c)).
+                collect(Collectors.toSet());
+
+        return Optional.of(possibilities);
+    }
+
+    /**
+     * Checks if the two given positions have an effect on each other with respect to the constraint.
+     */
+    public boolean isAffectedBy(Vec2i pos1, Vec2i pos2) {
+        return pos1.getX() >= x && pos1.getX() < dx && pos1.getY() >= y && pos1.getY() < dy
+                && pos2.getX() >= x && pos2.getX() < dx && pos2.getY() >= y && pos2.getY() < dy;
+    }
+
+    /**
+     * Checks if the given position is affected by the constraint.
+     */
+    public boolean isPosAffected(Vec2i pos) {
+        return pos.getX() >= x && pos.getX() < dx && pos.getY() >= y && pos.getY() < dy;
+    }
+
+    /**
+     * Checks if the given position is within the block.
+     *
+     * @param pos the position to check
+     * @return true if the position is within the block, false otherwise
+     */
+    public boolean isInBlock(Vec2i pos) {
+        return pos.getX() >= x && pos.getX() < dx && pos.getY() >= y && pos.getY() < dy;
     }
 
     /**
      * Extracts the block of characters from the grid based on the defined coordinates.
      *
      * @param grid the grid from which to extract the block
-     * @return a list of characters within the block, excluding empty cells
+     * @return a set of characters within the block, excluding empty cells
      */
-    private List<String> extractBlock(String[][] grid) {
-        List<String> list = new ArrayList<>();
+    private Set<String> extractBlock(String[][] grid) {
+        HashSet<String> set = new HashSet<>();
         for (int i = y; i < dy; i++) {
-            list.addAll(Arrays.asList(grid[i]).subList(x, dx));
+            set.addAll(Arrays.asList(grid[i]).subList(x, dx));
         }
-        list.removeIf(c -> c.equals(" "));
+        set.removeIf(c -> c.equals(" "));
 
-        return list;
+        return set;
     }
 
     public int getX() {

@@ -33,4 +33,21 @@ public class NotEmptyConstraint implements AbstractConstraint {
     public Optional<Set<String>> getPossibilities(String[][] grid, Vec2i pos) {
         return Optional.empty();
     }
+
+    /**
+     * Checks if the two given positions have an effect on each other with respect to the constraint.
+     */
+    public boolean isAffectedBy(Vec2i pos1, Vec2i pos2) {
+        return false;
+    }
+
+    /**
+     * Checks if the given position is affected by the constraint.
+     *
+     * @param pos the position to check
+     * @return true if the position is affected by the constraint, false otherwise
+     */
+    public boolean isPosAffected(Vec2i pos) {
+        return true;
+    }
 }

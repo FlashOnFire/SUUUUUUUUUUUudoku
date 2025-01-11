@@ -23,7 +23,7 @@ public class ConstraintsTests {
         }, List.of(
                 new BlockConstraint(Set.of("1", "2", "3", "4"), 0, 0, 2, 2)
         ), Set.of("1", "2", "3", "4"));
-        assertTrue(grid.areConstraintsSatisfied());
+        assertTrue(grid.areConstraintsSatisfied(false));
     }
 
     @Test
@@ -35,7 +35,7 @@ public class ConstraintsTests {
         }, List.of(
                 new BlockConstraint(Set.of("1", "2", "3", "4"), 0, 0, 2, 2)
         ), Set.of("1", "2", "3", "4"));
-        assertTrue(grid.areConstraintsSatisfied());
+        assertTrue(grid.areConstraintsSatisfied(false));
     }
 
     @Test
@@ -47,7 +47,7 @@ public class ConstraintsTests {
         }, List.of(
                 new BlockConstraint(Set.of("1", "2", "3"), 0, 0, 2, 2)
         ), Set.of("1", "2", "3"));
-        assertFalse(grid.areConstraintsSatisfied());
+        assertFalse(grid.areConstraintsSatisfied(false));
     }
 
     @Test
@@ -59,7 +59,7 @@ public class ConstraintsTests {
         }, List.of(
                 new ColumnConstraint(Set.of("1", "2", "3"))
         ), Set.of("1", "2", "3"));
-        assertTrue(grid.areConstraintsSatisfied());
+        assertTrue(grid.areConstraintsSatisfied(false));
     }
 
     @Test
@@ -71,7 +71,7 @@ public class ConstraintsTests {
         }, List.of(
                 new ColumnConstraint(Set.of("1", "2", "3"))
         ), Set.of("1", "2", "3"));
-        assertTrue(grid.areConstraintsSatisfied());
+        assertTrue(grid.areConstraintsSatisfied(false));
     }
 
     @Test
@@ -83,7 +83,7 @@ public class ConstraintsTests {
         }, List.of(
                 new ColumnConstraint(Set.of("1", "2", "3"))
         ), Set.of("1", "2", "3"));
-        assertFalse(grid.areConstraintsSatisfied());
+        assertFalse(grid.areConstraintsSatisfied(false));
     }
 
     @Test
@@ -95,7 +95,7 @@ public class ConstraintsTests {
         }, List.of(
                 new LineConstraint(Set.of("1", "2", "3"))
         ), Set.of("1", "2", "3"));
-        assertTrue(grid.areConstraintsSatisfied());
+        assertTrue(grid.areConstraintsSatisfied(false));
     }
 
     @Test
@@ -107,7 +107,7 @@ public class ConstraintsTests {
         }, List.of(
                 new LineConstraint(Set.of("1", "2", "3"))
         ), Set.of("1", "2", "3"));
-        assertTrue(grid.areConstraintsSatisfied());
+        assertTrue(grid.areConstraintsSatisfied(false));
     }
 
     @Test
@@ -119,6 +119,6 @@ public class ConstraintsTests {
         }, List.of(
                 new LineConstraint(Set.of("1", "2", "3"))
         ), Set.of("1", "2", "3"));
-        assertFalse(grid.areConstraintsSatisfied());
+        assertFalse(grid.areConstraintsSatisfied(false));
     }
 }

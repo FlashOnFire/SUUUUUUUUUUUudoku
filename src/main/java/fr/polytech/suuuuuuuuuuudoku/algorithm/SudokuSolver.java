@@ -52,6 +52,34 @@ public class SudokuSolver {
         return SolvingState.UNSOLVABLE;
     }
 
+    private static List<Grid> findAllSolutions(Grid grid, boolean deducing, boolean backtracking) {
+        assert deducing || backtracking : "At least one of deducing or backtracking must be enabled";
+
+        ArrayDeque<Grid> currentList = new ArrayDeque<>();
+        currentList.add(grid);
+        List<Grid> solutions = new ArrayList<>();
+
+        while (!currentList.isEmpty()) {
+            var currentGrid = currentList.removeLast();
+
+            if (deducing) {
+                var state = solveDeduction(currentGrid);
+
+                if (state == SolvingState.SOLVED) {
+                    solutions.add(currentGrid);
+                } else if (!backtracking) {
+                    if (state == SolvingState.UNSOLVABLE) {
+                        continue;
+                    }
+                }
+            }
+
+            currentList.addAll(doBacktracking(currentGrid));
+        }
+
+        return solutions;
+    }
+
     /**
      * Performs backtracking to solve the Sudoku grid.
      *

@@ -36,7 +36,7 @@ public class Main {
                 new NotEmptyConstraint()
         ), SymbolSets.DIGITS);*/
 
-        var grid = Generator.generate9x9();
+        var grid = Generator.generateClassicNxN(9);
 
         SwingUtilities.invokeLater(() ->
         {

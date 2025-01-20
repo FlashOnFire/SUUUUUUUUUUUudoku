@@ -55,14 +55,11 @@ public class ResolveTest {
     @Test
     public void testMultiSolve() throws FileNotFoundException {
         var grid = CsvUtils.importGrid(Path.of(resoucesPath + "multisolutions.csv"));
-//        var res = CsvUtils.importGrid(Path.of(resoucesPath + "backtrackAndDeduceSolved.csv"));
 
         assertFalse(grid.areConstraintsSatisfied(false));
-//        var isSolved = SudokuSolver.solve(grid, true, true);
-//        assertEquals(isSolved, SolvingState.SOLVED);
 
         var solvedList = SudokuSolver.findAllSolutions(grid, true, true);
-        assertEquals(solvedList.size(), 11);
+        assertEquals(11, solvedList.size());
         for (var solved : solvedList) {
             assertTrue(solved.areConstraintsSatisfied(true));
         }

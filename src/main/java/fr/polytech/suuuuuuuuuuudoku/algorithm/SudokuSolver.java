@@ -52,7 +52,7 @@ public class SudokuSolver {
         return SolvingState.UNSOLVABLE;
     }
 
-    private static List<Grid> findAllSolutions(Grid grid, boolean deducing, boolean backtracking) {
+    static List<Grid> findAllSolutions(Grid grid, boolean deducing, boolean backtracking) {
         assert deducing || backtracking : "At least one of deducing or backtracking must be enabled";
 
         ArrayDeque<Grid> currentList = new ArrayDeque<>();

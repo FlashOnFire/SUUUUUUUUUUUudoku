@@ -92,10 +92,13 @@ public class SudokuSolver {
         var cell = grid.getEmptyCellsPossibilities().entrySet().stream()
                 .min(Comparator.comparingInt(e -> e.getValue().size()))
                 .orElseThrow();
-        assert !cell.getValue().isEmpty() : "Cell has no possibilities";
         System.out.println("Trying " + cell.getKey() + " with " + cell.getValue());
 
-        assert cell.getValue().size() > 1 : "Cell has less than two possibilities";
+        // disable assert to allow solving with only backtracking
+        //assert cell.getValue().size() > 1 : "Cell has less than two possibilities";
+        if (cell.getValue().isEmpty()) {
+            return List.of();
+        }
 
         return cell.getValue().stream().map(c -> {
             Grid newgrid = new Grid(grid);

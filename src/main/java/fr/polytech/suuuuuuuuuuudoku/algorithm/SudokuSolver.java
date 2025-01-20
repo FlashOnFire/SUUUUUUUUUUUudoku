@@ -131,9 +131,6 @@ public class SudokuSolver {
                 var cell = emptyCells.pop();
 
                 var possibilities = grid.getEmptyCellsPossibilities().get(cell);
-                if (possibilities.isEmpty()) {
-                    return SolvingState.UNSOLVABLE;
-                }
 
                 if (possibilities.size() == 1) {
                     grid.placeUnchecked(cell, possibilities.iterator().next(), true);

@@ -1,8 +1,8 @@
 package fr.polytech.suuuuuuuuuuudoku.graphics;
 
+import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
-import fr.polytech.suuuuuuuuuuudoku.grid.InnerGrid;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -13,17 +13,21 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 
 public class SudokuBoard extends JPanel {
+    Boolean alreadySolved = false;
+    Grid solvedGrid;
     Grid grid;
+    Grid previousGrid;
     boolean[][] trace;
     JTable table;
 
     SudokuBoard(Grid grid) {
-        var value = grid.getGrid().getInner();
+        final Integer[][][] value = {grid.getGrid().getInner()};
 
-        String[] columnNames = new String[value[0].length];
+        String[] columnNames = new String[value[0][0].length];
         Arrays.fill(columnNames, "");
+        this.previousGrid = grid;
         this.grid = grid;
-        Object[][] data = new Object[value.length][value[0].length];
+        Object[][] data = new Object[value[0].length][value[0][0].length];
 
         table = new JTable(data, columnNames) {
             public boolean isCellEditable(int row, int col) {
@@ -35,17 +39,17 @@ public class SudokuBoard extends JPanel {
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         table.setRowHeight(900 / 9);
 
-        trace = new boolean[value.length][value[0].length];
-        for (int i = 0; i < value.length; i++) {
-            for (int j = 0; j < value[i].length; j++) {
+        trace = new boolean[value[0].length][value[0][0].length];
+        for (int i = 0; i < value[0].length; i++) {
+            for (int j = 0; j < value[0][i].length; j++) {
                 // In order to change the color of the editable cells
-                trace[i][j] = value[i][j] == null;
+                trace[i][j] = value[0][i][j] == null;
             }
         }
 
-        for (int i = 0; i < value.length; i++) {
-            table.getColumnModel().getColumn(i).setWidth(900 / 9);
-            System.arraycopy(value[i], 0, data[i], 0, value[i].length);
+        for (int i = 0; i < value[0].length; i++) {
+            table.getColumnModel().getColumn(i).setWidth(100);
+            System.arraycopy(value[0][i], 0, data[i], 0, value[0][i].length);
             table.getColumnModel().getColumn(i).setCellRenderer(new DefaultTableCellRenderer() {
                 @Override
                 public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -58,7 +62,7 @@ public class SudokuBoard extends JPanel {
                             .findFirst()
                             .ifPresent(blockConstraint -> c.setBackground(new Color((grid.getConstraints().indexOf(blockConstraint) * 123456) % 0x888888 + 0x777777)));
                     if (trace[row][column]) {
-                        c.setForeground(new Color(200, 50, 50));
+                        c.setForeground(new Color(50, 50, 200));
                     } else {
                         c.setForeground(Color.BLACK);
                     }
@@ -70,28 +74,27 @@ public class SudokuBoard extends JPanel {
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                int newSize = Math.min(getHeight() / value.length, getWidth() / value[0].length);
+                int newSize = Math.min(getHeight() / value[0].length, getWidth() / value[0][0].length);
                 table.setRowHeight(newSize);
-                IntStream.range(0, value[0].length).forEach(i -> table.getColumnModel().getColumn(i).setPreferredWidth(newSize));
+                IntStream.range(0, value[0][0].length).forEach(i -> table.getColumnModel().getColumn(i).setPreferredWidth(newSize));
                 table.setFont(table.getFont().deriveFont((float) newSize / 2));
             }
         });
-
 
         table.setShowGrid(true);
         add(table);
     }
 
-
-    public void update(Integer[][] newData) {
+    public void update(Integer[][] newData, boolean isSolution) {
         for (int i = 0; i < newData.length; i++) {
             for (int j = 0; j < newData[i].length; j++) {
                 table.setValueAt(newData[i][j], i, j);
             }
         }
 
-        grid.setGrid(new InnerGrid(newData));
-
+        grid = new Grid(newData, grid.getSymbols());
+        solvedGrid = new Grid(grid.getGrid().getInner(), grid.getSymbols());
+        alreadySolved = isSolution;
         table.repaint();
     }
 
@@ -100,8 +103,9 @@ public class SudokuBoard extends JPanel {
         IntStream.range(0, value.length).forEach(i -> IntStream.range(0, value[i].length).forEach(j -> {
             if (trace[i][j]) {
                 value[i][j] = null;
+                grid.placeUnchecked(new Vec2i(j, i), null, false);
             }
         }));
-        update(value);
+        update(value, false);
     }
 }

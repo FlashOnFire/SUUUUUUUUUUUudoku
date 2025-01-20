@@ -6,7 +6,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 public class SudokuOptions extends JPanel {
-    public SudokuOptions(Color background_color, Runnable solve, Runnable reset) {
+    public SudokuOptions(Color background_color, Runnable solve, Runnable reset, Runnable generate) {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
         buttonPanel.setBackground(background_color);
@@ -16,6 +16,7 @@ public class SudokuOptions extends JPanel {
         JButton button3 = new JButton("Reset");
         JButton button4 = new JButton("Hint");
 
+        button1.addActionListener(_ -> generate.run());
         button2.addActionListener(_ -> solve.run());
         button3.addActionListener(_ -> reset.run());
 
@@ -37,7 +38,6 @@ public class SudokuOptions extends JPanel {
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                //TODO : fix problem of resizing height which resize the width of the buttons
                 int newSize = getHeight() / 5;
                 buttonPanel.setPreferredSize(new Dimension(newSize, getHeight()));
                 for (Component component : buttonPanel.getComponents()) {
@@ -51,7 +51,7 @@ public class SudokuOptions extends JPanel {
         });
         add(buttonPanel, BorderLayout.CENTER);
 
-
+        revalidate();
     }
 
     private void applyMaterialDesign(JButton button) {
@@ -61,6 +61,5 @@ public class SudokuOptions extends JPanel {
         button.setBorder(BorderFactory.createEmptyBorder(10, 25, 10, 25));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.setMaximumSize(new Dimension(Integer.MAX_VALUE, button.getPreferredSize().height));
-
     }
 }

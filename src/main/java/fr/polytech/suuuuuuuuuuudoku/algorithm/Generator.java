@@ -19,7 +19,7 @@ public class Generator {
             Arrays.fill(innerGrid[i], null);
         }
 
-        var grid = new Grid(innerGrid, symbols);
+        var seedGrid = new Grid(innerGrid, symbols);
 
         var pos = new HashSet<Vec2i>();
         while (pos.size() < n) {
@@ -31,12 +31,13 @@ public class Generator {
         var posArray = pos.toArray(Vec2i[]::new);
         var symbolsArray = symbols.toArray(Integer[]::new);
 
-        IntStream.range(0, 9).forEach(i -> grid.placeUnchecked(posArray[i], symbolsArray[i], false));
-        grid.computeAllEmptyCellsPossibilities();
+        IntStream.range(0, 9).forEach(i -> seedGrid.placeUnchecked(posArray[i], symbolsArray[i], false));
+        seedGrid.computeAllEmptyCellsPossibilities();
 
-        SudokuSolver.solve(grid, true, true);
-        assert grid.isSolved();
+        var pair = SudokuSolver.solve(seedGrid, true, true);
+        assert pair.getFirst() == SolvingState.SOLVED;
 
+        var grid = pair.getSecond();
 
         Vec2i last_move_pos;
         Integer last_move_symbol;
@@ -49,11 +50,10 @@ public class Generator {
 
             last_move_pos = randomPos;
             last_move_symbol = grid.getSymbolAt(randomPos);
-            grid.placeUnchecked(randomPos, null, false);
-            grid.computeAllEmptyCellsPossibilities();
-        } while (SudokuSolver.findAllSolutions(new Grid(grid), true, true).size() == 1);
+            grid.placeUnchecked(randomPos, null, true);
+        } while (SudokuSolver.findAllSolutions(grid, true, true).size() == 1);
 
-        grid.placeUnchecked(last_move_pos, last_move_symbol, false);
+        grid.placeUnchecked(last_move_pos, last_move_symbol, true);
 
         return grid;
     }

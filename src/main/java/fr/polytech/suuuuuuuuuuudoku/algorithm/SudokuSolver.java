@@ -16,17 +16,17 @@ public class SudokuSolver {
      * @param backtracking whether to use backtracking if deduction fails
      * @return the solving state of the Sudoku grid
      */
-    public static SolvingState solve(Grid grid, boolean deducing, boolean backtracking) {
+    public static Pair<SolvingState, Grid> solve(Grid grid, boolean deducing, boolean backtracking) {
         assert deducing || backtracking : "At least one of deducing or backtracking must be enabled";
 
         ArrayDeque<Grid> currentList = new ArrayDeque<>();
-        currentList.add(grid);
+        currentList.add(new Grid(grid));
 
         while (!currentList.isEmpty()) {
             var currentGrid = currentList.removeLast();
             if (currentGrid.isSolved()) {
                 grid.setGrid(currentGrid.getGrid());
-                return SolvingState.SOLVED;
+                return new Pair<>(SolvingState.SOLVED, currentGrid);
             }
 
             if (deducing) {
@@ -34,19 +34,19 @@ public class SudokuSolver {
 
                 if (state == SolvingState.SOLVED) {
                     grid.setGrid(currentGrid.getGrid());
-                    return SolvingState.SOLVED;
+                    return new Pair<>(SolvingState.SOLVED, currentGrid);
                 } else if (state == SolvingState.UNSOLVABLE) {
                     continue;
                 } else if (!backtracking) {
                     grid.setGrid(currentGrid.getGrid());
-                    return SolvingState.PARTIALLY_SOLVED;
+                    return new Pair<>(SolvingState.PARTIALLY_SOLVED, currentGrid);
                 }
             }
 
             currentList.addAll(doBacktracking(currentGrid));
         }
 
-        return SolvingState.UNSOLVABLE;
+        return new Pair<>(SolvingState.UNSOLVABLE, null);
     }
 
     public static List<Grid> findAllSolutions(Grid grid, boolean deducing, boolean backtracking) {

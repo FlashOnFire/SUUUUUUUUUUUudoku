@@ -78,8 +78,8 @@ public class BlockConstraint implements AbstractConstraint {
 
         // Return the symbols that are not present in the block
         var possibilities = symbols.stream()
-                .filter(c -> !set.contains(c)).
-                collect(Collectors.toSet());
+                .filter(c -> !set.contains(c))
+                .collect(Collectors.toSet());
 
         return Optional.of(possibilities);
     }

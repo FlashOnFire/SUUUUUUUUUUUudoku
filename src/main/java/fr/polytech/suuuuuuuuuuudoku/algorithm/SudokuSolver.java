@@ -35,12 +35,9 @@ public class SudokuSolver {
                 if (state == SolvingState.SOLVED) {
                     grid.setGrid(currentGrid.getGrid());
                     return SolvingState.SOLVED;
+                } else if (state == SolvingState.UNSOLVABLE) {
+                    continue;
                 } else if (!backtracking) {
-                    if (state == SolvingState.UNSOLVABLE) {
-                        grid.setGrid(currentGrid.getGrid());
-                        return SolvingState.UNSOLVABLE;
-                    }
-
                     grid.setGrid(currentGrid.getGrid());
                     return SolvingState.PARTIALLY_SOLVED;
                 }
@@ -68,10 +65,10 @@ public class SudokuSolver {
                 if (state == SolvingState.SOLVED) {
                     solutions.add(new Grid(currentGrid));
                     continue;
+                } else if (state == SolvingState.UNSOLVABLE) {
+                    continue;
                 } else if (!backtracking) {
-                    if (state == SolvingState.UNSOLVABLE) {
-                        continue;
-                    }
+                    continue;
                 }
             }
 
@@ -95,12 +92,10 @@ public class SudokuSolver {
         var cell = grid.getEmptyCellsPossibilities().entrySet().stream()
                 .min(Comparator.comparingInt(e -> e.getValue().size()))
                 .orElseThrow();
+        assert !cell.getValue().isEmpty() : "Cell has no possibilities";
         System.out.println("Trying " + cell.getKey() + " with " + cell.getValue());
-        if (cell.getValue().isEmpty()) {
-            return List.of();
-        }
 
-        //assert cell.getValue().stream().count() > 1 : "Cell has less than two possibilities";
+        assert cell.getValue().size() > 1 : "Cell has less than two possibilities";
 
         return cell.getValue().stream().map(c -> {
             Grid newgrid = new Grid(grid);
@@ -137,6 +132,8 @@ public class SudokuSolver {
                     grid.placeUnchecked(cell, possibilities.iterator().next(), true);
                     finished = false;
                 } else if (possibilities.isEmpty()) {
+                    System.out.println("Empty cell has no possibilities1");
+
                     return SolvingState.UNSOLVABLE;
                 }
             }

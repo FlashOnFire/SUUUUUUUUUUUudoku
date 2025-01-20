@@ -43,7 +43,7 @@ public class InnerGrid {
         for (Integer[] lines : this.grid) {
             for (Integer cell : lines) {
                 if (cell == null) {
-                    System.out.print(" ");
+                    System.out.print("  ");
                 } else{
                     System.out.print(cell + " ");
                 }

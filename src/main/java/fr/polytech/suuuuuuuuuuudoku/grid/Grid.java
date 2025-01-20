@@ -1,7 +1,7 @@
 package fr.polytech.suuuuuuuuuuudoku.grid;
 
-import fr.polytech.suuuuuuuuuuudoku.constraints.AbstractConstraint;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
+import fr.polytech.suuuuuuuuuuudoku.constraints.AbstractConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.NotEmptyConstraint;
 
@@ -94,7 +94,7 @@ public class Grid {
                         acc.retainAll(set);
                         return acc;
                     })
-                    .orElse(Set.of());
+                    .orElse(new HashSet<>(this.symbols));
 
             this.emptyCellsPossibilities.put(pos, list);
         }
@@ -147,10 +147,12 @@ public class Grid {
         constraints.stream()
                 .filter(c -> c instanceof BlockConstraint)
                 .map(c -> (BlockConstraint) c)
-                .forEach(c -> blockToEmptyCells.put(c,
+                .forEach(c -> blockToEmptyCells.put(
+                        c,
                         this.emptyCellsPossibilities.keySet().stream()
                                 .filter(c::isInBlock) // precompute cells in the block
-                                .toList()));
+                                .toList()
+                ));
 
         // Iterate over blocks
         blockToEmptyCells.forEach((constraint, cells) -> {
@@ -238,8 +240,11 @@ public class Grid {
     }
 
     public void placeUnchecked(Vec2i pos, Integer value, boolean updatePossibilities) {
-        if (this.grid.getInner()[pos.getY()][pos.getX()] == null) {
+        if (getSymbolAt(pos) == null && value != null) {
             this.emptyCellsPossibilities.remove(pos);
+        } else if (getSymbolAt(pos) != null && value == null) {
+            System.out.println("Placing empty cell at " + pos);
+            this.emptyCellsPossibilities.put(pos, new HashSet<>(this.symbols));
         }
 
         this.grid.getInner()[pos.getY()][pos.getX()] = value;

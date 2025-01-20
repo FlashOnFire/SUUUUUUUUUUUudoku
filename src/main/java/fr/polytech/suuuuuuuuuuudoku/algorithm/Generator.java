@@ -37,11 +37,11 @@ public class Generator {
         SudokuSolver.solve(grid, true, true);
         assert grid.isSolved();
 
-        var emptyCells = grid.getEmptyCellsPossibilities().keySet();
 
         Vec2i last_move_pos;
         Integer last_move_symbol;
         do {
+            var emptyCells = grid.getEmptyCellsPossibilities().keySet();
             Vec2i randomPos;
             do {
                 randomPos = Vec2i.random(n, n);
@@ -50,11 +50,10 @@ public class Generator {
             last_move_pos = randomPos;
             last_move_symbol = grid.getSymbolAt(randomPos);
             grid.placeUnchecked(randomPos, null, false);
-        } while (grid.isSolved());
+            grid.computeAllEmptyCellsPossibilities();
+        } while (SudokuSolver.findAllSolutions(new Grid(grid), true, true).size() == 1);
 
         grid.placeUnchecked(last_move_pos, last_move_symbol, false);
-
-        grid.computeAllEmptyCellsPossibilities();
 
         return grid;
     }

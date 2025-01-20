@@ -249,6 +249,10 @@ public class Grid {
         }
     }
 
+    public Integer getSymbolAt(Vec2i pos) {
+        return this.grid.getInner()[pos.getY()][pos.getX()];
+    }
+
     /**
      * Returns the list of constraints.
      *

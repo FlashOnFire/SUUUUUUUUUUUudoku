@@ -1,6 +1,7 @@
 package fr.polytech.suuuuuuuuuuudoku.algorithm;
 
 import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * A class representing a 2D vector with integer coordinates.
@@ -18,6 +19,16 @@ public class Vec2i {
     public Vec2i(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    /**
+     * Generates a random Vec2i with coordinates between 0 and x_max and 0 and y_max.
+     * @param x_max the maximum x-coordinate
+     * @param y_max the maximum y-coordinate
+     * @return a random Vec2i
+     */
+    public static Vec2i random(int x_max, int y_max) {
+        return new Vec2i(ThreadLocalRandom.current().nextInt(x_max), ThreadLocalRandom.current().nextInt(y_max));
     }
 
     /**

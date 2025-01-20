@@ -8,20 +8,23 @@ import java.util.HashSet;
 import java.util.stream.IntStream;
 
 public class Generator {
-    public static Grid generate9x9() {
-        var symbols = SymbolSets.generateSymbols(9);
+    public static Grid generateClassicNxN(int n) {
+        //assert n is perfect square
+        assert Math.sqrt(n) == Math.floor(Math.sqrt(n));
 
-        var innerGrid = new Integer[9][9];
-        for (var i = 0; i < 9; i++) {
+        var symbols = SymbolSets.generateSymbols(n);
+
+        var innerGrid = new Integer[n][n];
+        for (var i = 0; i < n; i++) {
             Arrays.fill(innerGrid[i], null);
         }
 
         var grid = new Grid(innerGrid, symbols);
 
         var pos = new HashSet<Vec2i>();
-        while (pos.size() < symbols.size()) {
-            var x = (int) (Math.random() * 9);
-            var y = (int) (Math.random() * 9);
+        while (pos.size() < n) {
+            var x = (int) (Math.random() * n);
+            var y = (int) (Math.random() * n);
             pos.add(new Vec2i(x, y));
         }
 
@@ -34,7 +37,24 @@ public class Generator {
         SudokuSolver.solve(grid, true, true);
         assert grid.isSolved();
 
-        grid.display();
+        var emptyCells = grid.getEmptyCellsPossibilities().keySet();
+
+        Vec2i last_move_pos;
+        Integer last_move_symbol;
+        do {
+            Vec2i randomPos;
+            do {
+                randomPos = Vec2i.random(n, n);
+            } while (emptyCells.contains(randomPos));
+
+            last_move_pos = randomPos;
+            last_move_symbol = grid.getSymbolAt(randomPos);
+            grid.placeUnchecked(randomPos, null, false);
+        } while (grid.isSolved());
+
+        grid.placeUnchecked(last_move_pos, last_move_symbol, false);
+
+        grid.computeAllEmptyCellsPossibilities();
 
         return grid;
     }

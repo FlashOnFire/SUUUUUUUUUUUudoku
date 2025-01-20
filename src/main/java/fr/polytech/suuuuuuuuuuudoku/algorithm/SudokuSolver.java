@@ -52,11 +52,11 @@ public class SudokuSolver {
         return SolvingState.UNSOLVABLE;
     }
 
-    static List<Grid> findAllSolutions(Grid grid, boolean deducing, boolean backtracking) {
+    public static List<Grid> findAllSolutions(Grid grid, boolean deducing, boolean backtracking) {
         assert deducing || backtracking : "At least one of deducing or backtracking must be enabled";
 
         ArrayDeque<Grid> currentList = new ArrayDeque<>();
-        currentList.add(grid);
+        currentList.add(new Grid(grid));
         List<Grid> solutions = new ArrayList<>();
 
         while (!currentList.isEmpty()) {
@@ -66,7 +66,8 @@ public class SudokuSolver {
                 var state = solveDeduction(currentGrid);
 
                 if (state == SolvingState.SOLVED) {
-                    solutions.add(currentGrid);
+                    solutions.add(new Grid(currentGrid));
+                    continue;
                 } else if (!backtracking) {
                     if (state == SolvingState.UNSOLVABLE) {
                         continue;

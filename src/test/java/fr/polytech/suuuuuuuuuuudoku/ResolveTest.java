@@ -23,7 +23,7 @@ public class ResolveTest {
 
         assertFalse(grid.areConstraintsSatisfied(false));
         var isSolved = SudokuSolver.solve(grid, true, false);
-        assertEquals(SolvingState.SOLVED, isSolved);
+        assertEquals(SolvingState.SOLVED, isSolved.getFirst());
         assertTrue(grid.areConstraintsSatisfied(false));
         assertEquals(grid.getGrid(), res.getGrid());
     }
@@ -35,7 +35,7 @@ public class ResolveTest {
 
         assertFalse(grid.areConstraintsSatisfied(false));
         var isSolved = SudokuSolver.solve(grid, false, true);
-        assertEquals(SolvingState.SOLVED, isSolved);
+        assertEquals(SolvingState.SOLVED, isSolved.getFirst());
         assertTrue(grid.areConstraintsSatisfied(false));
         assertEquals(grid.getGrid(), res.getGrid());
     }
@@ -47,7 +47,7 @@ public class ResolveTest {
 
         assertFalse(grid.areConstraintsSatisfied(false));
         var isSolved = SudokuSolver.solve(grid, true, true);
-        assertEquals(SolvingState.SOLVED, isSolved);
+        assertEquals(SolvingState.SOLVED, isSolved.getFirst());
         assertTrue(grid.areConstraintsSatisfied(true));
         assertEquals(grid.getGrid(), res.getGrid());
     }
@@ -102,7 +102,7 @@ public class ResolveTest {
 
         assertFalse(grid.areConstraintsSatisfied(false));
         var isSolved = SudokuSolver.solve(grid, true, true);
-        assertEquals(SolvingState.SOLVED, isSolved);
+        assertEquals(SolvingState.SOLVED, isSolved.getFirst());
         assertTrue(grid.areConstraintsSatisfied(false));
         assertEquals(grid.getGrid(), res.getGrid());
     }

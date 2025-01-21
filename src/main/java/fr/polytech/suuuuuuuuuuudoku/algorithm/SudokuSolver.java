@@ -17,7 +17,7 @@ public class SudokuSolver {
      * @param backtracking whether to use backtracking if deduction fails
      * @return the solving state of the Sudoku grid
      */
-    public static <T extends Solvable & ShallowCopyable<T>> Pair<SolvingState, T> solve(T grid, boolean deducing, boolean backtracking) {
+    public static <C, T extends Solvable<C> & ShallowCopyable<T>> Pair<SolvingState, T> solve(T grid, boolean deducing, boolean backtracking) {
         assert deducing || backtracking : "At least one of deducing or backtracking must be enabled";
 
         ArrayDeque<T> currentList = new ArrayDeque<>();
@@ -82,7 +82,7 @@ public class SudokuSolver {
      * @param grid the Sudoku grid to solve
      * @return the solving state of the Sudoku grid
      */
-    private static <T extends Solvable & ShallowCopyable<T>> List<T> doBacktracking(T grid) {
+    private static <C, T extends Solvable<C> & ShallowCopyable<T>> List<T> doBacktracking(T grid) {
         System.out.println("Backtracking");
 
         assert !grid.getEmptyCellsPossibilities().isEmpty() : "No empty cells";
@@ -99,9 +99,9 @@ public class SudokuSolver {
         }
 
         return cell.getValue().stream().map(c -> {
-            T newgrid = grid.shallowCopy();
-            newgrid.placeUnchecked(cell.getKey(), c, true);
-            return newgrid;
+            T new_grid = grid.shallowCopy();
+            new_grid.placeUnchecked(cell.getKey(), c, true);
+            return new_grid;
         }).toList();
     }
 
@@ -111,7 +111,7 @@ public class SudokuSolver {
      * @param grid the Sudoku grid to solve
      * @return the solving state of the Sudoku grid
      */
-    private static <T extends Solvable> SolvingState solveDeduction(T grid) {
+    private static <C, T extends Solvable<C>> SolvingState solveDeduction(T grid) {
         System.out.println("Deduction");
 
         boolean finished = false;

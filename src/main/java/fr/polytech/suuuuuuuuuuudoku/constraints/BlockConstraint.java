@@ -1,6 +1,8 @@
 package fr.polytech.suuuuuuuuuuudoku.constraints;
 
+import fr.polytech.suuuuuuuuuuudoku.algorithm.Box2D;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
+import fr.polytech.suuuuuuuuuuudoku.grid.InnerGrid;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,28 +17,22 @@ public class BlockConstraint implements AbstractConstraint {
     private final Set<Integer> symbols;
 
     /**
-     * The starting and ending coordinates of the block.
+     * The box that defines the block in the grid.
      */
-    private final int x, y, dx, dy;
+    private final Box2D box;
 
     /**
      * Constructs a BlockConstraint with the specified symbols and coordinates.
      *
      * @param symbols the set of symbols to be checked within the block
-     * @param x       the starting x-coordinate of the block
-     * @param y       the starting y-coordinate of the block
-     * @param width   the width of the block
-     * @param height  the height of the block
+     * @param box     the box that defines the block in the grid
      * @throws IllegalArgumentException if dx is less than or equal to x or dy is less than or equal to y
      */
-    public BlockConstraint(Set<Integer> symbols, int x, int y, int width, int height) {
+    public BlockConstraint(Set<Integer> symbols, Box2D box) {
         this.symbols = symbols;
-        assert width != 0 || height != 0;
+        assert box.width() != 0 || box.height() != 0;
 
-        this.x = x;
-        this.y = y;
-        this.dx = x + width;
-        this.dy = y + height;
+        this.box = box;
     }
 
     /**
@@ -46,7 +42,7 @@ public class BlockConstraint implements AbstractConstraint {
      * @return true if the constraint is satisfied, false otherwise
      */
     @Override
-    public boolean isSatisfied(Integer[][] grid) {
+    public boolean isSatisfied(InnerGrid grid) {
         // Extract the block from the grid
         var set = extractBlock(grid);
 
@@ -63,13 +59,12 @@ public class BlockConstraint implements AbstractConstraint {
      * @throws AssertionError if the position is out of the grid bounds or the grid cell is empty
      */
     @Override
-    public Optional<Set<Integer>> getPossibilities(Integer[][] grid, Vec2i pos) {
-        assert pos.getX() < grid[0].length;
-        assert pos.getY() < grid.length;
-        assert grid[pos.getY()][pos.getX()] == null;
+    public Optional<Set<Integer>> getPossibilities(InnerGrid grid, Vec2i pos) {
+        assert pos.getX() < grid.get()[0].length;
+        assert pos.getY() < grid.length();
+        assert grid.get()[pos.getY()][pos.getX()] == null;
 
-        // Check if the position is within the block
-        if (pos.getX() < x || pos.getX() >= dx || pos.getY() < y || pos.getY() >= dy) {
+        if (!isInBlock(pos)) {
             return Optional.empty();
         }
 
@@ -88,15 +83,14 @@ public class BlockConstraint implements AbstractConstraint {
      * Checks if the two given positions have an effect on each other with respect to the constraint.
      */
     public boolean isAffectedBy(Vec2i pos1, Vec2i pos2) {
-        return pos1.getX() >= x && pos1.getX() < dx && pos1.getY() >= y && pos1.getY() < dy
-                && pos2.getX() >= x && pos2.getX() < dx && pos2.getY() >= y && pos2.getY() < dy;
+        return isInBlock(pos1) && isInBlock(pos2);
     }
 
     /**
      * Checks if the given position is affected by the constraint.
      */
     public boolean isPosAffected(Vec2i pos) {
-        return pos.getX() >= x && pos.getX() < dx && pos.getY() >= y && pos.getY() < dy;
+        return isInBlock(pos);
     }
 
     /**
@@ -106,7 +100,7 @@ public class BlockConstraint implements AbstractConstraint {
      * @return true if the position is within the block, false otherwise
      */
     public boolean isInBlock(Vec2i pos) {
-        return pos.getX() >= x && pos.getX() < dx && pos.getY() >= y && pos.getY() < dy;
+        return box.contains(pos);
     }
 
     /**
@@ -115,29 +109,17 @@ public class BlockConstraint implements AbstractConstraint {
      * @param grid the grid from which to extract the block
      * @return a set of characters within the block, excluding empty cells
      */
-    private Set<Integer> extractBlock(Integer[][] grid) {
+    private Set<Integer> extractBlock(InnerGrid grid) {
         HashSet<Integer> set = new HashSet<>();
-        for (int i = y; i < dy; i++) {
-            set.addAll(Arrays.asList(grid[i]).subList(x, dx));
+        for (int i = box.y(); i < box.dy(); i++) {
+            set.addAll(Arrays.asList(grid.get()[i]).subList(box.x(), box.dx()));
         }
         set.removeIf(Objects::isNull);
 
         return set;
     }
 
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public int getDx() {
-        return dx;
-    }
-
-    public int getDy() {
-        return dy;
+    public Box2D getBlock() {
+        return box;
     }
 }

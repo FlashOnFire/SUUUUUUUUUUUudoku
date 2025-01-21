@@ -12,7 +12,7 @@ public class InnerGrid {
     /**
      * The Sudoku grid represented as a 2D array of Strings.
      */
-    private Integer[][] grid;
+    private final Integer[][] grid;
 
     /**
      * Constructs a Grid with the specified grid and constraints.
@@ -22,7 +22,6 @@ public class InnerGrid {
     public InnerGrid(Integer[][] grid) {
         this.grid = grid;
     }
-
 
     public InnerGrid(InnerGrid otherGrid) {
         if (otherGrid.grid.length == 0) {
@@ -66,23 +65,21 @@ public class InnerGrid {
         return emptyCells;
     }
 
+    public Integer at(Vec2i pos) {
+        return grid[pos.getY()][pos.getX()];
+    }
+
+    public void set(Vec2i pos, Integer value) {
+        grid[pos.getY()][pos.getX()] = value;
+    }
+
     /**
      * Returns the grid.
      *
      * @return the grid
      */
-    public Integer[][] getInner() {
+    public Integer[][] get() {
         return grid;
-    }
-
-    /**
-     * Sets the grid.
-     *
-     * @param grid the new grid
-     */
-    public void setGrid(Integer[][] grid) {
-        this.grid = grid;
-        this.computeEmptyCells();
     }
 
     public int length() {

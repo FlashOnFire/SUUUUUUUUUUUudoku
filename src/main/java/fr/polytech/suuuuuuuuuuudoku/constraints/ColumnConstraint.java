@@ -1,6 +1,7 @@
 package fr.polytech.suuuuuuuuuuudoku.constraints;
 
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
+import fr.polytech.suuuuuuuuuuudoku.grid.InnerGrid;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -30,19 +31,19 @@ public class ColumnConstraint implements AbstractConstraint {
      * @return true if the constraint is satisfied, false otherwise
      */
     @Override
-    public boolean isSatisfied(Integer[][] grid) {
-        if (grid.length == 0) {
+    public boolean isSatisfied(InnerGrid grid) {
+        if (grid.length() == 0) {
             return true;
         }
 
-        if (grid[0].length != symbols.size()) {
+        if (grid.get()[0].length != symbols.size()) {
             return false;
         }
 
-        for (int i = 0; i < grid.length; i++) {
+        for (int i = 0; i < grid.length(); i++) {
             // This is a workaround to use the variable i in the lambda
             int finalI = i;
-            Integer[] column = Arrays.stream(grid)
+            Integer[] column = Arrays.stream(grid.get())
                     .map(line -> line[finalI])
                     .filter(Objects::nonNull)
                     .toArray(Integer[]::new);
@@ -66,12 +67,12 @@ public class ColumnConstraint implements AbstractConstraint {
      * @return an Optional containing a list of possible symbols, or an empty Optional if no symbols are possible
      */
     @Override
-    public Optional<Set<Integer>> getPossibilities(Integer[][] grid, Vec2i pos) {
-        assert pos.getX() < grid[0].length;
-        assert pos.getY() < grid.length;
-        assert grid[pos.getY()][pos.getX()] == null;
+    public Optional<Set<Integer>> getPossibilities(InnerGrid grid, Vec2i pos) {
+        assert pos.getY() < grid.length();
+        assert pos.getX() < grid.get()[0].length;
+        assert grid.at(pos) == null;
 
-        var column = Arrays.stream(grid)
+        var column = Arrays.stream(grid.get())
                 .map(line -> line[pos.getX()])
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());

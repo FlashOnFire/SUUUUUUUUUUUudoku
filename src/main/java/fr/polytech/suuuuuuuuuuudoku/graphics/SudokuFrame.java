@@ -19,11 +19,11 @@ public class SudokuFrame extends JFrame {
             JOptionPane.showMessageDialog(null, "The grid is already solved", "Sudoku", JOptionPane.INFORMATION_MESSAGE);
         } else {
             if (board.alreadySolved) {
-                board.grid.setGrid(board.solvedGrid.getGrid());
-                board.update(board.solvedGrid.getGrid().getInner(), true);
+                board.grid.setInnerGrid(board.solvedGrid.getInnerGrid());
+                board.update(board.solvedGrid.getInnerGrid().get(), true);
             } else {
                 board.grid = SudokuSolver.solve(board.grid, true, true).getSecond();
-                board.update(board.grid.getGrid().getInner(), true);
+                board.update(board.grid.getInnerGrid().get(), true);
             }
         }
         System.out.println("Solved !");

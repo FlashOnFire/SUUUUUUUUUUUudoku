@@ -1,6 +1,8 @@
 package fr.polytech.suuuuuuuuuuudoku.constraints;
 
+import fr.polytech.suuuuuuuuuuudoku.algorithm.Box2D;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
+import fr.polytech.suuuuuuuuuuudoku.grid.InnerGrid;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +27,7 @@ public interface AbstractConstraint {
 
         for (int i = 0; i < size; i += blockSize) {
             for (int j = 0; j < size; j += blockSize) {
-                constraintList.add(new BlockConstraint(symbols, i, j, blockSize, blockSize));
+                constraintList.add(new BlockConstraint(symbols, new Box2D(i, j, blockSize, blockSize)));
             }
         }
 
@@ -42,7 +44,7 @@ public interface AbstractConstraint {
      * @param grid the Sudoku grid
      * @return true if the constraint is satisfied, false otherwise
      */
-    boolean isSatisfied(Integer[][] grid);
+    boolean isSatisfied(InnerGrid grid);
 
     /**
      * Gets the possible values for a given position in the grid.
@@ -51,7 +53,7 @@ public interface AbstractConstraint {
      * @param pos  the position in the grid
      * @return an Optional containing a list of possible values, or an empty Optional if this constraint does not affect the position
      */
-    Optional<Set<Integer>> getPossibilities(Integer[][] grid, Vec2i pos);
+    Optional<Set<Integer>> getPossibilities(InnerGrid grid, Vec2i pos);
 
     /**
      * Checks if the two given positions have an effect on each other with respect to the constraint.

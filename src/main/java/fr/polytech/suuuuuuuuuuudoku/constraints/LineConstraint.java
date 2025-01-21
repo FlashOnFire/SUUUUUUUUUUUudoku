@@ -1,6 +1,7 @@
 package fr.polytech.suuuuuuuuuuudoku.constraints;
 
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
+import fr.polytech.suuuuuuuuuuudoku.grid.InnerGrid;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -30,10 +31,10 @@ public class LineConstraint implements AbstractConstraint {
      * @return true if the constraint is satisfied, false otherwise
      */
     @Override
-    public boolean isSatisfied(Integer[][] grid) {
-        assert grid.length == symbols.size();
+    public boolean isSatisfied(InnerGrid grid) {
+        assert grid.length() == symbols.size();
 
-        return Arrays.stream(grid).allMatch(line -> {
+        return Arrays.stream(grid.get()).allMatch(line -> {
             var list = Arrays.stream(line).filter(Objects::nonNull).toList();
 
             return symbols.containsAll(list)
@@ -49,12 +50,12 @@ public class LineConstraint implements AbstractConstraint {
      * @return an Optional containing a list of possible symbols, or an empty Optional if no symbols are possible
      */
     @Override
-    public Optional<Set<Integer>> getPossibilities(Integer[][] grid, Vec2i pos) {
-        assert pos.getY() < grid.length;
-        assert pos.getX() < grid[0].length;
-        assert grid[pos.getY()][pos.getX()] == null;
+    public Optional<Set<Integer>> getPossibilities(InnerGrid grid, Vec2i pos) {
+        assert pos.getY() < grid.length();
+        assert pos.getX() < grid.get().length;
+        assert grid.at(pos) == null;
 
-        var row = Arrays.stream(grid[pos.getY()])
+        var row = Arrays.stream(grid.get()[pos.getY()])
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 

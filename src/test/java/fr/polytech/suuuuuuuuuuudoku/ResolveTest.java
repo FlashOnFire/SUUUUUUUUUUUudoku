@@ -1,5 +1,6 @@
 package fr.polytech.suuuuuuuuuuudoku;
 
+import fr.polytech.suuuuuuuuuuudoku.algorithm.Box2D;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.SolvingState;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
@@ -25,7 +26,7 @@ public class ResolveTest {
         var solve = SudokuSolver.solve(grid, true, false);
         assertEquals(SolvingState.SOLVED, solve.getFirst());
         assertTrue(solve.getSecond().areConstraintsSatisfied(false));
-        assertEquals(solve.getSecond().getGrid(), res.getGrid());
+        assertEquals(solve.getSecond().getInnerGrid(), res.getInnerGrid());
     }
 
     @Test
@@ -37,7 +38,7 @@ public class ResolveTest {
         var solve = SudokuSolver.solve(grid, false, true);
         assertEquals(SolvingState.SOLVED, solve.getFirst());
         assertTrue(solve.getSecond().areConstraintsSatisfied(false));
-        assertEquals(solve.getSecond().getGrid(), res.getGrid());
+        assertEquals(solve.getSecond().getInnerGrid(), res.getInnerGrid());
     }
 
     @Test
@@ -49,7 +50,7 @@ public class ResolveTest {
         var solve = SudokuSolver.solve(grid, true, true);
         assertEquals(SolvingState.SOLVED, solve.getFirst());
         assertTrue(solve.getSecond().areConstraintsSatisfied(true));
-        assertEquals(solve.getSecond().getGrid(), res.getGrid());
+        assertEquals(solve.getSecond().getInnerGrid(), res.getInnerGrid());
     }
 
     @Test
@@ -74,7 +75,7 @@ public class ResolveTest {
                 {3, 1, 2},
                 {2, 1, 3}
         }, List.of(
-                new BlockConstraint(symbolSet, 0, 0, 2, 2)
+                new BlockConstraint(symbolSet, new Box2D(0, 0, 2, 2))
         ), symbolSet);
         assertFalse(grid.areConstraintsSatisfied(false));
     }
@@ -88,7 +89,7 @@ public class ResolveTest {
                 {3, 1, 2},
                 {2, 1, 3}
         }, List.of(
-                new BlockConstraint(symbolSet, 0, 0, 2, 2)
+                new BlockConstraint(symbolSet, new Box2D(0, 0, 2, 2))
         ), symbolSet);
         assertFalse(grid.areConstraintsSatisfied(false));
         assertThrows(AssertionError.class, () -> SudokuSolver.solve(grid, false, false));
@@ -104,6 +105,6 @@ public class ResolveTest {
         var solve = SudokuSolver.solve(grid, true, true);
         assertEquals(SolvingState.SOLVED, solve.getFirst());
         assertTrue(solve.getSecond().areConstraintsSatisfied(false));
-        assertEquals(solve.getSecond().getGrid(), res.getGrid());
+        assertEquals(solve.getSecond().getInnerGrid(), res.getInnerGrid());
     }
 }

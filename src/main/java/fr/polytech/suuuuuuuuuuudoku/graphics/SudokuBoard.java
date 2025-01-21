@@ -21,7 +21,7 @@ public class SudokuBoard extends JPanel {
     JTable table;
 
     SudokuBoard(Grid grid) {
-        final Integer[][][] value = {grid.getGrid().getInner()};
+        final Integer[][][] value = {grid.getInnerGrid().get()};
 
         String[] columnNames = new String[value[0][0].length];
         Arrays.fill(columnNames, "");
@@ -58,7 +58,7 @@ public class SudokuBoard extends JPanel {
                     grid.getConstraints().stream()
                             .filter(BlockConstraint.class::isInstance)
                             .map(BlockConstraint.class::cast)
-                            .filter(blockConstraint -> row >= blockConstraint.getX() && row < blockConstraint.getDx() && column >= blockConstraint.getY() && column < blockConstraint.getDy())
+                            .filter(blockConstraint -> row >= blockConstraint.getBlock().x() && row < blockConstraint.getBlock().dx() && column >= blockConstraint.getBlock().y() && column < blockConstraint.getBlock().dy())
                             .findFirst()
                             .ifPresent(blockConstraint -> c.setBackground(new Color((grid.getConstraints().indexOf(blockConstraint) * 1234567) % 0x888888 + 0x777777)));
                     if (trace[row][column]) {
@@ -93,13 +93,13 @@ public class SudokuBoard extends JPanel {
         }
 
         grid = new Grid(newData, grid.getSymbols());
-        solvedGrid = new Grid(grid.getGrid().getInner(), grid.getSymbols());
+        solvedGrid = new Grid(grid.getInnerGrid().get(), grid.getSymbols());
         alreadySolved = isSolution;
         table.repaint();
     }
 
     public void recoverPreviousSudoku(Grid grid) {
-        var value = grid.getGrid().getInner();
+        var value = grid.getInnerGrid().get();
         IntStream.range(0, value.length).forEach(i -> IntStream.range(0, value[i].length).forEach(j -> {
             if (trace[i][j]) {
                 value[i][j] = null;

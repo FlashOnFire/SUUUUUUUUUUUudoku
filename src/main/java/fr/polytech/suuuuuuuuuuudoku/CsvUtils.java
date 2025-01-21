@@ -33,7 +33,7 @@ public class CsvUtils {
      * @param path the path to save the CSV file to
      */
     static public void exportGrid(Path path, Grid grid) {
-        var csvData = Arrays.stream(grid.getGrid().getInner())
+        var csvData = Arrays.stream(grid.getInnerGrid().get())
                             .map(line -> Arrays.stream(line)
                                                .map(cell -> cell == null ? "." : cell.toString())
                                                .collect(Collectors.joining(",")))

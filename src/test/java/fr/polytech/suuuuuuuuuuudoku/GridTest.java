@@ -20,8 +20,8 @@ public class GridTest {
 
         var grid2 = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "100x100_export.csv"));
         for (int i = 0; i < grid.length(); i++) {
-            for (int j = 0; j < grid.getGrid().getInner()[0].length; j++) {
-                assertEquals(grid.getGrid().getInner()[i][j], grid2.getGrid().getInner()[i][j]);
+            for (int j = 0; j < grid.getInnerGrid().get()[0].length; j++) {
+                assertEquals(grid.getInnerGrid().get()[i][j], grid2.getInnerGrid().get()[i][j]);
             }
         }
 

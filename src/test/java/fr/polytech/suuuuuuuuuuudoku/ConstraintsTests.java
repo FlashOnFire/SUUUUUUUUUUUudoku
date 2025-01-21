@@ -1,5 +1,6 @@
 package fr.polytech.suuuuuuuuuuudoku;
 
+import fr.polytech.suuuuuuuuuuudoku.algorithm.Box2D;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.ColumnConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.LineConstraint;
@@ -23,7 +24,7 @@ public class ConstraintsTests {
                 {3, 1, 2},
                 {2, 1, 3}
         }, List.of(
-                new BlockConstraint(symbolSet, 0, 0, 2, 2)
+                new BlockConstraint(symbolSet, new Box2D(0, 0, 2, 2))
         ), symbolSet);
         assertTrue(grid.areConstraintsSatisfied(false));
     }
@@ -37,7 +38,7 @@ public class ConstraintsTests {
                 {null, null, null},
                 {null, null, null}
         }, List.of(
-                new BlockConstraint(symbolSet, 0, 0, 2, 2)
+                new BlockConstraint(symbolSet, new Box2D(0, 0, 2, 2))
         ), symbolSet);
         assertFalse(grid.areConstraintsSatisfied(false));
     }
@@ -51,7 +52,7 @@ public class ConstraintsTests {
                 {3, 1, 2},
                 {2, 1, 3}
         }, List.of(
-                new BlockConstraint(symbolSet, 0, 0, 2, 2)
+                new BlockConstraint(symbolSet, new Box2D(0, 0, 2, 2))
         ), symbolSet);
         assertFalse(grid.areConstraintsSatisfied(false));
     }

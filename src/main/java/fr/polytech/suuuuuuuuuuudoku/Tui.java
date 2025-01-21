@@ -75,9 +75,9 @@ public class Tui {
                 }
 
                 textGraphics.putString(position, line,
-                        grid.getInnerGrid().at(new Vec2i(i, j)) == null ?
+                        grid.getSymbolAt(i,j) == null ?
                                 " ".repeat(spacing + 1) :
-                                grid.getInnerGrid().at(new Vec2i(i, j)) + " ".repeat(spacing));
+                                grid.getSymbolAt(i,j) + " ".repeat(spacing));
             }
             line++;
         }

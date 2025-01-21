@@ -38,7 +38,7 @@ public class SudokuFrame extends JFrame {
 
         this.grid = new Grid(Generator.generateClassicNxN(nextGenerationLength*nextGenerationLength));
         board = new SudokuBoard(grid);
-        nextGenerationLength = nextGenerationLength % 4 == 0 ? 2 : nextGenerationLength % 4 + 1;
+        nextGenerationLength = nextGenerationLength % 3 == 0 ? 2 : nextGenerationLength % 3 + 1;
         updateJpanel();
 
         getContentPane().remove(board);

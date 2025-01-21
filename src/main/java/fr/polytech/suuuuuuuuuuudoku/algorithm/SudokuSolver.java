@@ -47,12 +47,12 @@ public class SudokuSolver {
         return new Pair<>(SolvingState.UNSOLVABLE, null);
     }
 
-    public static List<Grid> findAllSolutions(Grid grid, boolean deducing, boolean backtracking) {
+    public static <C, T extends Solvable<C> & ShallowCopyable<T>> List<T> findAllSolutions(T grid, boolean deducing, boolean backtracking) {
         assert deducing || backtracking : "At least one of deducing or backtracking must be enabled";
 
-        ArrayDeque<Grid> currentList = new ArrayDeque<>();
-        currentList.add(new Grid(grid));
-        List<Grid> solutions = new ArrayList<>();
+        ArrayDeque<T> currentList = new ArrayDeque<>();
+        currentList.add(grid.shallowCopy());
+        List<T> solutions = new ArrayList<>();
 
         while (!currentList.isEmpty()) {
             var currentGrid = currentList.removeLast();
@@ -61,7 +61,7 @@ public class SudokuSolver {
                 var state = solveDeduction(currentGrid);
 
                 if (state == SolvingState.SOLVED) {
-                    solutions.add(new Grid(currentGrid));
+                    solutions.add(currentGrid);
                     continue;
                 } else if (state == SolvingState.UNSOLVABLE) {
                     continue;
@@ -74,6 +74,38 @@ public class SudokuSolver {
         }
 
         return solutions;
+    }
+
+    public static <C, T extends Solvable<C> & ShallowCopyable<T>> boolean hasMoreThanOneSolution(T grid, boolean deducing, boolean backtracking) {
+        assert deducing || backtracking : "At least one of deducing or backtracking must be enabled";
+
+        ArrayDeque<T> currentList = new ArrayDeque<>();
+        currentList.add(grid.shallowCopy());
+        boolean foundOne = false;
+
+        while (!currentList.isEmpty()) {
+            var currentGrid = currentList.removeLast();
+
+            if (deducing) {
+                var state = solveDeduction(currentGrid);
+
+                if (state == SolvingState.SOLVED) {
+                    if (foundOne) {
+                        return true;
+                    }
+                    foundOne = true;
+                    continue;
+                } else if (state == SolvingState.UNSOLVABLE) {
+                    continue;
+                } else if (!backtracking) {
+                    continue;
+                }
+            }
+
+            currentList.addAll(doBacktracking(currentGrid));
+        }
+
+        return false;
     }
 
     /**

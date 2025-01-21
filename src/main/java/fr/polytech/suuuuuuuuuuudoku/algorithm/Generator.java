@@ -19,42 +19,48 @@ public class Generator {
             Arrays.fill(innerGrid[i], null);
         }
 
-        var seedGrid = new Grid(innerGrid, symbols);
+        Grid seedGrid;
+        SolvingState state;
+        Grid solvedGrid;
+        do {
+            seedGrid = new Grid(innerGrid, symbols);
 
-        var pos = new HashSet<Vec2i>();
-        while (pos.size() < n) {
-            var x = (int) (Math.random() * n);
-            var y = (int) (Math.random() * n);
-            pos.add(new Vec2i(x, y));
-        }
+            var pos = new HashSet<Vec2i>();
+            while (pos.size() < n) {
+                var x = (int) (Math.random() * n);
+                var y = (int) (Math.random() * n);
+                pos.add(new Vec2i(x, y));
+            }
 
-        var posArray = pos.toArray(Vec2i[]::new);
-        var symbolsArray = symbols.toArray(Integer[]::new);
+            var posArray = pos.toArray(Vec2i[]::new);
+            var symbolsArray = symbols.toArray(Integer[]::new);
 
-        IntStream.range(0, n).forEach(i -> seedGrid.placeUnchecked(posArray[i], symbolsArray[i], false));
-        seedGrid.computeAllEmptyCellsPossibilities();
+            Grid finalSeedGrid = seedGrid;
+            IntStream.range(0, n).forEach(i -> finalSeedGrid.placeUnchecked(posArray[i], symbolsArray[i], false));
+            seedGrid.computeAllEmptyCellsPossibilities();
 
-        var pair = SudokuSolver.solve(seedGrid, true, true);
-        assert pair.getFirst() == SolvingState.SOLVED;
+            var pair = SudokuSolver.solve(seedGrid, true, true);
+            state = pair.getFirst();
+            solvedGrid = pair.getSecond();
+        } while (state != SolvingState.SOLVED);
 
-        var grid = pair.getSecond();
 
         Vec2i last_move_pos;
         Integer last_move_symbol;
         do {
-            var emptyCells = grid.getEmptyCellsPossibilities().keySet();
+            var emptyCells = solvedGrid.getEmptyCellsPossibilities().keySet();
             Vec2i randomPos;
             do {
                 randomPos = Vec2i.random(n, n);
             } while (emptyCells.contains(randomPos));
 
             last_move_pos = randomPos;
-            last_move_symbol = grid.getSymbolAt(randomPos);
-            grid.placeUnchecked(randomPos, null, true);
-        } while (SudokuSolver.findAllSolutions(grid, true, true).size() == 1);
+            last_move_symbol = solvedGrid.getSymbolAt(randomPos);
+            solvedGrid.placeUnchecked(randomPos, null, true);
+        } while (!SudokuSolver.hasMoreThanOneSolution(solvedGrid, true, true));
 
-        grid.placeUnchecked(last_move_pos, last_move_symbol, true);
+        solvedGrid.placeUnchecked(last_move_pos, last_move_symbol, true);
 
-        return grid;
+        return solvedGrid;
     }
 }

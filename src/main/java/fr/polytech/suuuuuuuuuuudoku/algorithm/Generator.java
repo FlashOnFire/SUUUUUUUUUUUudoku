@@ -31,7 +31,7 @@ public class Generator {
         var posArray = pos.toArray(Vec2i[]::new);
         var symbolsArray = symbols.toArray(Integer[]::new);
 
-        IntStream.range(0, 9).forEach(i -> seedGrid.placeUnchecked(posArray[i], symbolsArray[i], false));
+        IntStream.range(0, n).forEach(i -> seedGrid.placeUnchecked(posArray[i], symbolsArray[i], false));
         seedGrid.computeAllEmptyCellsPossibilities();
 
         var pair = SudokuSolver.solve(seedGrid, true, true);

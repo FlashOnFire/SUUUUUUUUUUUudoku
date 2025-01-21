@@ -20,6 +20,11 @@
 
     mitmCache = gradle.fetchDeps {
       pkg = self;
+      /*
+      To update this file, run:
+      nix build .#SUUUUUUUUUUUudoku.mitmCache.updateScript
+      ./result
+      */
       data = ./deps.json;
     };
 

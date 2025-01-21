@@ -11,8 +11,9 @@ java {
 
 tasks.jar {
     manifest {
-        attributes["Main-Class"] = application.mainClass
+        attributes["Main-Class"] = application.mainClass.get()
     }
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
 }
 
 group = "fr.polytech.suuuuuuuuuuudoku"
@@ -30,6 +31,7 @@ application {
 dependencies {
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    implementation("com.googlecode.lanterna:lanterna:3.1.3")
 }
 
 tasks.test {

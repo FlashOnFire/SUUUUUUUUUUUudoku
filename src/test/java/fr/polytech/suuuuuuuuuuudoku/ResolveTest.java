@@ -22,10 +22,10 @@ public class ResolveTest {
         var res = CsvUtils.importGrid(Path.of(resoucesPath + "deduceSolved.csv"));
 
         assertFalse(grid.areConstraintsSatisfied(false));
-        var isSolved = SudokuSolver.solve(grid, true, false);
-        assertEquals(SolvingState.SOLVED, isSolved.getFirst());
-        assertTrue(grid.areConstraintsSatisfied(false));
-        assertEquals(grid.getGrid(), res.getGrid());
+        var solve = SudokuSolver.solve(grid, true, false);
+        assertEquals(SolvingState.SOLVED, solve.getFirst());
+        assertTrue(solve.getSecond().areConstraintsSatisfied(false));
+        assertEquals(solve.getSecond().getGrid(), res.getGrid());
     }
 
     @Test
@@ -34,10 +34,10 @@ public class ResolveTest {
         var res = CsvUtils.importGrid(Path.of(resoucesPath + "backtrackSolved.csv"));
 
         assertFalse(grid.areConstraintsSatisfied(false));
-        var isSolved = SudokuSolver.solve(grid, false, true);
-        assertEquals(SolvingState.SOLVED, isSolved.getFirst());
-        assertTrue(grid.areConstraintsSatisfied(false));
-        assertEquals(grid.getGrid(), res.getGrid());
+        var solve = SudokuSolver.solve(grid, false, true);
+        assertEquals(SolvingState.SOLVED, solve.getFirst());
+        assertTrue(solve.getSecond().areConstraintsSatisfied(false));
+        assertEquals(solve.getSecond().getGrid(), res.getGrid());
     }
 
     @Test
@@ -46,10 +46,10 @@ public class ResolveTest {
         var res = CsvUtils.importGrid(Path.of(resoucesPath + "backtrackAndDeduceSolved.csv"));
 
         assertFalse(grid.areConstraintsSatisfied(false));
-        var isSolved = SudokuSolver.solve(grid, true, true);
-        assertEquals(SolvingState.SOLVED, isSolved.getFirst());
-        assertTrue(grid.areConstraintsSatisfied(true));
-        assertEquals(grid.getGrid(), res.getGrid());
+        var solve = SudokuSolver.solve(grid, true, true);
+        assertEquals(SolvingState.SOLVED, solve.getFirst());
+        assertTrue(solve.getSecond().areConstraintsSatisfied(true));
+        assertEquals(solve.getSecond().getGrid(), res.getGrid());
     }
 
     @Test
@@ -101,9 +101,9 @@ public class ResolveTest {
         var res = CsvUtils.importGrid(Path.of(resoucesPath + "100x100Solved.csv"));
 
         assertFalse(grid.areConstraintsSatisfied(false));
-        var isSolved = SudokuSolver.solve(grid, true, true);
-        assertEquals(SolvingState.SOLVED, isSolved.getFirst());
-        assertTrue(grid.areConstraintsSatisfied(false));
-        assertEquals(grid.getGrid(), res.getGrid());
+        var solve = SudokuSolver.solve(grid, true, true);
+        assertEquals(SolvingState.SOLVED, solve.getFirst());
+        assertTrue(solve.getSecond().areConstraintsSatisfied(false));
+        assertEquals(solve.getSecond().getGrid(), res.getGrid());
     }
 }

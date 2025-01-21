@@ -11,15 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Represents a Sudoku grid with constraints.
  */
-public class Grid {
-    /**
-     * The list of constraints applied to the Sudoku grid.
-     */
-    private final List<AbstractConstraint> constraints;
-    /**
-     * The set of symbols used in the grid.
-     */
-    private final Set<Integer> symbols;
+public class Grid extends Solvable {
     /**
      * The Sudoku grid represented as a 2D array of Strings.
      */
@@ -34,9 +26,8 @@ public class Grid {
      * @param constraints the list of constraints
      */
     public Grid(Integer[][] grid, List<AbstractConstraint> constraints, Set<Integer> symbols) {
+        super(constraints, symbols);
         this.grid = new InnerGrid(grid);
-        this.constraints = constraints;
-        this.symbols = symbols;
         this.grid.computeEmptyCells();
         this.computeAllEmptyCellsPossibilities();
     }
@@ -53,12 +44,10 @@ public class Grid {
     }
 
     public Grid(Grid otherGrid) {
-        this.constraints = otherGrid.constraints;
-        this.symbols = otherGrid.symbols;
+        super(otherGrid.constraints, otherGrid.symbols);
         this.emptyCellsPossibilities = new HashMap<>(otherGrid.emptyCellsPossibilities);
         this.grid = new InnerGrid(otherGrid.grid);
     }
-
 
     /**
      * Displays the grid to the console.
@@ -72,6 +61,7 @@ public class Grid {
      *
      * @return true if all constraints are satisfied, false otherwise
      */
+    @Override
     public boolean areConstraintsSatisfied(boolean skip_not_empty) {
         return this.constraints.stream()
                 .filter(c -> !(skip_not_empty && c instanceof NotEmptyConstraint))    // Skip NotEmptyConstraint
@@ -81,6 +71,7 @@ public class Grid {
     /**
      * Computes the possibilities for each empty cell in the grid.
      */
+    @Override
     public void computeAllEmptyCellsPossibilities() {
         this.emptyCellsPossibilities.clear();
 
@@ -186,6 +177,7 @@ public class Grid {
         return changed.get();
     }
 
+    @Override
     public HashMap<Vec2i, Set<Integer>> getEmptyCellsPossibilities() {
         return this.emptyCellsPossibilities;
     }
@@ -239,6 +231,7 @@ public class Grid {
         return true;
     }
 
+    @Override
     public void placeUnchecked(Vec2i pos, Integer value, boolean updatePossibilities) {
         if (getSymbolAt(pos) == null && value != null) {
             this.emptyCellsPossibilities.remove(pos);
@@ -254,6 +247,7 @@ public class Grid {
         }
     }
 
+    @Override
     public Integer getSymbolAt(Vec2i pos) {
         return this.grid.getInner()[pos.getY()][pos.getX()];
     }
@@ -268,15 +262,6 @@ public class Grid {
     }
 
     /**
-     * Checks if the grid is solved.
-     *
-     * @return true if the grid is solved, false otherwise
-     */
-    public boolean isSolved() {
-        return this.areConstraintsSatisfied(false);
-    }
-
-    /**
      * Returns the set of symbols used in the grid.
      *
      * @return the set of symbols
@@ -287,5 +272,10 @@ public class Grid {
 
     public int length() {
         return this.grid.getInner().length;
+    }
+
+    @Override
+    public Grid clone() {
+        return new Grid(this);
     }
 }

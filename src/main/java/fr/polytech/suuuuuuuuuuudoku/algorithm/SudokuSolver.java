@@ -1,6 +1,7 @@
 package fr.polytech.suuuuuuuuuuudoku.algorithm;
 
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
+import fr.polytech.suuuuuuuuuuudoku.grid.Solvable;
 
 import java.util.*;
 
@@ -16,16 +17,15 @@ public class SudokuSolver {
      * @param backtracking whether to use backtracking if deduction fails
      * @return the solving state of the Sudoku grid
      */
-    public static Pair<SolvingState, Grid> solve(Grid grid, boolean deducing, boolean backtracking) {
+    public static <T extends Solvable> Pair<SolvingState, T> solve(T grid, boolean deducing, boolean backtracking) {
         assert deducing || backtracking : "At least one of deducing or backtracking must be enabled";
 
-        ArrayDeque<Grid> currentList = new ArrayDeque<>();
-        currentList.add(new Grid(grid));
+        ArrayDeque<T> currentList = new ArrayDeque<>();
+        currentList.add((T) grid.clone());
 
         while (!currentList.isEmpty()) {
             var currentGrid = currentList.removeLast();
             if (currentGrid.isSolved()) {
-                grid.setGrid(currentGrid.getGrid());
                 return new Pair<>(SolvingState.SOLVED, currentGrid);
             }
 
@@ -33,12 +33,10 @@ public class SudokuSolver {
                 var state = solveDeduction(currentGrid);
 
                 if (state == SolvingState.SOLVED) {
-                    grid.setGrid(currentGrid.getGrid());
                     return new Pair<>(SolvingState.SOLVED, currentGrid);
                 } else if (state == SolvingState.UNSOLVABLE) {
                     continue;
                 } else if (!backtracking) {
-                    grid.setGrid(currentGrid.getGrid());
                     return new Pair<>(SolvingState.PARTIALLY_SOLVED, currentGrid);
                 }
             }
@@ -84,7 +82,7 @@ public class SudokuSolver {
      * @param grid the Sudoku grid to solve
      * @return the solving state of the Sudoku grid
      */
-    private static List<Grid> doBacktracking(Grid grid) {
+    private static <T extends Solvable> List<T> doBacktracking(T grid) {
         System.out.println("Backtracking");
 
         assert !grid.getEmptyCellsPossibilities().isEmpty() : "No empty cells";
@@ -101,7 +99,7 @@ public class SudokuSolver {
         }
 
         return cell.getValue().stream().map(c -> {
-            Grid newgrid = new Grid(grid);
+            T newgrid = (T) grid.clone();
             newgrid.placeUnchecked(cell.getKey(), c, true);
             return newgrid;
         }).toList();
@@ -113,7 +111,7 @@ public class SudokuSolver {
      * @param grid the Sudoku grid to solve
      * @return the solving state of the Sudoku grid
      */
-    private static SolvingState solveDeduction(Grid grid) {
+    private static <T extends Solvable> SolvingState solveDeduction(T grid) {
         System.out.println("Deduction");
 
         boolean finished = false;

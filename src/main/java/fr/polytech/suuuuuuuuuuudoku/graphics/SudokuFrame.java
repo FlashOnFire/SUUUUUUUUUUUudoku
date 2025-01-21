@@ -21,7 +21,7 @@ public class SudokuFrame extends JFrame {
                 board.grid.setGrid(board.solvedGrid.getGrid());
                 board.update(board.solvedGrid.getGrid().getInner(), true);
             } else {
-                SudokuSolver.solve(board.grid, true, true);
+                board.grid = SudokuSolver.solve(board.grid, true, true).getSecond();
                 board.update(board.grid.getGrid().getInner(), true);
             }
         }

@@ -1,5 +1,6 @@
 package fr.polytech.suuuuuuuuuuudoku.grid;
 
+import fr.polytech.suuuuuuuuuuudoku.algorithm.ShallowCopyable;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.constraints.AbstractConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
@@ -11,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Represents a Sudoku grid with constraints.
  */
-public class Grid extends Solvable {
+public class Grid extends Solvable implements ShallowCopyable<Grid> {
     /**
      * The Sudoku grid represented as a 2D array of Strings.
      */
@@ -275,7 +276,8 @@ public class Grid extends Solvable {
     }
 
     @Override
-    public Grid clone() {
+    public Grid shallowCopy() {
         return new Grid(this);
     }
+
 }

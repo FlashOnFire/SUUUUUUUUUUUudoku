@@ -33,8 +33,5 @@ public abstract class Solvable {
     public abstract void placeUnchecked(Vec2i pos, Integer value, boolean updatePossibilities);
     public abstract Integer getSymbolAt(Vec2i pos);
 
-    @Override
-    public abstract Solvable clone();
-
     public abstract Map<Vec2i, Set<Integer>> getEmptyCellsPossibilities();
 }

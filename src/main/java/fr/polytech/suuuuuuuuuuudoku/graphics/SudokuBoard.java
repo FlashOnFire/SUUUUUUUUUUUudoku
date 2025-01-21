@@ -60,7 +60,7 @@ public class SudokuBoard extends JPanel {
                             .map(BlockConstraint.class::cast)
                             .filter(blockConstraint -> row >= blockConstraint.getX() && row < blockConstraint.getDx() && column >= blockConstraint.getY() && column < blockConstraint.getDy())
                             .findFirst()
-                            .ifPresent(blockConstraint -> c.setBackground(new Color((grid.getConstraints().indexOf(blockConstraint) * 123456) % 0x888888 + 0x777777)));
+                            .ifPresent(blockConstraint -> c.setBackground(new Color((grid.getConstraints().indexOf(blockConstraint) * 1234567) % 0x888888 + 0x777777)));
                     if (trace[row][column]) {
                         c.setForeground(new Color(50, 50, 200));
                     } else {

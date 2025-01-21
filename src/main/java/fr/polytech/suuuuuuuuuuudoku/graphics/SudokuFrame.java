@@ -12,6 +12,7 @@ public class SudokuFrame extends JFrame {
     private final Color background_color;
     private Grid grid;
     private JPanel buttonPanel;
+    private int nextGenerationLength = 3;
 
     private final Runnable solve = () -> {
         if (board.grid.isSolved()) {
@@ -35,8 +36,9 @@ public class SudokuFrame extends JFrame {
 
     private final Runnable generate = () -> {
 
-        this.grid = new Grid(Generator.generateClassicNxN(9));
+        this.grid = new Grid(Generator.generateClassicNxN(nextGenerationLength*nextGenerationLength));
         board = new SudokuBoard(grid);
+        nextGenerationLength = nextGenerationLength % 4 == 0 ? 2 : nextGenerationLength % 4 + 1;
         updateJpanel();
 
         getContentPane().remove(board);

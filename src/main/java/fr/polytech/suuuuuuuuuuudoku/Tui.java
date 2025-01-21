@@ -7,6 +7,7 @@ import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
+import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 
 import java.io.IOException;
@@ -59,7 +60,7 @@ public class Tui {
     private void displayGrid(Grid grid) throws IOException {
         // Afficher la grille
         grid.display();
-        int gridSize = grid.getGrid().getInner().length;
+        int gridSize = grid.getInnerGrid().length();
         int blockSize = (int) Math.sqrt(gridSize);
         int spacing = String.valueOf(gridSize).length();
 
@@ -74,9 +75,9 @@ public class Tui {
                 }
 
                 textGraphics.putString(position, line,
-                        grid.getGrid().getInner()[i][j] == null ?
+                        grid.getInnerGrid().at(new Vec2i(i, j)) == null ?
                                 " ".repeat(spacing + 1) :
-                                grid.getGrid().getInner()[i][j] + " ".repeat(spacing));
+                                grid.getInnerGrid().at(new Vec2i(i, j)) + " ".repeat(spacing));
             }
             line++;
         }

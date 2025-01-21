@@ -9,13 +9,6 @@ java {
     }
 }
 
-tasks.jar {
-    manifest {
-        attributes["Main-Class"] = application.mainClass.get()
-    }
-    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
-}
-
 group = "fr.polytech.suuuuuuuuuuudoku"
 version = "1.0-SNAPSHOT"
 
@@ -36,4 +29,11 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = application.mainClass
+    }
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
 }

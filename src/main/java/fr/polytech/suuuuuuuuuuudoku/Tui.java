@@ -1,5 +1,6 @@
 package fr.polytech.suuuuuuuuuuudoku;
 
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
@@ -22,6 +23,7 @@ public class Tui {
     public Tui() throws IOException {
         System.setProperty("com.googlecode.lanterna.terminal.UnixTerminal.sttyCommand", "stty");
         DefaultTerminalFactory defaultTerminalFactory = new DefaultTerminalFactory();
+        defaultTerminalFactory.setInitialTerminalSize(new TerminalSize(100, 50));
         terminal = defaultTerminalFactory.createTerminal();
         terminal.setCursorVisible(false);
         terminal.clearScreen();
@@ -62,6 +64,7 @@ public class Tui {
 
     private void displayMultiGrid(MultiGrid grid) throws IOException {
         HashMap<Integer, Vec2i> paddings = new HashMap<>();
+        int totalHeight = 0;
         for (int i = 0; i < grid.getGrids().length; i++) {
             int finalI = i;
             BlockEqualityMGConstraint relatedConstraint =
@@ -71,13 +74,12 @@ public class Tui {
                         .map(constraint -> (BlockEqualityMGConstraint) constraint)
                         .findFirst().orElseThrow();
 
-//            System.out.println("Grid " + i);
-//            System.out.println(relatedConstraint.getGridIndex1() == i);
-//            System.out.println(relatedConstraint.getPadding());
-//            System.out.println(paddings);
-//            System.out.println(relatedConstraint.getGridIndex1());
-//            System.out.println(relatedConstraint.getGridIndex2());
-
+            System.out.println("Grid " + i);
+            System.out.println(relatedConstraint.getGridIndex1() == i);
+            System.out.println(relatedConstraint.getPadding());
+            System.out.println(paddings);
+            System.out.println(relatedConstraint.getGridIndex1());
+            System.out.println(relatedConstraint.getGridIndex2());
 
             var padding = (relatedConstraint.getGridIndex1() == i) ? Vec2i.zero() : relatedConstraint.getPadding();
 
@@ -85,15 +87,19 @@ public class Tui {
                 padding.add(paddings.get(relatedConstraint.getGridIndex1()));
             }
             System.out.println("line: " + line);
-//            System.out.println(padding);
+            System.out.println(padding);
             displayGrid(grid.getGrids()[i], padding);
             paddings.put(i, padding);
-//            System.out.println();
+            System.out.println();
+            var height = grid.getGrids()[i].length() + padding.getX();
+            if (height > totalHeight) {
+                totalHeight = height;
+            }
         }
     }
 
     private void displayGrid(Grid grid, Vec2i padding) throws IOException {
-        System.out.println(padding);
+//        System.out.println(padding);
         var oldLine = line;
         // Afficher la grille
         int gridSize = grid.getInnerGrid().length();
@@ -107,9 +113,9 @@ public class Tui {
                 padding.getY() + (padding.getY() / blockSize);
         line += yPadding;
 
-        System.out.println("xPadding: " + xPadding);
-        System.out.println("yPadding: " + yPadding);
-        System.out.println("line: " + line);
+//        System.out.println("xPadding: " + xPadding);
+//        System.out.println("yPadding: " + yPadding);
+//        System.out.println("line: " + line);
 
         for (int i = 0; i < gridSize; i++) {
             if (i % blockSize == 0 && i != 0) {
@@ -130,8 +136,8 @@ public class Tui {
         }
         terminal.flush();
         line = oldLine;
-        System.out.println("line: " + line);
-        System.out.println();
+//        System.out.println("line: " + line);
+//        System.out.println();
     }
 
     private int selectMode() throws IOException {

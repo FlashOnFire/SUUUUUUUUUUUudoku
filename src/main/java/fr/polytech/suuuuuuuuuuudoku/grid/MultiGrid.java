@@ -172,14 +172,14 @@ public class MultiGrid extends Solvable<Vec3i> implements ShallowCopyable<MultiG
                         new Box2D(6, 0, 3, 3),
                         2,
                         new Box2D(0, 6, 3, 3)),
-                new BlockEqualityMGConstraint(3,
-                        new Box2D(6, 0, 3, 3),
-                        2,
-                        new Box2D(0, 6, 3, 3)),
-                new BlockEqualityMGConstraint(4,
-                        new Box2D(0, 0, 3, 3),
-                        2,
-                        new Box2D(6, 6, 3, 3)),
+                new BlockEqualityMGConstraint(1,
+                        new Box2D(0, 6, 3, 3),
+                        3,
+                        new Box2D(6, 0, 3, 3)),
+                new BlockEqualityMGConstraint(1,
+                        new Box2D(6, 6, 3, 3),
+                        4,
+                        new Box2D(0, 0, 3, 3)),
         });
 
         return new MultiGrid(grids, constraints, symbolSet);

@@ -1,6 +1,5 @@
 package fr.polytech.suuuuuuuuuuudoku.algorithm;
 
-import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.grid.Solvable;
 
 import java.util.*;
@@ -159,15 +158,19 @@ public class SudokuSolver {
             while (!emptyCells.isEmpty()) {
                 var cell = emptyCells.pop();
 
-                var possibilities = grid.getEmptyCellsPossibilities().get(cell);
+                // Handle multigrid
+                // We may have already filled this cell by placing a value in another grid
+                if (grid.getEmptyCellsPossibilities().containsKey(cell)) {
+                    var possibilities = grid.getEmptyCellsPossibilities().get(cell);
 
-                if (possibilities.size() == 1) {
-                    grid.placeUnchecked(cell, possibilities.iterator().next(), true);
-                    finished = false;
-                } else if (possibilities.isEmpty()) {
-                    System.out.println("Empty cell has no possibilities1");
+                    if (possibilities.size() == 1) {
+                        grid.placeUnchecked(cell, possibilities.iterator().next(), true);
+                        finished = false;
+                    } else if (possibilities.isEmpty()) {
+                        System.out.println("Empty cell has no possibilities1");
 
-                    return SolvingState.UNSOLVABLE;
+                        return SolvingState.UNSOLVABLE;
+                    }
                 }
             }
         }

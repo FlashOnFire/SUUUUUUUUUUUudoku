@@ -13,7 +13,6 @@ public class BlockEqualityMGConstraint implements MultiGridConstraint {
     /**
      * The set of symbols to be checked within the block.
      */
-
     private final int grid1, grid2;
     private final Box2D block1, block2;
 
@@ -51,9 +50,10 @@ public class BlockEqualityMGConstraint implements MultiGridConstraint {
         }
 
         var possibilities = new HashSet<>(
-                grid[grid1].getEmptyCellsPossibilities().get(new Vec2i(pos.getX(), pos.getY()))
+                grid[pos.getZ()].getEmptyCellsPossibilities().get(new Vec2i(pos.getX(), pos.getY()))
         );
-        possibilities.retainAll(grid[grid2].getEmptyCellsPossibilities().get(new Vec2i(pos.getX(), pos.getY())));
+        var correspondingPos = getCorrespondingPosition(pos);
+        possibilities.retainAll(grid[correspondingPos.getZ()].getEmptyCellsPossibilities().get(new Vec2i(correspondingPos.getX(), correspondingPos.getY())));
 
         return Optional.of(possibilities);
     }

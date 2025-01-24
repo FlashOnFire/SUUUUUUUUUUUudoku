@@ -6,12 +6,13 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockEqualityMGConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
+import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 public class Tui {
     private final Terminal terminal;
@@ -30,21 +31,22 @@ public class Tui {
 
     void start() throws IOException, InterruptedException {
         welcomeMessage();
-        int selectedMode = selectMode();
-        switch (selectedMode) {
-            case 0:
-                // Generer un sudoku
-                //Demander la taille du sudoku
-                int size = selectSize();
-                var grid = Generator.generateClassicNxN(size);
-                displayGrid(grid);
-
-
-                break;
-            case 1:
-                // Entrer un sudoku
-                break;
-        }
+        displayMultiGrid(MultiGrid.getExemple());
+//        int selectedMode = selectMode();
+//        switch (selectedMode) {
+//            case 0:
+//                // Generer un sudoku
+//                //Demander la taille du sudoku
+//                int size = selectSize();
+//                var grid = Generator.generateClassicNxN(size);
+//                displayGrid(grid, Vec2i(0,0);
+//
+//
+//                break;
+//            case 1:
+//                // Entrer un sudoku
+//                break;
+//        }
     }
 
     private void welcomeMessage() throws IOException {
@@ -58,31 +60,78 @@ public class Tui {
 
     }
 
-    private void displayGrid(Grid grid) throws IOException {
+    private void displayMultiGrid(MultiGrid grid) throws IOException {
+        HashMap<Integer, Vec2i> paddings = new HashMap<>();
+        for (int i = 0; i < grid.getGrids().length; i++) {
+            int finalI = i;
+            BlockEqualityMGConstraint relatedConstraint =
+                    grid.getConstraints().stream()
+                        .filter(constraint -> constraint instanceof BlockEqualityMGConstraint)
+                        .filter(constraint -> ((BlockEqualityMGConstraint) constraint).getGridIndex1() == finalI || ((BlockEqualityMGConstraint) constraint).getGridIndex2() == finalI)
+                        .map(constraint -> (BlockEqualityMGConstraint) constraint)
+                        .findFirst().orElseThrow();
+
+//            System.out.println("Grid " + i);
+//            System.out.println(relatedConstraint.getGridIndex1() == i);
+//            System.out.println(relatedConstraint.getPadding());
+//            System.out.println(paddings);
+//            System.out.println(relatedConstraint.getGridIndex1());
+//            System.out.println(relatedConstraint.getGridIndex2());
+
+
+            var padding = (relatedConstraint.getGridIndex1() == i) ? Vec2i.zero() : relatedConstraint.getPadding();
+
+            if (paddings.containsKey(relatedConstraint.getGridIndex1())) {
+                padding.add(paddings.get(relatedConstraint.getGridIndex1()));
+            }
+            System.out.println("line: " + line);
+//            System.out.println(padding);
+            displayGrid(grid.getGrids()[i], padding);
+            paddings.put(i, padding);
+//            System.out.println();
+        }
+    }
+
+    private void displayGrid(Grid grid, Vec2i padding) throws IOException {
+        System.out.println(padding);
+        var oldLine = line;
         // Afficher la grille
-        grid.display();
         int gridSize = grid.getInnerGrid().length();
         int blockSize = (int) Math.sqrt(gridSize);
         int spacing = String.valueOf(gridSize).length();
 
+        // Calculate the padding which is the padding + the padding between each character + the number of blocks
+        int xPadding =
+                padding.getX() * spacing + padding.getX() + (padding.getX() / blockSize) * (spacing);
+        int yPadding =
+                padding.getY() + (padding.getY() / blockSize);
+        line += yPadding;
+
+        System.out.println("xPadding: " + xPadding);
+        System.out.println("yPadding: " + yPadding);
+        System.out.println("line: " + line);
+
         for (int i = 0; i < gridSize; i++) {
             if (i % blockSize == 0 && i != 0) {
-                textGraphics.putString(0, line++, "-".repeat(gridSize * (spacing + 1) + blockSize - 1));
+                textGraphics.putString(xPadding, line++, "-".repeat(gridSize * (spacing + 1) + blockSize - 1));
             }
             for (int j = 0; j < gridSize; j++) {
-                int position = j * (spacing + 1) + j / blockSize;
+                int position = j * (spacing + 1) + j / blockSize + xPadding;
                 if (j % blockSize == 0 && j != 0) {
                     textGraphics.putString(position - 1, line, "|");
                 }
 
                 textGraphics.putString(position, line,
-                        grid.getSymbolAt(i,j) == null ?
+                        grid.getSymbolAt(j, i) == null ?
                                 " ".repeat(spacing + 1) :
-                                grid.getSymbolAt(i,j) + " ".repeat(spacing));
+                                grid.getSymbolAt(j, i) + " ".repeat(spacing));
             }
             line++;
         }
         terminal.flush();
+        line = oldLine;
+        System.out.println("line: " + line);
+        System.out.println();
     }
 
     private int selectMode() throws IOException {

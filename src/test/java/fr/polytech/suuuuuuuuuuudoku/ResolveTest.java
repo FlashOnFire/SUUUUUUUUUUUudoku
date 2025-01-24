@@ -235,11 +235,16 @@ public class ResolveTest {
         }
         assertTrue(grid.isSolved());
 
-        grid.placeUnchecked(new Vec3i(0, 0, 0), null, false);
-        grid.placeUnchecked(new Vec3i(0, 0, 1), null, false);
+//        grid.placeUnchecked(new Vec3i(0, 0, 0), null, false);
+//        grid.placeUnchecked(new Vec3i(0, 0, 1), null, false);
         grid.placeUnchecked(new Vec3i(0, 0, 2), null, false);
-        grid.placeUnchecked(new Vec3i(0, 0, 3), null, false);
-        grid.placeUnchecked(new Vec3i(0, 0, 4), null, false);
+        grid.placeUnchecked(new Vec3i(6, 6, 0), null, false);
+        grid.getGrids()[2].display();
+        System.out.println();
+        grid.getGrids()[0].display();
+//        grid.placeUnchecked(new Vec3i(6, 6, 0), null, false);
+//        grid.placeUnchecked(new Vec3i(0, 0, 3), null, false);
+//        grid.placeUnchecked(new Vec3i(0, 0, 4), null, false);
         grid.computeAllEmptyCellsPossibilities();
         assertFalse(grid.isSolved());
         var solve = SudokuSolver.solve(grid, true, true);

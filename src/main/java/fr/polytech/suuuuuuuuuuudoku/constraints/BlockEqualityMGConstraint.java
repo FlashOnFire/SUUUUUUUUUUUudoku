@@ -23,6 +23,22 @@ public class BlockEqualityMGConstraint implements MultiGridConstraint {
         this.block2 = block2;
     }
 
+    public int getGridIndex1() {
+        return gridIndex1;
+    }
+
+    public int getGridIndex2() {
+        return gridIndex2;
+    }
+
+    public Box2D getBlock1() {
+        return block1;
+    }
+
+    public Box2D getBlock2() {
+        return block2;
+    }
+
     @Override
     public boolean isSatisfied(Grid[] grid) {
         for (int i = 0; i < block1.width(); i++) {
@@ -65,48 +81,26 @@ public class BlockEqualityMGConstraint implements MultiGridConstraint {
 
     @Override
     public boolean isPosAffected(Vec3i pos) {
-        return (pos.getDepth() == gridIndex1 && block1.contains(pos.getLine(), pos.getColumn()))
+        return (pos.getZ() == grid1 && block1.contains(pos.getX(), pos.getY()))
                 ||
-                (pos.getDepth() == gridIndex2 && block2.contains(pos.getLine(), pos.getColumn()));
+                (pos.getZ() == grid2 && block2.contains(pos.getX(), pos.getY()));
     }
 
     public Vec3i getCorrespondingPosition(Vec3i pos) {
         assert isPosAffected(pos);
 
-        if (pos.getDepth() == gridIndex1) {
+        if (pos.getZ() == grid1) {
             return new Vec3i(
-                    pos.getLine() - block1.line() + block2.line(),
-                    pos.getColumn() - block1.column() + block2.column(),
-                    gridIndex2
+                    pos.getX() - block1.x() + block2.x(),
+                    pos.getY() - block1.y() + block2.y(),
+                    grid2
             );
         } else {
             return new Vec3i(
-                    pos.getLine() - block2.line() + block1.line(),
-                    pos.getColumn() - block2.column() + block1.column(),
-                    gridIndex1
+                    pos.getX() - block2.x() + block1.x(),
+                    pos.getY() - block2.y() + block1.y(),
+                    grid1
             );
         }
-    }
-
-    public Vec2i getPadding() {
-        return new Vec2i(block1.line() - block2.line(), block1.column() - block2.column());
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-
-        BlockEqualityMGConstraint that = (BlockEqualityMGConstraint) o;
-        return (gridIndex1 == that.gridIndex1 && gridIndex2 == that.gridIndex2 && block1.equals(that.block1) && block2.equals(that.block2))
-                || (gridIndex1 == that.gridIndex2 && gridIndex2 == that.gridIndex1 && block1.equals(that.block2) && block2.equals(that.block1));
-    }
-
-    @Override
-    public int hashCode() {
-        int result = gridIndex1;
-        result = 31 * result + gridIndex2;
-        result = 31 * result + block1.hashCode();
-        result = 31 * result + block2.hashCode();
-        return result;
     }
 }

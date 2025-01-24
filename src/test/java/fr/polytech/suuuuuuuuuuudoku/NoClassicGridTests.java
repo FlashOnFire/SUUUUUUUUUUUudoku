@@ -1,24 +1,47 @@
 package fr.polytech.suuuuuuuuuuudoku;
 
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
+import fr.polytech.suuuuuuuuuuudoku.algorithm.Box2D;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
-import fr.polytech.suuuuuuuuuuudoku.constraints.ColumnConstraint;
-import fr.polytech.suuuuuuuuuuudoku.constraints.GeneralSymbolConstraint;
-import fr.polytech.suuuuuuuuuuudoku.constraints.LineConstraint;
-import fr.polytech.suuuuuuuuuuudoku.constraints.NotEmptyConstraint;
+import fr.polytech.suuuuuuuuuuudoku.constraints.*;
 import fr.polytech.suuuuuuuuuuudoku.graphics.SudokuFrame;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
+import org.junit.jupiter.api.Test;
 
 import javax.swing.*;
 import java.util.List;
 
-import static fr.polytech.suuuuuuuuuuudoku.algorithm.Generator.generateNxM;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class Main {
-    public static void main(String[] args) {
-        /* graphics test for GeneralSymbolConstraint
+public class NoClassicGridTests {
+    @Test
+    public void testNoSquareGridConstraint() {
+        var symbolSet = SymbolSets.generateSymbols(6);
+        var grid = new Grid(new Integer[][]{
+                {1, 2, 6, 4, 5, 3},
+                {3, 4, 5, 1, 6, 2},
+                {6, 5, 3, 2, 4, 1},
+                {4, 6, 1, 3, 2, 5},
+                {5, 1, 2, 6, 3, 4},
+                {2, 3, 4, 5, 1, 6}
+        }, List.of(
+                new BlockConstraint(symbolSet, new Box2D(0, 0, 2, 3)),
+                new BlockConstraint(symbolSet, new Box2D(2, 0, 2, 3)),
+                new BlockConstraint(symbolSet, new Box2D(4, 0, 2, 3)),
+                new BlockConstraint(symbolSet, new Box2D(0, 3, 2, 3)),
+                new BlockConstraint(symbolSet, new Box2D(2, 3, 2, 3)),
+                new BlockConstraint(symbolSet, new Box2D(4, 3, 2, 3)),
+                new LineConstraint(symbolSet),
+                new ColumnConstraint(symbolSet),
+                new NotEmptyConstraint()
+        ), symbolSet);
+        assertTrue(grid.areConstraintsSatisfied(false));
+    }
+
+    @Test
+    public void testGridWithConstraintNoRect() {
         var symbolSet = SymbolSets.generateSymbols(9);
+
         var grid = new Grid(new Integer[][]{
                 {8, 5, 6, 2, 9, 4, 1, 7, 3},
                 {2, 7, 8, 5, 6, 3, 9, 4, 1},
@@ -144,12 +167,6 @@ public class Main {
                 new ColumnConstraint(symbolSet),
                 new NotEmptyConstraint()
         ), symbolSet);
-*/
-        var grid = generateNxM(2, 3);
-        SwingUtilities.invokeLater(() ->
-        {
-            SudokuFrame frame = new SudokuFrame(grid);
-            frame.setVisible(true);
-        });
+        assertTrue(grid.areConstraintsSatisfied(false));
     }
 }

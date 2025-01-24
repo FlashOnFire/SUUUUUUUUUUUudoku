@@ -12,9 +12,13 @@ public class Generator {
         //assert n is perfect square
         assert Math.sqrt(n) == Math.floor(Math.sqrt(n));
 
-        var symbols = SymbolSets.generateSymbols(n);
+        return generateNxM((int) Math.floor(Math.sqrt(n)), (int) Math.floor(Math.sqrt(n)));
+    }
 
-        var innerGrid = new Integer[n][n];
+    public static Grid generateNxM(int n, int m) {
+        var symbols = SymbolSets.generateSymbols(n * m);
+
+        var innerGrid = new Integer[n*m][n*m];
         for (var i = 0; i < n; i++) {
             Arrays.fill(innerGrid[i], null);
         }
@@ -23,12 +27,12 @@ public class Generator {
         SolvingState state;
         Grid solvedGrid;
         do {
-            seedGrid = new Grid(innerGrid, symbols);
+            seedGrid = new Grid(innerGrid, symbols, n, m);
 
             var pos = new HashSet<Vec2i>();
-            while (pos.size() < n) {
+            while (pos.size() < n * m) {
                 var x = (int) (Math.random() * n);
-                var y = (int) (Math.random() * n);
+                var y = (int) (Math.random() * m);
                 pos.add(new Vec2i(x, y));
             }
 
@@ -36,7 +40,7 @@ public class Generator {
             var symbolsArray = symbols.toArray(Integer[]::new);
 
             Grid finalSeedGrid = seedGrid;
-            IntStream.range(0, n).forEach(i -> finalSeedGrid.placeUnchecked(posArray[i], symbolsArray[i], false));
+            IntStream.range(0, n * m).forEach(i -> finalSeedGrid.placeUnchecked(posArray[i], symbolsArray[i], false));
             seedGrid.computeAllEmptyCellsPossibilities();
 
             var pair = SudokuSolver.solve(seedGrid, true, true);
@@ -44,14 +48,14 @@ public class Generator {
             solvedGrid = pair.getSecond();
         } while (state != SolvingState.SOLVED);
 
-
         Vec2i last_move_pos;
         Integer last_move_symbol;
         do {
             var emptyCells = solvedGrid.getEmptyCellsPossibilities().keySet();
             Vec2i randomPos;
             do {
-                randomPos = Vec2i.random(n, n);
+                //random among empty cells
+                randomPos = Vec2i.random(n * m, n * m);
             } while (emptyCells.contains(randomPos));
 
             last_move_pos = randomPos;
@@ -60,7 +64,6 @@ public class Generator {
         } while (!SudokuSolver.hasMoreThanOneSolution(solvedGrid, true, true));
 
         solvedGrid.placeUnchecked(last_move_pos, last_move_symbol, true);
-
         return solvedGrid;
     }
 }

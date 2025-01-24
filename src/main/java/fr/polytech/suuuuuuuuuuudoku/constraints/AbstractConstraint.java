@@ -38,6 +38,22 @@ public interface AbstractConstraint {
         return constraintList;
     }
 
+    static List<AbstractConstraint> getRectConstraints(int width, int height, Set<Integer> symbols) {
+        List<AbstractConstraint> constraintList = new ArrayList<>();
+        var length = width * height;
+        for (int i = 0; i < length; i += width) {
+            for (int j = 0; j < length; j += height) {
+                constraintList.add(new BlockConstraint(symbols, new Box2D(i, j, width, height)));
+            }
+        }
+
+        constraintList.add(new LineConstraint(symbols));
+        constraintList.add(new ColumnConstraint(symbols));
+        constraintList.add(new NotEmptyConstraint());
+
+        return constraintList;
+    }
+
     /**
      * Checks if the constraint is satisfied for the given grid.
      *

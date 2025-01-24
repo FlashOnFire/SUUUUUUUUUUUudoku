@@ -2,6 +2,7 @@ package fr.polytech.suuuuuuuuuuudoku.graphics;
 
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
+import fr.polytech.suuuuuuuuuuudoku.constraints.GeneralSymbolConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 
 import javax.swing.*;
@@ -61,6 +62,14 @@ public class SudokuBoard extends JPanel {
                             .filter(blockConstraint -> row >= blockConstraint.getBlock().x() && row < blockConstraint.getBlock().dx() && column >= blockConstraint.getBlock().y() && column < blockConstraint.getBlock().dy())
                             .findFirst()
                             .ifPresent(blockConstraint -> c.setBackground(new Color((grid.getConstraints().indexOf(blockConstraint) * 1234567) % 0x888888 + 0x777777)));
+
+                    grid.getConstraints().stream()
+                            .filter(GeneralSymbolConstraint.class::isInstance)
+                            .map(GeneralSymbolConstraint.class::cast)
+                            .filter(generalSymbolConstraint -> Arrays.stream(generalSymbolConstraint.getPositionList()).anyMatch(pos -> pos.getX() == column && pos.getY() == row))
+                            .findFirst()
+                            .ifPresent(blockConstraint -> c.setBackground(new Color((grid.getConstraints().indexOf(blockConstraint) * 1234567) % 0x888888 + 0x777777)));
+
                     if (trace[row][column]) {
                         c.setForeground(new Color(50, 50, 200));
                     } else {

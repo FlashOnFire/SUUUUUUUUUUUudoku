@@ -20,6 +20,7 @@ public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
     final List<AbstractConstraint> constraints;
 
     private HashMap<Vec2i, Set<Integer>> emptyCellsPossibilities = new HashMap<>();
+    private ArrayList<Move> moves = new ArrayList<>();
 
     /**
      * Constructs a Grid with the specified grid, constraints, and symbols.
@@ -46,11 +47,16 @@ public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
         this(grid, AbstractConstraint.getClassicConstraints(grid.length, symbols), symbols);
     }
 
+    public Grid(Integer[][] grid, Set<Integer> symbols, int width, int height) {
+        this(grid, AbstractConstraint.getRectConstraints(width, height, symbols), symbols);
+    }
+
     public Grid(Grid otherGrid) {
         super(otherGrid.symbols);
         this.constraints = otherGrid.constraints;
         this.emptyCellsPossibilities = new HashMap<>(otherGrid.emptyCellsPossibilities);
         this.innerGrid = new InnerGrid(otherGrid.innerGrid);
+        this.moves = new ArrayList<>(otherGrid.moves);
     }
 
     /**
@@ -289,4 +295,15 @@ public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
         return new Grid(this);
     }
 
+    public void addMove(Vec2i pos, Integer value) {
+        this.moves.add(new Move(pos, value, this.innerGrid.get()[pos.getY()][pos.getX()]));
+    }
+
+    public void undoMove() {
+        if (this.moves.isEmpty()) {
+            return;
+        }
+
+        this.moves.removeLast();
+    }
 }

@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 /**
  * Represents a constraint that ensures each line in the grid satisfies certain conditions.
  */
-public class LineConstraint implements AbstractConstraint {
+public class LineConstraint implements AbstractConstraint<InnerGrid, Vec2i> {
     private final Set<Integer> symbols;
 
     /**

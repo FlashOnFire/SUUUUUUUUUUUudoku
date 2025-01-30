@@ -33,7 +33,7 @@ public class Tui {
 
     void start() throws IOException, InterruptedException {
         welcomeMessage();
-        displayMultiGrid(MultiGrid.getExemple());
+//        displayMultiGrid(MultiGrid.getExemple());
 //        int selectedMode = selectMode();
 //        switch (selectedMode) {
 //            case 0:
@@ -76,7 +76,7 @@ public class Tui {
 
             System.out.println("Grid " + i);
             System.out.println(relatedConstraint.getGridIndex1() == i);
-            System.out.println(relatedConstraint.getPadding());
+//            System.out.println(relatedConstraint.getPadding());
             System.out.println(paddings);
             System.out.println(relatedConstraint.getGridIndex1());
             System.out.println(relatedConstraint.getGridIndex2());
@@ -91,7 +91,7 @@ public class Tui {
             displayGrid(grid.getGrids()[i], padding);
             paddings.put(i, padding);
             System.out.println();
-            var height = grid.getGrids()[i].length() + padding.getX();
+            var height = grid.getGrids()[i].length() + padding.getLine();
             if (height > totalHeight) {
                 totalHeight = height;
             }
@@ -108,9 +108,9 @@ public class Tui {
 
         // Calculate the padding which is the padding + the padding between each character + the number of blocks
         int xPadding =
-                padding.getX() * spacing + padding.getX() + (padding.getX() / blockSize) * (spacing);
+                padding.getLine() * spacing + padding.getLine() + (padding.getLine() / blockSize) * (spacing);
         int yPadding =
-                padding.getY() + (padding.getY() / blockSize);
+                padding.getColumn() + (padding.getColumn() / blockSize);
         line += yPadding;
 
 //        System.out.println("xPadding: " + xPadding);

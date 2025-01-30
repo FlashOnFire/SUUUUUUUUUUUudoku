@@ -4,6 +4,7 @@ import fr.polytech.suuuuuuuuuuudoku.constraints.AbstractConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.GeneralSymbolConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
+import fr.polytech.suuuuuuuuuuudoku.grid.InnerGrid;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
 import java.util.*;
@@ -50,7 +51,7 @@ public class Generator {
         Vec2i dividers = findDividers(length_innerGrid);
         Grid solvedGrid = generateSolvedGrid(dividers.getLine(), dividers.getColumn());
 
-        List<AbstractConstraint> generalSymbolConstraints = new ArrayList<>();
+        List<AbstractConstraint<InnerGrid, Vec2i>> generalSymbolConstraints = new ArrayList<>();
         for (AbstractConstraint constraint : solvedGrid.getConstraints()) {
             if (constraint instanceof BlockConstraint) {
                 var list = new ArrayList<Vec2i>();

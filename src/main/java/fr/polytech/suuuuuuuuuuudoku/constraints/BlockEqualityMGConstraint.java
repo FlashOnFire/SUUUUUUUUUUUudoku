@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-public class BlockEqualityMGConstraint implements MultiGridConstraint {
+public class BlockEqualityMGConstraint implements AbstractConstraint<Grid[], Vec3i> {
     /**
      * The set of symbols to be checked within the block.
      */
@@ -37,6 +37,10 @@ public class BlockEqualityMGConstraint implements MultiGridConstraint {
 
     public Box2D getBlock2() {
         return block2;
+    }
+
+    public Vec2i getPadding() {
+        return new Vec2i(block2.line() - block1.line(), block2.column() - block1.column());
     }
 
     @Override
@@ -81,25 +85,25 @@ public class BlockEqualityMGConstraint implements MultiGridConstraint {
 
     @Override
     public boolean isPosAffected(Vec3i pos) {
-        return (pos.getZ() == grid1 && block1.contains(pos.getX(), pos.getY()))
+        return (pos.getDepth() == gridIndex1 && block1.contains(pos.getLine(), pos.getColumn()))
                 ||
-                (pos.getZ() == grid2 && block2.contains(pos.getX(), pos.getY()));
+                (pos.getDepth() == gridIndex2 && block2.contains(pos.getLine(), pos.getColumn()));
     }
 
     public Vec3i getCorrespondingPosition(Vec3i pos) {
         assert isPosAffected(pos);
 
-        if (pos.getZ() == grid1) {
+        if (pos.getDepth() == gridIndex1) {
             return new Vec3i(
-                    pos.getX() - block1.x() + block2.x(),
-                    pos.getY() - block1.y() + block2.y(),
-                    grid2
+                    pos.getLine() - block1.line() + block2.line(),
+                    pos.getColumn() - block1.column() + block2.column(),
+                    gridIndex2
             );
         } else {
             return new Vec3i(
-                    pos.getX() - block2.x() + block1.x(),
-                    pos.getY() - block2.y() + block1.y(),
-                    grid1
+                    pos.getLine() - block2.line() + block1.line(),
+                    pos.getColumn() - block2.column() + block1.column(),
+                    gridIndex1
             );
         }
     }

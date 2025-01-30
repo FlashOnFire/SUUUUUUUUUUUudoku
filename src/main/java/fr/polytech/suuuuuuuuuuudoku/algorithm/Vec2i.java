@@ -23,6 +23,7 @@ public class Vec2i {
 
     /**
      * Generates a random Vec2i with coordinates between 0 and x_max and 0 and y_max.
+     *
      * @param x_max the maximum x-coordinate
      * @param y_max the maximum y-coordinate
      * @return a random Vec2i
@@ -49,16 +50,6 @@ public class Vec2i {
 
     public Vec2i absolute() {
         return new Vec2i(Math.abs(line), Math.abs(column));
-    }
-
-    public static Vec2i zero() {
-        return new Vec2i(0, 0);
-    }
-
-    public Vec2i add(Vec2i other) {
-        this.x += other.x;
-        this.y += other.y;
-        return this;
     }
 
     /**

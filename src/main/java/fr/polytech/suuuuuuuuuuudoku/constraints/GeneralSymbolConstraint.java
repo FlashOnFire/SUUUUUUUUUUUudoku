@@ -6,7 +6,7 @@ import fr.polytech.suuuuuuuuuuudoku.grid.InnerGrid;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class GeneralSymbolConstraint implements AbstractConstraint {
+public class GeneralSymbolConstraint implements AbstractConstraint<InnerGrid, Vec2i> {
     /**
      * The set of symbols to be checked within the constraints.
      */

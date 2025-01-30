@@ -22,22 +22,17 @@ public interface AbstractConstraint<T, O> {
      * @return a list of classic constraints
      */
     static List<AbstractConstraint<InnerGrid, Vec2i>> getClassicConstraints(int size, Set<Integer> symbols) {
-        List<AbstractConstraint<InnerGrid, Vec2i>> constraintList = new ArrayList<>();
-        var blockSize = (int) Math.sqrt(size);
-
-        for (int i = 0; i < size; i += blockSize) {
-            for (int j = 0; j < size; j += blockSize) {
-                constraintList.add(new BlockConstraint(symbols, new Box2D(i, j, blockSize, blockSize)));
-            }
-        }
-
-        constraintList.add(new LineConstraint(symbols));
-        constraintList.add(new ColumnConstraint(symbols));
-        constraintList.add(new NotEmptyConstraint());
-
-        return constraintList;
+        return getRectConstraints(size, size, symbols);
     }
 
+    /**
+     * Generates the rectangular constraints for a Sudoku grid.
+     *
+     * @param width: the width of the grid
+     * @param height: the height of the grid
+     * @param symbols: the set of symbols used in the grid
+     * @return a list of rectangular constraints
+     */
     static List<AbstractConstraint<InnerGrid, Vec2i>> getRectConstraints(int width, int height, Set<Integer> symbols) {
         List<AbstractConstraint<InnerGrid, Vec2i>> constraintList = new ArrayList<>();
         var length = width * height;

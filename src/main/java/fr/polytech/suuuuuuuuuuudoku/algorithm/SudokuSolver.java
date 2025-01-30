@@ -114,14 +114,14 @@ public class SudokuSolver {
      * @return the solving state of the Sudoku grid
      */
     private static <C, T extends Solvable<C> & ShallowCopyable<T>> List<T> doBacktracking(T grid) {
-        System.out.println("Backtracking");
+        // System.out.println("Backtracking");
 
         assert !grid.getEmptyCellsPossibilities().isEmpty() : "No empty cells";
 
         var cell = grid.getEmptyCellsPossibilities().entrySet().stream()
                 .min(Comparator.comparingInt(e -> e.getValue().size()))
                 .orElseThrow();
-        System.out.println("Trying " + cell.getKey() + " with " + cell.getValue());
+        // System.out.println("Trying " + cell.getKey() + " with " + cell.getValue());
 
         // disable assert to allow solving with only backtracking
         //assert cell.getValue().size() > 1 : "Cell has less than two possibilities";
@@ -143,7 +143,7 @@ public class SudokuSolver {
      * @return the solving state of the Sudoku grid
      */
     private static <C, T extends Solvable<C>> SolvingState solveDeduction(T grid) {
-        System.out.println("Deduction");
+        // System.out.println("Deduction");
 
         boolean finished = false;
 
@@ -167,7 +167,7 @@ public class SudokuSolver {
                         grid.placeUnchecked(cell, possibilities.iterator().next(), true);
                         finished = false;
                     } else if (possibilities.isEmpty()) {
-                        System.out.println("Empty cell has no possibilities1");
+                        // System.out.println("Empty cell has no possibilities");
 
                         return SolvingState.UNSOLVABLE;
                     }

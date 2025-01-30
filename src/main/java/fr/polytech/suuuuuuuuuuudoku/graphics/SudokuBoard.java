@@ -95,26 +95,27 @@ public class SudokuBoard extends JPanel {
     }
 
     public void update(Integer[][] newData, boolean isSolution) {
-        for (int i = 0; i < newData.length; i++) {
-            for (int j = 0; j < newData[i].length; j++) {
-                table.setValueAt(newData[i][j], i, j);
+        for (int row = 0; row < newData.length; row++) {
+            for (int column = 0; column < newData[row].length; column++) {
+                table.setValueAt(newData[row][column], row, column);
             }
         }
 
-        grid = new Grid(newData, grid.getSymbols());
-        solvedGrid = new Grid(grid.getInnerGrid().get(), grid.getSymbols());
+        grid = new Grid(newData, grid.getConstraints(), grid.getSymbols());
+        solvedGrid = new Grid(grid.getInnerGrid().get(), grid.getConstraints(), grid.getSymbols());
         alreadySolved = isSolution;
         table.repaint();
     }
 
-    public void recoverPreviousSudoku(Grid grid) {
-        var value = grid.getInnerGrid().get();
-        IntStream.range(0, value.length).forEach(i -> IntStream.range(0, value[i].length).forEach(j -> {
-            if (trace[i][j]) {
-                value[i][j] = null;
-                grid.placeUnchecked(new Vec2i(j, i), null, false);
+    public void recoverPreviousSudoku(Grid currentGrid) {
+        var integerTab = currentGrid.getInnerGrid().get();
+        IntStream.range(0, integerTab.length).forEach(row -> IntStream.range(0, integerTab[row].length).forEach(column -> {
+            if (trace[row][column]) {
+                integerTab[row][column] = null;
+                grid.placeUnchecked(new Vec2i(column, row), null, false);
             }
         }));
-        update(value, false);
+
+        update(integerTab, false);
     }
 }

@@ -247,6 +247,7 @@ public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
     @Override
     public void placeUnchecked(Vec2i pos, Integer value, boolean updatePossibilities) {
         if (getSymbolAt(pos) == null && value != null) {
+            System.out.println("Suppress empty cell at " + pos);
             this.emptyCellsPossibilities.remove(pos);
         } else if (getSymbolAt(pos) != null && value == null) {
             System.out.println("Placing empty cell at " + pos);

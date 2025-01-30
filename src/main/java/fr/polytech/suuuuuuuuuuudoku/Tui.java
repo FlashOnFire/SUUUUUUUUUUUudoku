@@ -8,12 +8,10 @@ import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
-import fr.polytech.suuuuuuuuuuudoku.constraints.BlockEqualityMGConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 public class Tui {
     private final Terminal terminal;
@@ -33,7 +31,7 @@ public class Tui {
 
     void start() throws IOException, InterruptedException {
         welcomeMessage();
-//        displayMultiGrid(MultiGrid.getExemple());
+        displayMultiGrid(MultiGrid.getExemple());
 //        int selectedMode = selectMode();
 //        switch (selectedMode) {
 //            case 0:
@@ -63,38 +61,8 @@ public class Tui {
     }
 
     private void displayMultiGrid(MultiGrid grid) throws IOException {
-        HashMap<Integer, Vec2i> paddings = new HashMap<>();
-        int totalHeight = 0;
         for (int i = 0; i < grid.getGrids().length; i++) {
-            int finalI = i;
-            BlockEqualityMGConstraint relatedConstraint =
-                    grid.getConstraints().stream()
-                        .filter(constraint -> constraint instanceof BlockEqualityMGConstraint)
-                        .filter(constraint -> ((BlockEqualityMGConstraint) constraint).getGridIndex1() == finalI || ((BlockEqualityMGConstraint) constraint).getGridIndex2() == finalI)
-                        .map(constraint -> (BlockEqualityMGConstraint) constraint)
-                        .findFirst().orElseThrow();
-
-            System.out.println("Grid " + i);
-            System.out.println(relatedConstraint.getGridIndex1() == i);
-//            System.out.println(relatedConstraint.getPadding());
-            System.out.println(paddings);
-            System.out.println(relatedConstraint.getGridIndex1());
-            System.out.println(relatedConstraint.getGridIndex2());
-
-            var padding = (relatedConstraint.getGridIndex1() == i) ? Vec2i.zero() : relatedConstraint.getPadding();
-
-            if (paddings.containsKey(relatedConstraint.getGridIndex1())) {
-                padding.add(paddings.get(relatedConstraint.getGridIndex1()));
-            }
-            System.out.println("line: " + line);
-            System.out.println(padding);
-            displayGrid(grid.getGrids()[i], padding);
-            paddings.put(i, padding);
-            System.out.println();
-            var height = grid.getGrids()[i].length() + padding.getLine();
-            if (height > totalHeight) {
-                totalHeight = height;
-            }
+            displayGrid(grid.getGrids()[i], grid.getPaddings()[i]);
         }
     }
 

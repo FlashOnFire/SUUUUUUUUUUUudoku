@@ -27,10 +27,16 @@ public class ResolveTest {
         var res = CsvUtils.importGrid(Path.of(resoucesPath + "deduceSolved.csv"));
 
         assertFalse(grid.areConstraintsSatisfied(false));
+
+        var start = System.nanoTime();
         var solve = SudokuSolver.solve(grid, true, false);
+        var end = System.nanoTime();
+
         assertEquals(SolvingState.SOLVED, solve.getFirst());
         assertTrue(solve.getSecond().areConstraintsSatisfied(false));
         assertEquals(solve.getSecond().getInnerGrid(), res.getInnerGrid());
+
+        System.out.println("Time: " + (end - start) / 1_000_000 + "ms");
     }
 
     @Test
@@ -106,14 +112,18 @@ public class ResolveTest {
         var res = CsvUtils.importGrid(Path.of(resoucesPath + "100x100Solved.csv"));
 
         assertFalse(grid.areConstraintsSatisfied(false));
+
+        var start = System.nanoTime();
         var solve = SudokuSolver.solve(grid, true, true);
+        var end = System.nanoTime();
         assertEquals(SolvingState.SOLVED, solve.getFirst());
         assertTrue(solve.getSecond().areConstraintsSatisfied(false));
         assertEquals(solve.getSecond().getInnerGrid(), res.getInnerGrid());
+        System.out.println("Time: " + (end - start) / 1_000_000 + "ms");
     }
 
     @Test
-    public void testMultiDokuSolve() throws FileNotFoundException {
+    public void testMultiDokuSolve() {
         Grid[] grids = new Grid[5];
         var symbolSet = SymbolSets.generateSymbols(9);
         grids[0] = new Grid(

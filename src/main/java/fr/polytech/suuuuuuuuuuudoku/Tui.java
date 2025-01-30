@@ -7,11 +7,15 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
+import fr.polytech.suuuuuuuuuuudoku.algorithm.Pair;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Tui {
     private final Terminal terminal;
@@ -31,7 +35,21 @@ public class Tui {
 
     void start() throws IOException, InterruptedException {
         welcomeMessage();
-        displayMultiGrid(MultiGrid.getExemple());
+        List<Pair<Vec2i, Grid>> grids = new ArrayList<>();
+        Vec2i[] positions = {
+                new Vec2i(0, 6),
+                new Vec2i(6, 0),
+                new Vec2i(6, 6),
+                new Vec2i(6, 12),
+                new Vec2i(12, 6),
+        };
+        for (int i = 0; i < 5; i++) {
+            var grid = CsvUtils.importGrid(Path.of("src/test/java/fr/polytech/suuuuuuuuuuudoku/resources/" +
+                    "/multigrid_2/" + i + ".csv"));
+            grids.add(new Pair<>(positions[i], grid));
+        }
+        var grid = new MultiGrid(grids);
+        displayMultiGrid(grid);
 //        int selectedMode = selectMode();
 //        switch (selectedMode) {
 //            case 0:

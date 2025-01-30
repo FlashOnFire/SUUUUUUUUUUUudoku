@@ -10,18 +10,17 @@ import org.junit.jupiter.api.Test;
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ResolveTest {
-    static String resoucesPath = "src/test/java/fr/polytech/suuuuuuuuuuudoku/resources/";
+    static String RESSOURCES_PATH = "src/test/java/fr/polytech/suuuuuuuuuuudoku/resources/";
 
     @Test
     public void testSolveDeduce() throws FileNotFoundException {
-        var grid = CsvUtils.importGrid(Path.of(resoucesPath + "deduce.csv"));
-        var res = CsvUtils.importGrid(Path.of(resoucesPath + "deduceSolved.csv"));
+        var grid = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "deduce.csv"));
+        var res = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "deduceSolved.csv"));
 
         assertFalse(grid.areConstraintsSatisfied(false));
 
@@ -38,8 +37,8 @@ public class ResolveTest {
 
     @Test
     public void testSolveWithBackTrack() throws FileNotFoundException {
-        var grid = CsvUtils.importGrid(Path.of(resoucesPath + "backtrack.csv"));
-        var res = CsvUtils.importGrid(Path.of(resoucesPath + "backtrackSolved.csv"));
+        var grid = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "backtrack.csv"));
+        var res = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "backtrackSolved.csv"));
 
         assertFalse(grid.areConstraintsSatisfied(false));
         var solve = SudokuSolver.solve(grid, false, true, false);
@@ -50,8 +49,8 @@ public class ResolveTest {
 
     @Test
     public void testSolveWithBackTrackAndDeduce() throws FileNotFoundException {
-        var grid = CsvUtils.importGrid(Path.of(resoucesPath + "backtrackAndDeduce.csv"));
-        var res = CsvUtils.importGrid(Path.of(resoucesPath + "backtrackAndDeduceSolved.csv"));
+        var grid = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "backtrackAndDeduce.csv"));
+        var res = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "backtrackAndDeduceSolved.csv"));
 
         assertFalse(grid.areConstraintsSatisfied(false));
         var solve = SudokuSolver.solve(grid, true, true, false);
@@ -62,7 +61,7 @@ public class ResolveTest {
 
     @Test
     public void testMultiSolve() throws FileNotFoundException {
-        var grid = CsvUtils.importGrid(Path.of(resoucesPath + "multisolutions.csv"));
+        var grid = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "multisolutions.csv"));
 
         assertFalse(grid.areConstraintsSatisfied(false));
 
@@ -105,8 +104,8 @@ public class ResolveTest {
 
     @Test
     public void testSolveBig() throws FileNotFoundException {
-        var grid = CsvUtils.importGrid(Path.of(resoucesPath + "100x100.csv"));
-        var res = CsvUtils.importGrid(Path.of(resoucesPath + "100x100Solved.csv"));
+        var grid = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "100x100.csv"));
+        var res = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "100x100Solved.csv"));
 
         assertFalse(grid.areConstraintsSatisfied(false));
 
@@ -120,102 +119,19 @@ public class ResolveTest {
     }
 
     @Test
-    public void testMultiDokuSolve() {
+    public void testMultiDokuSolve() throws FileNotFoundException {
         List<Pair<Vec2i, Grid>> grids = new ArrayList<>();
-        var symbolSet = SymbolSets.generateSymbols(9);
-        grids.add(new Pair<>(
+        Vec2i[] positions = {
                 Vec2i.zero(),
-                new Grid(
-                        new Integer[][]
-                                {
-                                        {7, 1, 2, 6, 3, 8, 4, 9, 5},
-                                        {9, 5, 3, 4, 1, 2, 8, 7, 6},
-                                        {4, 8, 6, 9, 5, 7, 2, 1, 3},
-                                        {2, 3, 4, 1, 7, 6, 5, 8, 9},
-                                        {5, 9, 1, 3, 8, 4, 7, 6, 2},
-                                        {8, 6, 7, 2, 9, 5, 3, 4, 1},
-                                        {1, 7, 8, 5, 2, 9, 6, 3, 4},
-                                        {3, 4, 5, 8, 6, 1, 9, 2, 7},
-                                        {6, 2, 9, 7, 4, 3, 1, 5, 8},
-                                }
-                        ,
-                        symbolSet
-                )));
-
-        grids.add(new Pair<>(
-                new Vec2i(0, 12), new Grid(
-                new Integer[][]
-                        {
-                                {5, 9, 1, 2, 4, 8, 3, 7, 6},
-                                {6, 2, 3, 9, 1, 7, 5, 8, 4},
-                                {8, 4, 7, 5, 6, 3, 2, 1, 9},
-                                {2, 1, 9, 7, 5, 4, 8, 6, 3},
-                                {4, 8, 6, 1, 3, 9, 7, 2, 5},
-                                {3, 7, 5, 8, 2, 6, 4, 9, 1},
-                                {9, 5, 8, 4, 7, 1, 6, 3, 2},
-                                {1, 6, 4, 3, 8, 2, 9, 5, 7},
-                                {7, 3, 2, 6, 9, 5, 1, 4, 8}
-                        }
-                ,
-                symbolSet
-        )));
-
-        grids.add(new Pair<>(
+                new Vec2i(0, 12),
                 new Vec2i(6, 6),
-                new Grid(
-                        new Integer[][]
-                                {
-                                        {6, 3, 4, 1, 7, 2, 9, 5, 8},
-                                        {9, 2, 7, 8, 5, 3, 1, 6, 4},
-                                        {1, 5, 8, 9, 4, 6, 7, 3, 2},
-                                        {2, 6, 5, 7, 3, 8, 4, 9, 1},
-                                        {3, 7, 9, 2, 1, 4, 6, 8, 5},
-                                        {8, 4, 1, 6, 9, 5, 2, 7, 3},
-                                        {7, 9, 3, 5, 2, 1, 8, 4, 6},
-                                        {5, 1, 6, 4, 8, 7, 3, 2, 9},
-                                        {4, 8, 2, 3, 6, 9, 5, 1, 7}
-                                }
-                        ,
-                        symbolSet
-                )));
-
-        grids.add(new Pair<>(
-                new Vec2i(12, 0), new Grid(
-                new Integer[][]
-                        {
-                                {6, 2, 5, 8, 1, 4, 7, 9, 3},
-                                {9, 8, 4, 2, 7, 3, 5, 1, 6},
-                                {7, 3, 1, 6, 5, 9, 4, 8, 2},
-                                {5, 6, 2, 9, 8, 7, 1, 3, 4},
-                                {3, 1, 7, 5, 4, 2, 9, 6, 8},
-                                {8, 4, 9, 3, 6, 1, 2, 5, 7},
-                                {2, 7, 6, 1, 3, 5, 8, 4, 9},
-                                {1, 9, 3, 4, 2, 8, 6, 7, 5},
-                                {4, 5, 8, 7, 9, 6, 3, 2, 1}
-                        }
-                ,
-                symbolSet)
-        ));
-        grids.add(new Pair<>(
-                new Vec2i(12, 12), new Grid(
-                new Integer[][]
-                        {
-                                {8, 4, 6, 5, 3, 7, 1, 9, 2},
-                                {3, 2, 9, 6, 1, 8, 5, 7, 4},
-                                {5, 1, 7, 4, 9, 2, 6, 3, 8},
-                                {7, 5, 2, 1, 4, 9, 3, 8, 6},
-                                {4, 3, 8, 7, 6, 5, 2, 1, 9},
-                                {9, 6, 1, 2, 8, 3, 7, 4, 5},
-                                {1, 9, 3, 8, 2, 6, 4, 5, 7},
-                                {2, 7, 4, 9, 5, 1, 8, 6, 3},
-                                {6, 8, 5, 3, 7, 4, 9, 2, 1}
-                        }
-                ,
-                symbolSet
-        )));
-
-        Collections.shuffle(grids);
-
+                new Vec2i(12, 0),
+                new Vec2i(12, 12),
+        };
+        for (int i = 0; i < 5; i++) {
+            var grid = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "/multigrid_1/" + i + ".csv"));
+            grids.add(new Pair<>(positions[i], grid));
+        }
         var grid = new MultiGrid(grids);
 
         for (var g : grid.getGrids()) {
@@ -223,16 +139,48 @@ public class ResolveTest {
         }
         assertTrue(grid.isSolved());
 
-//        grid.placeUnchecked(new Vec3i(0, 0, 0), null, false);
-//        grid.placeUnchecked(new Vec3i(0, 0, 1), null, false);
+        grid.placeUnchecked(new Vec3i(0, 0, 0), null, false, false);
+        grid.placeUnchecked(new Vec3i(0, 0, 1), null, false, false);
         grid.placeUnchecked(new Vec3i(0, 0, 2), null, false, false);
         grid.placeUnchecked(new Vec3i(6, 6, 0), null, false, false);
-        grid.getGrids()[2].display();
-        System.out.println();
-        grid.getGrids()[0].display();
-//        grid.placeUnchecked(new Vec3i(6, 6, 0), null, false);
-//        grid.placeUnchecked(new Vec3i(0, 0, 3), null, false);
-//        grid.placeUnchecked(new Vec3i(0, 0, 4), null, false);
+        grid.placeUnchecked(new Vec3i(6, 6, 0), null, false, false);
+        grid.placeUnchecked(new Vec3i(0, 0, 3), null, false, false);
+        grid.placeUnchecked(new Vec3i(0, 0, 4), null, false, false);
+        grid.computeAllEmptyCellsPossibilities();
+        assertFalse(grid.isSolved());
+        var solve = SudokuSolver.solve(grid, true, true, false);
+        assertEquals(SolvingState.SOLVED, solve.getFirst());
+    }
+
+
+    @Test
+    public void testMultiDokuSolve2() throws FileNotFoundException {
+        List<Pair<Vec2i, Grid>> grids = new ArrayList<>();
+        Vec2i[] positions = {
+                new Vec2i(0, 6),
+                new Vec2i(6, 0),
+                new Vec2i(6, 6),
+                new Vec2i(6, 12),
+                new Vec2i(12, 6),
+        };
+        for (int i = 0; i < 5; i++) {
+            var grid = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "/multigrid_2/" + i + ".csv"));
+            grids.add(new Pair<>(positions[i], grid));
+        }
+        var grid = new MultiGrid(grids);
+
+        for (var g : grid.getGrids()) {
+            assertTrue(g.isSolved());
+        }
+        assertTrue(grid.isSolved());
+
+        grid.placeUnchecked(new Vec3i(0, 0, 0), null, false, false);
+        grid.placeUnchecked(new Vec3i(0, 0, 1), null, false, false);
+        grid.placeUnchecked(new Vec3i(0, 0, 2), null, false, false);
+//        grid.placeUnchecked(new Vec3i(6, 6, 0), null, false, false);
+//        grid.placeUnchecked(new Vec3i(6, 6, 0), null, false, false);
+//        grid.placeUnchecked(new Vec3i(0, 0, 3), null, false, false);
+//        grid.placeUnchecked(new Vec3i(0, 0, 4), null, false, false);
         grid.computeAllEmptyCellsPossibilities();
         assertFalse(grid.isSolved());
         var solve = SudokuSolver.solve(grid, true, true, false);

@@ -9,14 +9,14 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-public class BlockEqualityMGConstraint implements AbstractConstraint<Grid[], Vec3i> {
+public class BlockEqualityConstraint implements AbstractConstraint<Grid[], Vec3i> {
     /**
      * The set of symbols to be checked within the block.
      */
     private final int gridIndex1, gridIndex2;
     private final Box2D block1, block2;
 
-    public BlockEqualityMGConstraint(int gridIndex1, Box2D block1, int gridIndex2, Box2D block2) {
+    public BlockEqualityConstraint(int gridIndex1, Box2D block1, int gridIndex2, Box2D block2) {
         this.gridIndex1 = gridIndex1;
         this.block1 = block1;
         this.gridIndex2 = gridIndex2;
@@ -48,9 +48,9 @@ public class BlockEqualityMGConstraint implements AbstractConstraint<Grid[], Vec
         for (int i = 0; i < block1.width(); i++) {
             for (int j = 0; j < block1.height(); j++) {
                 if (!grid[gridIndex1].getSymbolAt(
-                        block1.line() + i,
-                        block1.column() + j
-                ).equals(grid[gridIndex2].getSymbolAt(block2.line() + i, block2.column() + j))) {
+                        block1.column() + j,
+                        block1.line() + i
+                ).equals(grid[gridIndex2].getSymbolAt(block2.column() + j, block2.line() + i))) {
                     return false;
                 }
             }
@@ -106,5 +106,23 @@ public class BlockEqualityMGConstraint implements AbstractConstraint<Grid[], Vec
                     gridIndex1
             );
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BlockEqualityConstraint that = (BlockEqualityConstraint) o;
+        return (gridIndex1 == that.gridIndex1 && gridIndex2 == that.gridIndex2 && block1.equals(that.block1) && block2.equals(that.block2))
+                || (gridIndex1 == that.gridIndex2 && gridIndex2 == that.gridIndex1 && block1.equals(that.block2) && block2.equals(that.block1));
+    }
+
+    @Override
+    public int hashCode() {
+        int result = gridIndex1;
+        result = 31 * result + gridIndex2;
+        result = 31 * result + block1.hashCode();
+        result = 31 * result + block2.hashCode();
+        return result;
     }
 }

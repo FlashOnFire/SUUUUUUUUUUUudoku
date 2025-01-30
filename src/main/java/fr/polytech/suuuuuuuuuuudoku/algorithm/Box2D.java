@@ -60,11 +60,7 @@ public class Box2D {
     }
 
     public Box2D substract(Box2D other) {
-//        var relativeI = new Vec2i(overlap.x() - usedI.x(), overlap.y() - usedI.y());
-//        var endI = new Vec2i(overlap.dx() - usedI.x(), overlap.dy() - usedI.y());
         return Box2D.absolute(line - other.line, column - other.column, line2 - other.line, column2 - other.column);
-
-
     }
 
     @Override

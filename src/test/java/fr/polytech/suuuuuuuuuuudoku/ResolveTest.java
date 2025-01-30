@@ -5,8 +5,6 @@ import fr.polytech.suuuuuuuuuuudoku.algorithm.SolvingState;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec3i;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
-import fr.polytech.suuuuuuuuuuudoku.constraints.BlockEqualityConstraint;
-import fr.polytech.suuuuuuuuuuudoku.constraints.MultiGridConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
@@ -29,7 +27,7 @@ public class ResolveTest {
         assertFalse(grid.areConstraintsSatisfied(false));
 
         var start = System.nanoTime();
-        var solve = SudokuSolver.solve(grid, true, false);
+        var solve = SudokuSolver.solve(grid, true, false, false);
         var end = System.nanoTime();
 
         assertEquals(SolvingState.SOLVED, solve.getFirst());
@@ -45,7 +43,7 @@ public class ResolveTest {
         var res = CsvUtils.importGrid(Path.of(resoucesPath + "backtrackSolved.csv"));
 
         assertFalse(grid.areConstraintsSatisfied(false));
-        var solve = SudokuSolver.solve(grid, false, true);
+        var solve = SudokuSolver.solve(grid, false, true, false);
         assertEquals(SolvingState.SOLVED, solve.getFirst());
         assertTrue(solve.getSecond().areConstraintsSatisfied(false));
         assertEquals(solve.getSecond().getInnerGrid(), res.getInnerGrid());
@@ -57,7 +55,7 @@ public class ResolveTest {
         var res = CsvUtils.importGrid(Path.of(resoucesPath + "backtrackAndDeduceSolved.csv"));
 
         assertFalse(grid.areConstraintsSatisfied(false));
-        var solve = SudokuSolver.solve(grid, true, true);
+        var solve = SudokuSolver.solve(grid, true, true, false);
         assertEquals(SolvingState.SOLVED, solve.getFirst());
         assertTrue(solve.getSecond().areConstraintsSatisfied(true));
         assertEquals(solve.getSecond().getInnerGrid(), res.getInnerGrid());
@@ -69,7 +67,7 @@ public class ResolveTest {
 
         assertFalse(grid.areConstraintsSatisfied(false));
 
-        var solvedList = SudokuSolver.findAllSolutions(grid, true, true);
+        var solvedList = SudokuSolver.findAllSolutions(grid, true, true, false);
         assertEquals(11, solvedList.size());
         for (var solved : solvedList) {
             assertTrue(solved.areConstraintsSatisfied(true));
@@ -102,7 +100,7 @@ public class ResolveTest {
                 new BlockConstraint(symbolSet, new Box2D(0, 0, 2, 2))
         ), symbolSet);
         assertFalse(grid.areConstraintsSatisfied(false));
-        assertThrows(AssertionError.class, () -> SudokuSolver.solve(grid, false, false));
+        assertThrows(AssertionError.class, () -> SudokuSolver.solve(grid, false, false, false));
         assertFalse(grid.areConstraintsSatisfied(false));
     }
 
@@ -114,7 +112,7 @@ public class ResolveTest {
         assertFalse(grid.areConstraintsSatisfied(false));
 
         var start = System.nanoTime();
-        var solve = SudokuSolver.solve(grid, true, true);
+        var solve = SudokuSolver.solve(grid, true, true, false);
         var end = System.nanoTime();
         assertEquals(SolvingState.SOLVED, solve.getFirst());
         assertTrue(solve.getSecond().areConstraintsSatisfied(false));
@@ -237,8 +235,8 @@ public class ResolveTest {
 
 //        grid.placeUnchecked(new Vec3i(0, 0, 0), null, false);
 //        grid.placeUnchecked(new Vec3i(0, 0, 1), null, false);
-        grid.placeUnchecked(new Vec3i(0, 0, 2), null, false);
-        grid.placeUnchecked(new Vec3i(6, 6, 0), null, false);
+        grid.placeUnchecked(new Vec3i(0, 0, 2), null, false, false);
+        grid.placeUnchecked(new Vec3i(6, 6, 0), null, false, false);
         grid.getGrids()[2].display();
         System.out.println();
         grid.getGrids()[0].display();
@@ -247,7 +245,7 @@ public class ResolveTest {
 //        grid.placeUnchecked(new Vec3i(0, 0, 4), null, false);
         grid.computeAllEmptyCellsPossibilities();
         assertFalse(grid.isSolved());
-        var solve = SudokuSolver.solve(grid, true, true);
+        var solve = SudokuSolver.solve(grid, true, true, false);
         assertEquals(SolvingState.SOLVED, solve.getFirst());
     }
 }

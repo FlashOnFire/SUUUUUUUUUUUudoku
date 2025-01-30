@@ -1,6 +1,8 @@
 package fr.polytech.suuuuuuuuuuudoku.algorithm;
 
-import fr.polytech.suuuuuuuuuuudoku.constraints.*;
+import fr.polytech.suuuuuuuuuuudoku.constraints.AbstractConstraint;
+import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
+import fr.polytech.suuuuuuuuuuudoku.constraints.GeneralSymbolConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
@@ -46,14 +48,14 @@ public class Generator {
         }
 
         Vec2i dividers = findDividers(length_innerGrid);
-        Grid solvedGrid = generateSolvedGrid(dividers.getX(), dividers.getY());
+        Grid solvedGrid = generateSolvedGrid(dividers.getLine(), dividers.getColumn());
 
         List<AbstractConstraint> generalSymbolConstraints = new ArrayList<>();
         for (AbstractConstraint constraint : solvedGrid.getConstraints()) {
             if (constraint instanceof BlockConstraint) {
                 var list = new ArrayList<Vec2i>();
-                for (int pos_x = ((BlockConstraint) constraint).getBlock().x(); pos_x < ((BlockConstraint) constraint).getBlock().dx(); pos_x++) {
-                    for (int pos_y = ((BlockConstraint) constraint).getBlock().y(); pos_y < ((BlockConstraint) constraint).getBlock().dy(); pos_y++) {
+                for (int pos_x = ((BlockConstraint) constraint).getBlock().line(); pos_x < ((BlockConstraint) constraint).getBlock().line2(); pos_x++) {
+                    for (int pos_y = ((BlockConstraint) constraint).getBlock().column(); pos_y < ((BlockConstraint) constraint).getBlock().column2(); pos_y++) {
                         list.add(new Vec2i(pos_x, pos_y));
                     }
                 }
@@ -146,7 +148,8 @@ public class Generator {
             var symbolsArray = symbols.toArray(Integer[]::new);
 
             Grid finalSeedGrid = seedGrid;
-            IntStream.range(0, n * m).forEach(i -> finalSeedGrid.placeUnchecked(posArray[i], symbolsArray[i], false, false));
+            IntStream.range(0, n * m).forEach(i -> finalSeedGrid.placeUnchecked(posArray[i], symbolsArray[i], false,
+                    false));
             seedGrid.computeAllEmptyCellsPossibilities();
 
             var pair = SudokuSolver.solve(seedGrid, true, true, false);

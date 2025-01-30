@@ -7,29 +7,29 @@ import java.util.concurrent.ThreadLocalRandom;
  * A class representing a 2D vector with integer coordinates.
  */
 public class Vec2i {
-    private int x;
-    private int y;
+    private int line;
+    private int column;
 
     /**
      * Constructs a Vec2i with the specified coordinates.
      *
-     * @param x the x-coordinate
-     * @param y the y-coordinate
+     * @param line the x-coordinate
+     * @param y    the y-coordinate
      */
-    public Vec2i(int x, int y) {
-        this.x = x;
-        this.y = y;
+    public Vec2i(int line, int y) {
+        this.line = line;
+        this.column = y;
     }
 
     /**
      * Generates a random Vec2i with coordinates between 0 and x_max and 0 and y_max.
      *
-     * @param x_max the maximum x-coordinate
-     * @param y_max the maximum y-coordinate
+     * @param line_max the maximum x-coordinate
+     * @param column   the maximum y-coordinate
      * @return a random Vec2i
      */
-    public static Vec2i random(int x_max, int y_max) {
-        return new Vec2i(ThreadLocalRandom.current().nextInt(x_max), ThreadLocalRandom.current().nextInt(y_max));
+    public static Vec2i random(int line_max, int column) {
+        return new Vec2i(ThreadLocalRandom.current().nextInt(line_max), ThreadLocalRandom.current().nextInt(column));
     }
 
     public static Vec2i zero() {
@@ -37,19 +37,19 @@ public class Vec2i {
     }
 
     public Vec2i add(Vec2i other) {
-        this.x += other.x;
-        this.y += other.y;
+        this.line += other.line;
+        this.column += other.column;
         return this;
     }
 
     public Vec2i substract(Vec2i other) {
-        this.x -= other.x;
-        this.y -= other.y;
+        this.line -= other.line;
+        this.column -= other.column;
         return this;
     }
 
     public Vec2i absolute() {
-        return new Vec2i(Math.abs(x), Math.abs(y));
+        return new Vec2i(Math.abs(line), Math.abs(column));
     }
 
     /**
@@ -57,8 +57,8 @@ public class Vec2i {
      *
      * @return the x-coordinate
      */
-    public int getX() {
-        return x;
+    public int getLine() {
+        return line;
     }
 
     /**
@@ -66,8 +66,8 @@ public class Vec2i {
      *
      * @return the y-coordinate
      */
-    public int getY() {
-        return y;
+    public int getColumn() {
+        return column;
     }
 
     /**
@@ -81,7 +81,7 @@ public class Vec2i {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Vec2i vec2i = (Vec2i) o;
-        return x == vec2i.x && y == vec2i.y;
+        return line == vec2i.line && column == vec2i.column;
     }
 
     /**
@@ -91,7 +91,7 @@ public class Vec2i {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(x, y);
+        return Objects.hash(line, column);
     }
 
     /**
@@ -102,8 +102,8 @@ public class Vec2i {
     @Override
     public String toString() {
         return "Vec2i{" +
-                "x=" + x +
-                ", y=" + y +
+                "line=" + line +
+                ", column=" + column +
                 '}';
     }
 }

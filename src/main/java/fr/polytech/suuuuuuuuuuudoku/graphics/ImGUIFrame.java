@@ -48,22 +48,24 @@ public class ImGUIFrame extends Application {
         var gridSize = grid.size();
         var minSize = Math.min(size.x, size.y);
 
-        var gridPixelSize = new ImVec2(minSize / gridSize.getX(), minSize / gridSize.getY());
+        var gridPixelSize = new ImVec2(minSize / gridSize.getLine(), minSize / gridSize.getColumn());
         gridPixelSize.x = Math.min(gridPixelSize.x, 50);
         gridPixelSize.y = Math.min(gridPixelSize.y, 50);
 
-        var fullGridPixelSize = new ImVec2(gridPixelSize.x * gridSize.getX(), gridPixelSize.y * gridSize.getY());
+        var fullGridPixelSize = new ImVec2(gridPixelSize.x * gridSize.getLine(),
+                gridPixelSize.y * gridSize.getColumn());
 
-        ImGui.setNextWindowPos(size.x /2 - fullGridPixelSize.x / 2, size.y / 2 - fullGridPixelSize.y / 2);
+        ImGui.setNextWindowPos(size.x / 2 - fullGridPixelSize.x / 2, size.y / 2 - fullGridPixelSize.y / 2);
         ImGui.setNextWindowSize(fullGridPixelSize.x, fullGridPixelSize.y);
-        
-        
+
+
         ImGui.pushStyleColor(ImGuiCol.WindowBg, ImGui.getColorU32(0.6f, 0.6f, 0.6f, 1.0f));
-        ImGui.begin("Grid", null, ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoCollapse);
+        ImGui.begin("Grid", null,
+                ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoCollapse);
 
         ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, 0, 0);
-        for (int i = 0; i < gridSize.getX(); i++) {
-            for (int j = 0; j < gridSize.getY(); j++) {
+        for (int i = 0; i < gridSize.getLine(); i++) {
+            for (int j = 0; j < gridSize.getColumn(); j++) {
                 ImGui.button(grid.getSymbolAt(i, j) == null ? " " : grid.getSymbolAt(i, j).toString(), gridPixelSize);
                 ImGui.sameLine();
             }

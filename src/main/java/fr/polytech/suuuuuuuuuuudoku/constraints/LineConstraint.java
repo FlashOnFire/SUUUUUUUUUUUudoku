@@ -51,13 +51,13 @@ public class LineConstraint implements AbstractConstraint {
      */
     @Override
     public Optional<Set<Integer>> getPossibilities(InnerGrid grid, Vec2i pos) {
-        assert pos.getY() < grid.length();
-        assert pos.getX() < grid.get().length;
+        assert pos.getColumn() < grid.length();
+        assert pos.getLine() < grid.get().length;
         assert grid.at(pos) == null;
 
-        var row = Arrays.stream(grid.get()[pos.getY()])
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+        var row = Arrays.stream(grid.get()[pos.getColumn()])
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toSet());
 
         var list = symbols
                 .stream()
@@ -71,7 +71,7 @@ public class LineConstraint implements AbstractConstraint {
      * Checks if the two given positions have an effect on each other with respect to the constraint.
      */
     public boolean isAffectedBy(Vec2i pos1, Vec2i pos2) {
-        return pos1.getY() == pos2.getY();
+        return pos1.getColumn() == pos2.getColumn();
     }
 
     /**

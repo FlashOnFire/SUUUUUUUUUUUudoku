@@ -13,14 +13,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Represents a Sudoku grid with constraints.
  */
 public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
+    final List<AbstractConstraint> constraints;
+    private final ArrayList<Move2i> moves = new ArrayList<>();
     /**
      * The Sudoku grid represented as a 2D array of Strings.
      */
     private InnerGrid innerGrid;
-    final List<AbstractConstraint> constraints;
-
     private HashMap<Vec2i, Set<Integer>> emptyCellsPossibilities = new HashMap<>();
-    private final ArrayList<Move2i> moves = new ArrayList<>();
 
     /**
      * Constructs a Grid with the specified grid, constraints, and symbols.
@@ -74,8 +73,9 @@ public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
     @Override
     public boolean areConstraintsSatisfied(boolean skip_not_empty) {
         return this.constraints.stream()
-                .filter(c -> !(skip_not_empty && c instanceof NotEmptyConstraint))    // Skip NotEmptyConstraint
-                .allMatch(c -> c.isSatisfied(this.innerGrid));
+                               .filter(c -> !(skip_not_empty && c instanceof NotEmptyConstraint))    // Skip
+                               // NotEmptyConstraint
+                               .allMatch(c -> c.isSatisfied(this.innerGrid));
     }
 
     /**
@@ -87,15 +87,15 @@ public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
 
         for (var pos : this.innerGrid.computeEmptyCells()) {
             var list = this.constraints.stream()
-                    .filter(c -> c.isPosAffected(pos))
-                    .map(c -> c.getPossibilities(this.innerGrid, pos))
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .reduce((acc, set) -> {
-                        acc.retainAll(set);
-                        return acc;
-                    })
-                    .orElse(new HashSet<>(this.symbols));
+                                       .filter(c -> c.isPosAffected(pos))
+                                       .map(c -> c.getPossibilities(this.innerGrid, pos))
+                                       .filter(Optional::isPresent)
+                                       .map(Optional::get)
+                                       .reduce((acc, set) -> {
+                                           acc.retainAll(set);
+                                           return acc;
+                                       })
+                                       .orElse(new HashSet<>(this.symbols));
 
             this.emptyCellsPossibilities.put(pos, list);
         }
@@ -125,15 +125,15 @@ public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
         // Recompute possibilities for affected cells
         for (var pos : affectedCells) {
             var list = this.constraints.stream()
-                    .filter(c -> !(skip_not_empty && c instanceof NotEmptyConstraint) && c.isPosAffected(pos))
-                    .map(c -> c.getPossibilities(this.innerGrid, pos))
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .reduce((acc, set) -> {
-                        acc.retainAll(set);
-                        return acc;
-                    })
-                    .orElse(new HashSet<>(this.symbols));
+                                       .filter(c -> !(skip_not_empty && c instanceof NotEmptyConstraint) && c.isPosAffected(pos))
+                                       .map(c -> c.getPossibilities(this.innerGrid, pos))
+                                       .filter(Optional::isPresent)
+                                       .map(Optional::get)
+                                       .reduce((acc, set) -> {
+                                           acc.retainAll(set);
+                                           return acc;
+                                       })
+                                       .orElse(new HashSet<>(this.symbols));
 
             this.emptyCellsPossibilities.put(pos, list);
         }
@@ -146,14 +146,14 @@ public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
         // Create a mapping of each block to its related empty cells
         Map<BlockConstraint, List<Vec2i>> blockToEmptyCells = new HashMap<>();
         constraints.stream()
-                .filter(c -> c instanceof BlockConstraint)
-                .map(c -> (BlockConstraint) c)
-                .forEach(c -> blockToEmptyCells.put(
-                        c,
-                        this.emptyCellsPossibilities.keySet().stream()
-                                .filter(c::isInBlock) // precompute cells in the block
-                                .toList()
-                ));
+                   .filter(c -> c instanceof BlockConstraint)
+                   .map(c -> (BlockConstraint) c)
+                   .forEach(c -> blockToEmptyCells.put(
+                           c,
+                           this.emptyCellsPossibilities.keySet().stream()
+                                                       .filter(c::isInBlock) // precompute cells in the block
+                                                       .toList()
+                   ));
 
         // Iterate over blocks
         blockToEmptyCells.forEach((constraint, cells) -> {
@@ -268,7 +268,7 @@ public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
     }
 
     public Integer getSymbolAt(Vec2i pos) {
-        return this.innerGrid.get()[pos.getY()][pos.getX()];
+        return this.innerGrid.get()[pos.getColumn()][pos.getLine()];
     }
 
     public Integer getSymbolAt(int x, int y) {
@@ -296,8 +296,10 @@ public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
     public int length() {
         return this.innerGrid.get().length;
     }
+
     public Vec2i size() {
-        return new Vec2i(this.innerGrid.get().length, this.innerGrid.length() == 0 ? 0 : this.innerGrid.get()[0].length);
+        return new Vec2i(this.innerGrid.get().length, this.innerGrid.length() == 0 ? 0 :
+                this.innerGrid.get()[0].length);
     }
 
     @Override

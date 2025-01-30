@@ -28,9 +28,9 @@ public class BlockEqualityMGConstraint implements MultiGridConstraint {
         for (int i = 0; i < block1.width(); i++) {
             for (int j = 0; j < block1.height(); j++) {
                 if (!grid[gridIndex1].getSymbolAt(
-                        block1.x() + i,
-                        block1.y() + j
-                ).equals(grid[gridIndex2].getSymbolAt(block2.x() + i, block2.y() + j))) {
+                        block1.line() + i,
+                        block1.column() + j
+                ).equals(grid[gridIndex2].getSymbolAt(block2.line() + i, block2.column() + j))) {
                     return false;
                 }
             }
@@ -41,7 +41,7 @@ public class BlockEqualityMGConstraint implements MultiGridConstraint {
 
     @Override
     public Optional<Set<Integer>> getPossibilities(Grid[] grid, Vec3i pos) {
-        if (pos.getZ() != gridIndex1 && pos.getZ() != gridIndex2) {
+        if (pos.getDepth() != gridIndex1 && pos.getDepth() != gridIndex2) {
             return Optional.empty();
         }
 
@@ -50,46 +50,46 @@ public class BlockEqualityMGConstraint implements MultiGridConstraint {
         }
 
         var possibilities = new HashSet<>(
-                grid[pos.getZ()].getEmptyCellsPossibilities().get(new Vec2i(pos.getX(), pos.getY()))
+                grid[pos.getDepth()].getEmptyCellsPossibilities().get(new Vec2i(pos.getLine(), pos.getColumn()))
         );
         var correspondingPos = getCorrespondingPosition(pos);
-        possibilities.retainAll(grid[correspondingPos.getZ()].getEmptyCellsPossibilities().get(new Vec2i(correspondingPos.getX(), correspondingPos.getY())));
+        possibilities.retainAll(grid[correspondingPos.getDepth()].getEmptyCellsPossibilities().get(new Vec2i(correspondingPos.getLine(), correspondingPos.getColumn())));
 
         return Optional.of(possibilities);
     }
 
     @Override
     public boolean isAffectedBy(Vec3i pos1, Vec3i pos2) {
-        return pos1.getZ() != pos2.getZ() && isPosAffected(pos1) && isPosAffected(pos2);
+        return pos1.getDepth() != pos2.getDepth() && isPosAffected(pos1) && isPosAffected(pos2);
     }
 
     @Override
     public boolean isPosAffected(Vec3i pos) {
-        return (pos.getZ() == gridIndex1 && block1.contains(pos.getX(), pos.getY()))
+        return (pos.getDepth() == gridIndex1 && block1.contains(pos.getLine(), pos.getColumn()))
                 ||
-                (pos.getZ() == gridIndex2 && block2.contains(pos.getX(), pos.getY()));
+                (pos.getDepth() == gridIndex2 && block2.contains(pos.getLine(), pos.getColumn()));
     }
 
     public Vec3i getCorrespondingPosition(Vec3i pos) {
         assert isPosAffected(pos);
 
-        if (pos.getZ() == gridIndex1) {
+        if (pos.getDepth() == gridIndex1) {
             return new Vec3i(
-                    pos.getX() - block1.x() + block2.x(),
-                    pos.getY() - block1.y() + block2.y(),
+                    pos.getLine() - block1.line() + block2.line(),
+                    pos.getColumn() - block1.column() + block2.column(),
                     gridIndex2
             );
         } else {
             return new Vec3i(
-                    pos.getX() - block2.x() + block1.x(),
-                    pos.getY() - block2.y() + block1.y(),
+                    pos.getLine() - block2.line() + block1.line(),
+                    pos.getColumn() - block2.column() + block1.column(),
                     gridIndex1
             );
         }
     }
 
     public Vec2i getPadding() {
-        return new Vec2i(block1.x() - block2.x(), block1.y() - block2.y());
+        return new Vec2i(block1.line() - block2.line(), block1.column() - block2.column());
     }
 
     @Override

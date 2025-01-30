@@ -6,21 +6,21 @@ import java.util.Objects;
  * A class representing a 3D vector with integer coordinates.
  */
 public class Vec3i {
-    private final int x;
-    private final int y;
-    private final int z;
+    private final int line;
+    private final int column;
+    private final int depth;
 
     /**
      * Constructs a Vec3i with the specified coordinates.
      *
-     * @param x the x-coordinate
-     * @param y the y-coordinate
-     * @param z the z-coordinate
+     * @param line   the x-coordinate
+     * @param column the y-coordinate
+     * @param depth  the z-coordinate
      */
-    public Vec3i(int x, int y, int z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+    public Vec3i(int line, int column, int depth) {
+        this.line = line;
+        this.column = column;
+        this.depth = depth;
     }
 
     /**
@@ -28,8 +28,8 @@ public class Vec3i {
      *
      * @return the x-coordinate
      */
-    public int getX() {
-        return x;
+    public int getLine() {
+        return line;
     }
 
     /**
@@ -37,8 +37,8 @@ public class Vec3i {
      *
      * @return the y-coordinate
      */
-    public int getY() {
-        return y;
+    public int getColumn() {
+        return column;
     }
 
     /**
@@ -46,8 +46,8 @@ public class Vec3i {
      *
      * @return the z-coordinate
      */
-    public int getZ() {
-        return z;
+    public int getDepth() {
+        return depth;
     }
 
     /**
@@ -61,7 +61,7 @@ public class Vec3i {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Vec3i vec3i = (Vec3i) o;
-        return x == vec3i.x && y == vec3i.y && z == vec3i.z;
+        return line == vec3i.line && column == vec3i.column && depth == vec3i.depth;
     }
 
     /**
@@ -71,7 +71,7 @@ public class Vec3i {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(x, y, z);
+        return Objects.hash(line, column, depth);
     }
 
     /**
@@ -82,9 +82,9 @@ public class Vec3i {
     @Override
     public String toString() {
         return "Vec3i{" +
-                "x=" + x +
-                ", y=" + y +
-                ", z=" + z +
+                "x=" + line +
+                ", y=" + column +
+                ", z=" + depth +
                 '}';
     }
 }

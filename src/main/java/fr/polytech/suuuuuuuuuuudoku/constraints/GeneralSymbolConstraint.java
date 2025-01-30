@@ -20,10 +20,10 @@ public class GeneralSymbolConstraint implements AbstractConstraint {
     /**
      * Constructs a GeneralSymbolConstraint with the specified symbols and positions.
      *
-     * @param symbols the set of symbols to be checked within the constraints
+     * @param symbols      the set of symbols to be checked within the constraints
      * @param positionList the list of position which define value to check
      * @throws IllegalArgumentException if the positionList is empty or the length of the positionList
-     * is different from the length of the symbols
+     *                                  is different from the length of the symbols
      */
     public GeneralSymbolConstraint(Set<Integer> symbols, Vec2i[] positionList) {
         assert positionList.length != 0;
@@ -50,9 +50,9 @@ public class GeneralSymbolConstraint implements AbstractConstraint {
 
     @Override
     public Optional<Set<Integer>> getPossibilities(InnerGrid grid, Vec2i pos) {
-        assert pos.getX() < grid.get()[0].length;
-        assert pos.getY() < grid.length();
-        assert grid.get()[pos.getY()][pos.getX()] == null;
+        assert pos.getLine() < grid.get()[0].length;
+        assert pos.getColumn() < grid.length();
+        assert grid.get()[pos.getColumn()][pos.getLine()] == null;
 
         if (!isInPositionList(pos)) {
             return Optional.empty();
@@ -63,8 +63,8 @@ public class GeneralSymbolConstraint implements AbstractConstraint {
 
         // Return the symbols that are not present in the block
         var possibilities = symbols.stream()
-                .filter(c -> !set.contains(c))
-                .collect(Collectors.toSet());
+                                   .filter(c -> !set.contains(c))
+                                   .collect(Collectors.toSet());
 
         return Optional.of(possibilities);
     }

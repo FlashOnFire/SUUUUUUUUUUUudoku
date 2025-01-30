@@ -13,13 +13,13 @@ public class BlockEqualityMGConstraint implements MultiGridConstraint {
     /**
      * The set of symbols to be checked within the block.
      */
-    private final int grid1, grid2;
+    private final int gridIndex1, gridIndex2;
     private final Box2D block1, block2;
 
-    public BlockEqualityMGConstraint(int grid1, Box2D block1, int grid2, Box2D block2) {
-        this.grid1 = grid1;
+    public BlockEqualityMGConstraint(int gridIndex1, Box2D block1, int gridIndex2, Box2D block2) {
+        this.gridIndex1 = gridIndex1;
         this.block1 = block1;
-        this.grid2 = grid2;
+        this.gridIndex2 = gridIndex2;
         this.block2 = block2;
     }
 
@@ -27,10 +27,10 @@ public class BlockEqualityMGConstraint implements MultiGridConstraint {
     public boolean isSatisfied(Grid[] grid) {
         for (int i = 0; i < block1.width(); i++) {
             for (int j = 0; j < block1.height(); j++) {
-                if (!grid[grid1].getSymbolAt(
+                if (!grid[gridIndex1].getSymbolAt(
                         block1.x() + i,
                         block1.y() + j
-                ).equals(grid[grid2].getSymbolAt(block2.x() + i, block2.y() + j))) {
+                ).equals(grid[gridIndex2].getSymbolAt(block2.x() + i, block2.y() + j))) {
                     return false;
                 }
             }
@@ -41,7 +41,7 @@ public class BlockEqualityMGConstraint implements MultiGridConstraint {
 
     @Override
     public Optional<Set<Integer>> getPossibilities(Grid[] grid, Vec3i pos) {
-        if (pos.getZ() != grid1 && pos.getZ() != grid2) {
+        if (pos.getZ() != gridIndex1 && pos.getZ() != gridIndex2) {
             return Optional.empty();
         }
 
@@ -65,26 +65,48 @@ public class BlockEqualityMGConstraint implements MultiGridConstraint {
 
     @Override
     public boolean isPosAffected(Vec3i pos) {
-        return (pos.getZ() == grid1 && block1.contains(pos.getX(), pos.getY()))
+        return (pos.getZ() == gridIndex1 && block1.contains(pos.getX(), pos.getY()))
                 ||
-                (pos.getZ() == grid2 && block2.contains(pos.getX(), pos.getY()));
+                (pos.getZ() == gridIndex2 && block2.contains(pos.getX(), pos.getY()));
     }
 
     public Vec3i getCorrespondingPosition(Vec3i pos) {
         assert isPosAffected(pos);
 
-        if (pos.getZ() == grid1) {
+        if (pos.getZ() == gridIndex1) {
             return new Vec3i(
                     pos.getX() - block1.x() + block2.x(),
                     pos.getY() - block1.y() + block2.y(),
-                    grid2
+                    gridIndex2
             );
         } else {
             return new Vec3i(
                     pos.getX() - block2.x() + block1.x(),
                     pos.getY() - block2.y() + block1.y(),
-                    grid1
+                    gridIndex1
             );
         }
+    }
+
+    public Vec2i getPadding() {
+        return new Vec2i(block1.x() - block2.x(), block1.y() - block2.y());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BlockEqualityMGConstraint that = (BlockEqualityMGConstraint) o;
+        return (gridIndex1 == that.gridIndex1 && gridIndex2 == that.gridIndex2 && block1.equals(that.block1) && block2.equals(that.block2))
+                || (gridIndex1 == that.gridIndex2 && gridIndex2 == that.gridIndex1 && block1.equals(that.block2) && block2.equals(that.block1));
+    }
+
+    @Override
+    public int hashCode() {
+        int result = gridIndex1;
+        result = 31 * result + gridIndex2;
+        result = 31 * result + block1.hashCode();
+        result = 31 * result + block2.hashCode();
+        return result;
     }
 }

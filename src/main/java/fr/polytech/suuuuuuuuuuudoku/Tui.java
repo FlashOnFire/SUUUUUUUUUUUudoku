@@ -8,6 +8,7 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
+import fr.polytech.suuuuuuuuuuudoku.constraints.BlockEqualityMGConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 
 import java.io.IOException;

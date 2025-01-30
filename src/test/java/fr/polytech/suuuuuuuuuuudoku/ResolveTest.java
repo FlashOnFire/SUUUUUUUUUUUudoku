@@ -5,7 +5,7 @@ import fr.polytech.suuuuuuuuuuudoku.algorithm.SolvingState;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec3i;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
-import fr.polytech.suuuuuuuuuuudoku.constraints.BlockEqualityMGConstraint;
+import fr.polytech.suuuuuuuuuuudoku.constraints.BlockEqualityConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.MultiGridConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
@@ -211,19 +211,19 @@ public class ResolveTest {
         );
 
         List<MultiGridConstraint> constraints = List.of(new MultiGridConstraint[]{
-                new BlockEqualityMGConstraint(0,
+                new BlockEqualityConstraint(0,
                         new Box2D(6, 6, 3, 3),
                         2,
                         new Box2D(0, 0, 3, 3)),
-                new BlockEqualityMGConstraint(1,
+                new BlockEqualityConstraint(1,
                         new Box2D(0, 6, 3, 3),
                         2,
                         new Box2D(6, 0, 3, 3)),
-                new BlockEqualityMGConstraint(3,
+                new BlockEqualityConstraint(3,
                         new Box2D(6, 0, 3, 3),
                         2,
                         new Box2D(0, 6, 3, 3)),
-                new BlockEqualityMGConstraint(4,
+                new BlockEqualityConstraint(4,
                         new Box2D(0, 0, 3, 3),
                         2,
                         new Box2D(6, 6, 3, 3)),

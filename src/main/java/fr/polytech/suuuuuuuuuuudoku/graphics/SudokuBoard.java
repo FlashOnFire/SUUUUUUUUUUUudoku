@@ -112,7 +112,7 @@ public class SudokuBoard extends JPanel {
         IntStream.range(0, integerTab.length).forEach(row -> IntStream.range(0, integerTab[row].length).forEach(column -> {
             if (trace[row][column]) {
                 integerTab[row][column] = null;
-                grid.placeUnchecked(new Vec2i(column, row), null, false);
+                grid.placeUnchecked(new Vec2i(column, row), null, false, false);
             }
         }));
 

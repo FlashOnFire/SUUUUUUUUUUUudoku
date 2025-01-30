@@ -30,10 +30,10 @@ public class Generator {
 
             last_move_pos = randomPos;
             last_move_symbol = solvedGrid.getSymbolAt(randomPos);
-            solvedGrid.placeUnchecked(randomPos, null, true);
+            solvedGrid.placeUnchecked(randomPos, null, true, false);
         } while (!SudokuSolver.hasMoreThanOneSolution(solvedGrid, true, true));
 
-        solvedGrid.placeUnchecked(last_move_pos, last_move_symbol, true);
+        solvedGrid.placeUnchecked(last_move_pos, last_move_symbol, true, false);
         return solvedGrid;
     }
 
@@ -81,7 +81,7 @@ public class Generator {
         }
 
         solvedGrid = new Grid(solvedGrid.getInnerGrid().get(), generalSymbolConstraints, symbols);
-        solvedGrid = SudokuSolver.solve(solvedGrid, true, true).getSecond();
+        solvedGrid = SudokuSolver.solve(solvedGrid, true, true, false).getSecond();
         Vec2i last_move_pos;
         Integer last_move_symbol;
         Set<Vec2i> emptyCells = solvedGrid.getEmptyCellsPossibilities().keySet();
@@ -94,10 +94,10 @@ public class Generator {
 
             last_move_pos = randomPos;
             last_move_symbol = solvedGrid.getSymbolAt(randomPos);
-            solvedGrid.placeUnchecked(randomPos, null, true);
+            solvedGrid.placeUnchecked(randomPos, null, true, false);
         } while (!SudokuSolver.hasMoreThanOneSolution(solvedGrid, true, true));
 
-        solvedGrid.placeUnchecked(last_move_pos, last_move_symbol, true);
+        solvedGrid.placeUnchecked(last_move_pos, last_move_symbol, true, false);
         return solvedGrid;
     }
 
@@ -146,10 +146,10 @@ public class Generator {
             var symbolsArray = symbols.toArray(Integer[]::new);
 
             Grid finalSeedGrid = seedGrid;
-            IntStream.range(0, n * m).forEach(i -> finalSeedGrid.placeUnchecked(posArray[i], symbolsArray[i], false));
+            IntStream.range(0, n * m).forEach(i -> finalSeedGrid.placeUnchecked(posArray[i], symbolsArray[i], false, false));
             seedGrid.computeAllEmptyCellsPossibilities();
 
-            var pair = SudokuSolver.solve(seedGrid, true, true);
+            var pair = SudokuSolver.solve(seedGrid, true, true, false);
             state = pair.getFirst();
             solvedGrid = pair.getSecond();
         } while (state != SolvingState.SOLVED);

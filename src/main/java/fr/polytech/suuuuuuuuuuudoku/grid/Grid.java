@@ -20,7 +20,7 @@ public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
     final List<AbstractConstraint> constraints;
 
     private HashMap<Vec2i, Set<Integer>> emptyCellsPossibilities = new HashMap<>();
-    private ArrayList<Move> moves = new ArrayList<>();
+    private final ArrayList<Move2i> moves = new ArrayList<>();
 
     /**
      * Constructs a Grid with the specified grid, constraints, and symbols.
@@ -56,7 +56,7 @@ public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
         this.constraints = otherGrid.constraints;
         this.emptyCellsPossibilities = new HashMap<>(otherGrid.emptyCellsPossibilities);
         this.innerGrid = new InnerGrid(otherGrid.innerGrid);
-        this.moves = new ArrayList<>(otherGrid.moves);
+        this.moves.addAll(otherGrid.moves);
     }
 
     /**
@@ -218,7 +218,7 @@ public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
      * @param value the value to place
      * @return true if the placement is valid, false otherwise
      */
-    public boolean tryPlace(Vec2i pos, Integer value, boolean updatePossibilities) {
+    public boolean tryPlace(Vec2i pos, Integer value, boolean updatePossibilities, boolean store_move) {
         var oldValue = this.innerGrid.at(pos);
         this.innerGrid.set(pos, value);
         if (!this.areConstraintsSatisfied(true)) {
@@ -245,11 +245,13 @@ public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
     }
 
     @Override
-    public void placeUnchecked(Vec2i pos, Integer value, boolean updatePossibilities) {
-        if (getSymbolAt(pos) == null && value != null) {
+    public void placeUnchecked(Vec2i pos, Integer value, boolean updatePossibilities, boolean store_move) {
+        Integer oldValue = getSymbolAt(pos);
+
+        if (oldValue == null && value != null) {
             System.out.println("Suppress empty cell at " + pos);
             this.emptyCellsPossibilities.remove(pos);
-        } else if (getSymbolAt(pos) != null && value == null) {
+        } else if (oldValue != null && value == null) {
             System.out.println("Placing empty cell at " + pos);
             this.emptyCellsPossibilities.put(pos, new HashSet<>(this.symbols));
         }
@@ -258,6 +260,10 @@ public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
 
         if (updatePossibilities) {
             computeChangedEmptyCellsPossibilities(pos, true);
+        }
+
+        if (store_move) {
+            this.moves.add(new Move2i(pos, value, oldValue));
         }
     }
 
@@ -296,15 +302,7 @@ public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
         return new Grid(this);
     }
 
-    public void addMove(Vec2i pos, Integer value) {
-        this.moves.add(new Move(pos, value, this.innerGrid.get()[pos.getY()][pos.getX()]));
-    }
-
-    public void undoMove() {
-        if (this.moves.isEmpty()) {
-            return;
-        }
-
-        this.moves.removeLast();
+    public List<Move2i> getMoves() {
+        return moves;
     }
 }

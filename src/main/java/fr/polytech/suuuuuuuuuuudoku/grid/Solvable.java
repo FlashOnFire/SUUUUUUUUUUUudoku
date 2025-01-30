@@ -24,7 +24,7 @@ public abstract class Solvable<T> {
 
     public abstract void computeAllEmptyCellsPossibilities();
 
-    public abstract void placeUnchecked(T pos, Integer value, boolean updatePossibilities);
+    public abstract void placeUnchecked(T pos, Integer value, boolean updatePossibilities, boolean store_move);
 
     public abstract Map<T, Set<Integer>> getEmptyCellsPossibilities();
 }

@@ -16,7 +16,7 @@ public class SudokuSolver {
      * @param backtracking whether to use backtracking if deduction fails
      * @return the solving state of the Sudoku grid
      */
-    public static <C, T extends Solvable<C> & ShallowCopyable<T>> Pair<SolvingState, T> solve(T grid, boolean deducing, boolean backtracking) {
+    public static <C, T extends Solvable<C> & ShallowCopyable<T>> Pair<SolvingState, T> solve(T grid, boolean deducing, boolean backtracking, boolean store_moves) {
         assert deducing || backtracking : "At least one of deducing or backtracking must be enabled";
 
         ArrayDeque<T> currentList = new ArrayDeque<>();
@@ -29,7 +29,7 @@ public class SudokuSolver {
             }
 
             if (deducing) {
-                var state = solveDeduction(currentGrid);
+                var state = solveDeduction(currentGrid, store_moves);
 
                 if (state == SolvingState.SOLVED) {
                     return new Pair<>(SolvingState.SOLVED, currentGrid);
@@ -40,13 +40,13 @@ public class SudokuSolver {
                 }
             }
 
-            currentList.addAll(doBacktracking(currentGrid));
+            currentList.addAll(doBacktracking(currentGrid, store_moves));
         }
 
         return new Pair<>(SolvingState.UNSOLVABLE, null);
     }
 
-    public static <C, T extends Solvable<C> & ShallowCopyable<T>> List<T> findAllSolutions(T grid, boolean deducing, boolean backtracking) {
+    public static <C, T extends Solvable<C> & ShallowCopyable<T>> List<T> findAllSolutions(T grid, boolean deducing, boolean backtracking, boolean store_moves) {
         assert deducing || backtracking : "At least one of deducing or backtracking must be enabled";
 
         ArrayDeque<T> currentList = new ArrayDeque<>();
@@ -57,7 +57,7 @@ public class SudokuSolver {
             var currentGrid = currentList.removeLast();
 
             if (deducing) {
-                var state = solveDeduction(currentGrid);
+                var state = solveDeduction(currentGrid, store_moves);
 
                 if (state == SolvingState.SOLVED) {
                     solutions.add(currentGrid);
@@ -69,7 +69,7 @@ public class SudokuSolver {
                 }
             }
 
-            currentList.addAll(doBacktracking(currentGrid));
+            currentList.addAll(doBacktracking(currentGrid, store_moves));
         }
 
         return solutions;
@@ -86,7 +86,7 @@ public class SudokuSolver {
             var currentGrid = currentList.removeLast();
 
             if (deducing) {
-                var state = solveDeduction(currentGrid);
+                var state = solveDeduction(currentGrid, false);
 
                 if (state == SolvingState.SOLVED) {
                     if (foundOne) {
@@ -101,7 +101,7 @@ public class SudokuSolver {
                 }
             }
 
-            currentList.addAll(doBacktracking(currentGrid));
+            currentList.addAll(doBacktracking(currentGrid, false));
         }
 
         return false;
@@ -113,7 +113,7 @@ public class SudokuSolver {
      * @param grid the Sudoku grid to solve
      * @return the solving state of the Sudoku grid
      */
-    private static <C, T extends Solvable<C> & ShallowCopyable<T>> List<T> doBacktracking(T grid) {
+    private static <C, T extends Solvable<C> & ShallowCopyable<T>> List<T> doBacktracking(T grid, boolean store_moves) {
         // System.out.println("Backtracking");
 
         assert !grid.getEmptyCellsPossibilities().isEmpty() : "No empty cells";
@@ -131,7 +131,7 @@ public class SudokuSolver {
 
         return cell.getValue().stream().map(c -> {
             T new_grid = grid.shallowCopy();
-            new_grid.placeUnchecked(cell.getKey(), c, true);
+            new_grid.placeUnchecked(cell.getKey(), c, true, store_moves);
             return new_grid;
         }).toList();
     }
@@ -142,7 +142,7 @@ public class SudokuSolver {
      * @param grid the Sudoku grid to solve
      * @return the solving state of the Sudoku grid
      */
-    private static <C, T extends Solvable<C>> SolvingState solveDeduction(T grid) {
+    private static <C, T extends Solvable<C>> SolvingState solveDeduction(T grid, boolean store_moves) {
         // System.out.println("Deduction");
 
         boolean finished = false;
@@ -164,7 +164,7 @@ public class SudokuSolver {
                     var possibilities = grid.getEmptyCellsPossibilities().get(cell);
 
                     if (possibilities.size() == 1) {
-                        grid.placeUnchecked(cell, possibilities.iterator().next(), true);
+                        grid.placeUnchecked(cell, possibilities.iterator().next(), true, store_moves);
                         finished = false;
                     } else if (possibilities.isEmpty()) {
                         // System.out.println("Empty cell has no possibilities");

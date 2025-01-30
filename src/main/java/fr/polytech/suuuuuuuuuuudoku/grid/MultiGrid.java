@@ -14,6 +14,8 @@ public class MultiGrid extends Solvable<Vec3i> implements ShallowCopyable<MultiG
 
     private HashMap<Vec3i, Set<Integer>> emptyCellsPossibilities = new HashMap<>();
 
+    private final List<Move3i> moves = new ArrayList<>();
+
     public MultiGrid(Grid[] grids, List<MultiGridConstraint> constraints, Set<Integer> symbols) {
         super(symbols);
         this.constraints = constraints;
@@ -25,6 +27,7 @@ public class MultiGrid extends Solvable<Vec3i> implements ShallowCopyable<MultiG
         this.constraints = other.constraints;
         this.grids = Arrays.stream(other.grids).map(Grid::new).toArray(Grid[]::new);
         this.emptyCellsPossibilities = new HashMap<>(other.emptyCellsPossibilities);
+        this.moves.addAll(other.moves);
     }
 
     public Grid[] getGrids() {
@@ -80,11 +83,12 @@ public class MultiGrid extends Solvable<Vec3i> implements ShallowCopyable<MultiG
     }
 
     @Override
-    public void placeUnchecked(Vec3i pos, Integer value, boolean updatePossibilities) {
+    public void placeUnchecked(Vec3i pos, Integer value, boolean updatePossibilities, boolean store_move) {
         assert pos.getZ() < grids.length;
         System.out.println("MG: placing pos: " + pos + " value: " + value);
 
-        grids[pos.getZ()].placeUnchecked(new Vec2i(pos.getX(), pos.getY()), value, updatePossibilities);
+        Integer oldValue = grids[pos.getZ()].getSymbolAt(pos.getX(), pos.getY());
+        grids[pos.getZ()].placeUnchecked(new Vec2i(pos.getX(), pos.getY()), value, updatePossibilities, false);
 
         constraints.stream()
                 .filter(c -> c instanceof BlockEqualityMGConstraint)
@@ -95,7 +99,8 @@ public class MultiGrid extends Solvable<Vec3i> implements ShallowCopyable<MultiG
                     grids[correspondingPos.getZ()].placeUnchecked(
                             new Vec2i(correspondingPos.getX(), correspondingPos.getY()),
                             value,
-                            updatePossibilities
+                            updatePossibilities,
+                            false
                     );
                 });
 
@@ -109,6 +114,10 @@ public class MultiGrid extends Solvable<Vec3i> implements ShallowCopyable<MultiG
             gatherEmptyCellsPossibilitiesFromGrids();
             applyAllMultiGridConstraints();
         }
+
+        if (store_move) {
+            moves.add(new Move3i(pos, value, oldValue));
+        }
     }
 
     public Integer getSymbolAt(Vec3i pos) {
@@ -119,5 +128,9 @@ public class MultiGrid extends Solvable<Vec3i> implements ShallowCopyable<MultiG
     @Override
     public Map<Vec3i, Set<Integer>> getEmptyCellsPossibilities() {
         return emptyCellsPossibilities;
+    }
+
+    public List<Move3i> getMoves() {
+        return moves;
     }
 }

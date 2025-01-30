@@ -22,7 +22,7 @@ public class SudokuFrame extends JFrame {
                 board.grid.setInnerGrid(board.solvedGrid.getInnerGrid());
                 board.update(board.solvedGrid.getInnerGrid().get(), true);
             } else {
-                board.grid = SudokuSolver.solve(board.grid, true, true).getSecond();
+                board.grid = SudokuSolver.solve(board.grid, true, true, true).getSecond();
                 board.update(board.grid.getInnerGrid().get(), true);
             }
         }
@@ -89,7 +89,7 @@ public class SudokuFrame extends JFrame {
                 board.grid.setInnerGrid(board.solvedGrid.getInnerGrid());
                 board.update(board.solvedGrid.getInnerGrid().get(), true);
             } else {
-                board.grid = SudokuSolver.solve(board.grid, true, true).getSecond();
+                board.grid = SudokuSolver.solve(board.grid, true, true, true).getSecond();
                 board.update(board.grid.getInnerGrid().get(), true);
             }
         }

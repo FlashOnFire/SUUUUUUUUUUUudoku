@@ -194,9 +194,72 @@ classDiagram
 
 <!-- END_CLASS -->
 
-### Diagramme de séquence :
+### Diagramme d'activité du générateur  :
 
 ```
-Todo
+TODO
 ```
 
+### Diagramme d'activité du solveur :
+
+```mermaid
+stateDiagram
+queue_init: Ajouter grille à la queue
+boucle: La queue est vide ?
+if_solved: La grille est résolu ? 
+partial: PARTIELLEMENT RESOLU
+suppress: On supprime un element de la queue
+SudokuSolver.doBacktracking: BACKTRACKING
+SudokuSolver.solveDeduction: DEDUCTION
+
+state SudokuSolver.solve {
+    SudokuSolver.doBacktracking --> boucle
+    [*] --> solve
+    solve --> queue_init
+    queue_init --> boucle
+
+    state boucle_test <<choice>>
+    boucle --> boucle_test
+    boucle_test --> suppress: Non
+    suppress --> if_solved
+    boucle_test --> INSOLVABLE: Oui, on ne peut pas résoudre
+    INSOLVABLE --> [*] 
+
+    state is_solved_test <<choice>>
+    if_solved --> is_solved_test
+    is_solved_test --> if_deduced: Non
+
+    is_solved_bis_test --> RESOLU:Oui
+    is_solved_test --> RESOLU: Oui
+    RESOLU --> [*]
+
+    if_deduced: Doit on essayer de déduire avec les contraintes ?
+    state is_deduced_test <<choice>>
+    if_deduced --> is_deduced_test
+    is_backtracking_test --> SudokuSolver.doBacktracking: Oui
+    is_deduced_test --> SudokuSolver.doBacktracking:Non, alors on fait forcement du backtracking et on récupère les possibilités engendrée
+    is_deduced_test --> SudokuSolver.solveDeduction: Oui  
+
+    if_solved_bis : La grille est résolu ? 
+    SudokuSolver.solveDeduction --> if_solved_bis
+    state is_solved_bis_test <<choice>>
+    if_solved_bis --> is_solved_bis_test
+    is_solved_bis_test --> if_unsolvable:Non
+
+    if_unsolvable: La grille peut être résolu en l'état ?
+    state is_unsolvable_test <<choice>>
+    if_unsolvable --> is_unsolvable_test
+    is_unsolvable_test --> INSOLVABLE:Non
+    is_unsolvable_test --> if_backtracking: Oui
+
+    if_backtracking: Doit on essayer le backtracking ? 
+    state is_backtracking_test <<choice>>
+    if_backtracking --> is_backtracking_test
+    is_backtracking_test --> partial: Non, on ne peut pas aller plus loin juste avec le déduction
+
+    
+    partial --> [*]
+
+    
+}
+```

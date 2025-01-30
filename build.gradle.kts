@@ -25,6 +25,8 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     implementation("com.googlecode.lanterna:lanterna:3.1.3")
+    implementation("io.github.spair:imgui-java-app:1.88.0")
+
 }
 
 tasks.test {

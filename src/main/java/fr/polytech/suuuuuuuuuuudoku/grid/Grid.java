@@ -249,10 +249,10 @@ public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
         Integer oldValue = getSymbolAt(pos);
 
         if (oldValue == null && value != null) {
-            System.out.println("Suppress empty cell at " + pos);
+            //System.out.println("Suppress empty cell at " + pos);
             this.emptyCellsPossibilities.remove(pos);
         } else if (oldValue != null && value == null) {
-            System.out.println("Placing empty cell at " + pos);
+            //System.out.println("Placing empty cell at " + pos);
             this.emptyCellsPossibilities.put(pos, new HashSet<>(this.symbols));
         }
 
@@ -295,6 +295,9 @@ public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
 
     public int length() {
         return this.innerGrid.get().length;
+    }
+    public Vec2i size() {
+        return new Vec2i(this.innerGrid.get().length, this.innerGrid.length() == 0 ? 0 : this.innerGrid.get()[0].length);
     }
 
     @Override

@@ -139,11 +139,9 @@ public class ImGUIFrame extends Application {
         ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, 0, 0);
         for (int y = 0; y < gridSize.getY(); y++) {
             for (int x = 0; x < gridSize.getX(); x++) {
-                boolean stylePushed = false;
                 if (selected_pos != null && selected_pos.equals(x, y)) {
                     ImGui.pushStyleColor(ImGuiCol.Button, ImGui.getColorU32(0.2f, 0.2f, 0.8f, 1.0f));
                     ImGui.pushStyleColor(ImGuiCol.ButtonHovered, ImGui.getColorU32(0.3f, 0.3f, 0.8f, 1.0f));
-                    stylePushed = true;
                     ImGui.button(
                             (current_symbol == null ? " " : current_symbol) + "##" + y + ":" + x,
                             gridPixelSize

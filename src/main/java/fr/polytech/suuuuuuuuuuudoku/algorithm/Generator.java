@@ -1,13 +1,12 @@
 package fr.polytech.suuuuuuuuuuudoku.algorithm;
 
-import fr.polytech.suuuuuuuuuuudoku.constraints.AbstractConstraint;
-import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
-import fr.polytech.suuuuuuuuuuudoku.constraints.GeneralSymbolConstraint;
+import fr.polytech.suuuuuuuuuuudoku.constraints.*;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.grid.InnerGrid;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Generator {
@@ -17,11 +16,11 @@ public class Generator {
      * @param n: The size of the grid
      * @return A grid to be played
      */
-    public static Grid generateClassicNxN(int n) {
+    public static Grid generateClassicSudoku(int n) {
         //assert n is perfect square
         assert Math.sqrt(n) == Math.floor(Math.sqrt(n));
 
-        return generateNxM((int) Math.floor(Math.sqrt(n)), (int) Math.floor(Math.sqrt(n)));
+        return generateSudokuWithNxMConstraintBlock((int) Math.floor(Math.sqrt(n)), (int) Math.floor(Math.sqrt(n)));
     }
 
     /**
@@ -31,37 +30,28 @@ public class Generator {
      * @param m: The number of columns
      * @return A grid to be played
      */
-    public static Grid generateNxM(int n, int m) {
-        var solvedGrid = generateSolvedNxMGrid(n, m);
-        return unpopulateGrid(solvedGrid, n * m);
+    public static Grid generateSudokuWithNxMConstraintBlock(int n, int m) {
+        var solvedGrid = createSolvedSudoku(n, m);
+        return removeRandomCells(solvedGrid, n * m);
     }
 
     /**
-     * Generate a random grid of size NxN
+     * Generate a grid with random block constraints
      *
      * @param lengthInnerGrid: The length of the inner grid
      * @return A grid to be played
      */
-    public static Grid generateRandomGridN(int lengthInnerGrid) {
+    public static Grid generateSudokuWithRandomBlockConstraint(int lengthInnerGrid) {
         System.out.println("Generating random grid of size " + lengthInnerGrid + "x" + lengthInnerGrid);
         var symbols = SymbolSets.generateSymbols(lengthInnerGrid);
-        var innerGrid = new Integer[lengthInnerGrid][lengthInnerGrid];
-        for (var i = 0; i < lengthInnerGrid; i++) {
-            Arrays.fill(innerGrid[i], null);
-        }
-
         Vec2i dividers = findDividers(lengthInnerGrid);
-        Grid solvedGrid = generateSolvedNxMGrid(dividers.getX(), dividers.getY());
-
-        var generalSymbolConstraints = generateRandomConstraint(lengthInnerGrid, solvedGrid, symbols);
+        Grid solvedGrid = createSolvedSudoku(dividers.getX(), dividers.getY());
+        var generalSymbolConstraints = createRandomConstraints(solvedGrid);
 
         // We update the new constraints
         solvedGrid = new Grid(solvedGrid.getInnerGrid().get(), generalSymbolConstraints, symbols);
-
-        // We solve the grid
-        solvedGrid = SudokuSolver.solve(solvedGrid, true, true, false).getSecond();
-
-        return unpopulateGrid(solvedGrid, lengthInnerGrid);
+        assert solvedGrid.isSolved();
+        return removeRandomCells(solvedGrid, lengthInnerGrid);
     }
 
     /**
@@ -71,7 +61,7 @@ public class Generator {
      * @param lengthInnerGrid: The length of the inner grid
      * @return A grid to be played
      */
-    private static Grid unpopulateGrid(Grid solvedGrid, int lengthInnerGrid) {
+    private static Grid removeRandomCells(Grid solvedGrid, int lengthInnerGrid) {
         Vec2i lastMovePos;
         Integer lastMoveSymbol;
         Set<Vec2i> emptyCells = solvedGrid.getEmptyCellsPossibilities().keySet();
@@ -116,63 +106,39 @@ public class Generator {
      * Generate random constraints for a solved grid
      * Use a solved grid of NxM blocks to generate random constraints (shuffle the constraints positions)
      *
-     * @param length_innerGrid: The length of the inner grid
-     * @param grid:             A solved grid with NxM BlocksConstraint
-     * @param symbols:          The set of symbols
+     * @param grid:             A solved grid
      * @return A list of constraints with random positions for each GeneralSymbolConstraint
      */
-    private static List<AbstractConstraint<InnerGrid, Vec2i>> generateRandomConstraint(int length_innerGrid,
-                                                                                       Grid grid,
-                                                                                       Set<Integer> symbols) {
-        List<AbstractConstraint<InnerGrid, Vec2i>> generalSymbolConstraints = new ArrayList<>();
-        for (AbstractConstraint<InnerGrid, Vec2i> constraint : grid.getConstraints()) {
-            if (constraint instanceof BlockConstraint) {
-                var list = new ArrayList<Vec2i>();
-                for (int posX = ((BlockConstraint) constraint).getBlock().x(); posX < ((BlockConstraint) constraint).getBlock().dx(); posX++) {
-                    for (int posY = ((BlockConstraint) constraint).getBlock().y(); posY < ((BlockConstraint) constraint).getBlock().dy(); posY++) {
-                        list.add(new Vec2i(posX, posY));
-                    }
-                }
-                generalSymbolConstraints.add(new GeneralSymbolConstraint(symbols, list.toArray(Vec2i[]::new)));
-            } else {
-                generalSymbolConstraints.add(constraint);
-            }
-        }
-        for (int i = 0; i < length_innerGrid * 4; i++) {
-            int randomId = (int) (Math.random() * symbols.size());
-            int constraintId1 = (int) (Math.random() * length_innerGrid);
-            int constraintId2 = (int) (Math.random() * length_innerGrid);
-            Vec2i[] constraint1 =
-                    ((GeneralSymbolConstraint) generalSymbolConstraints.get(constraintId1)).getPositionList();
-            Vec2i[] constraint2 =
-                    ((GeneralSymbolConstraint) generalSymbolConstraints.get(constraintId2)).getPositionList();
-
-            int value = grid.getInnerGrid().at(constraint1[randomId]);
-            for (int otherValId = 0; otherValId < constraint2.length; otherValId++) {
-                if (grid.getInnerGrid().at(constraint2[otherValId]) == value) {
-                    swapConstraints(constraint1, constraint2, randomId, otherValId);
-                    generalSymbolConstraints.set(constraintId1, new GeneralSymbolConstraint(symbols, constraint1));
-                    generalSymbolConstraints.set(constraintId2, new GeneralSymbolConstraint(symbols, constraint2));
-                    break;
+    static List<AbstractConstraint<InnerGrid, Vec2i>> createRandomConstraints(Grid grid) {
+        int length = grid.length();
+        List<List<Vec2i>> positionList = IntStream.range(0, length)
+                .mapToObj(_ -> new ArrayList<Vec2i>())
+                .collect(Collectors.toList());
+        for (int x = 0; x < length; x++) {
+            for (int y = 0; y < length; y++) {
+                Integer symbol = grid.getSymbolAt(x, y);
+                if (symbol != null) {
+                    positionList.get(symbol-1).add(new Vec2i(x, y));
+                } else {
+                    System.out.println("Error: symbol is null");
                 }
             }
         }
-        return generalSymbolConstraints;
-    }
-
-    /**
-     * Swap one position of the constraints one with the other
-     *
-     * @param constraint1:   The first constraint position list
-     * @param constraint2:   The second constraint position list
-     * @param constraintId1: The index of the first constraint
-     * @param constraintId2: The index of the second constraint
-     */
-    private static void swapConstraints(Vec2i[] constraint1, Vec2i[] constraint2, int constraintId1,
-                                        int constraintId2) {
-        Vec2i temp = constraint1[constraintId1];
-        constraint1[constraintId1] = constraint2[constraintId2];
-        constraint2[constraintId2] = temp;
+        List<AbstractConstraint<InnerGrid, Vec2i>> constraints = new ArrayList<>();
+        for (int i = 0; i < length; i++) {
+            List<Vec2i> listInConstraint = new ArrayList<>();
+            for (int j = 0; j < length; j++) {
+                int selectedPos = (int) (Math.random() * positionList.get(j).size());
+                Vec2i pos = positionList.get(j).get(selectedPos);
+                listInConstraint.add(pos);
+                positionList.get(i).remove(pos);
+            }
+            constraints.add(new GeneralSymbolConstraint(SymbolSets.generateSymbols(length), listInConstraint.toArray(Vec2i[]::new)));
+        }
+        constraints.add(new LineConstraint(grid.getSymbols()));
+        constraints.add(new ColumnConstraint(grid.getSymbols()));
+        constraints.add(new NotEmptyConstraint());
+        return constraints;
     }
 
     /**
@@ -182,7 +148,7 @@ public class Generator {
      * @param m: The number of columns
      * @return A solved grid
      */
-    private static Grid generateSolvedNxMGrid(int n, int m) {
+    private static Grid createSolvedSudoku(int n, int m) {
         var symbols = SymbolSets.generateSymbols(n * m);
         var innerGrid = new Integer[n * m][n * m];
         for (var i = 0; i < n; i++) {

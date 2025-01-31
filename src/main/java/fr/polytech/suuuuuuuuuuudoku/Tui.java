@@ -76,7 +76,7 @@ public class Tui {
 //                displayMultiGrid(gridd);
                 int size = selectSize();
                 loaderThread.start();
-                grid = Generator.generateClassicNxN(size);
+                grid = Generator.generateClassicSudoku(size);
                 loaderThread.interrupt();
                 displayGrid(grid, Vec2i.zero());
             }

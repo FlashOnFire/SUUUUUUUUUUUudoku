@@ -35,7 +35,7 @@ public class SudokuFrame extends JFrame {
     };
 
     private final Runnable generate = () -> {
-        this.grid = new Grid(Generator.generateClassicNxN(lengthClassicSudoku*lengthClassicSudoku));
+        this.grid = new Grid(Generator.generateClassicSudoku(lengthClassicSudoku*lengthClassicSudoku));
         lengthClassicSudoku = (lengthClassicSudoku) % 4 + 1;
         if (lengthClassicSudoku < 2) lengthClassicSudoku = 2;
         board = new SudokuBoard(grid);
@@ -52,7 +52,7 @@ public class SudokuFrame extends JFrame {
 
     private final Runnable generateRandom = () -> {
         var length = (int) (Math.random() * 6) + 4;
-        this.grid = new Grid(Generator.generateRandomGridN(length));
+        this.grid = new Grid(Generator.generateSudokuWithRandomBlockConstraint(length));
         board = new SudokuBoard(grid);
         updateJpanel();
 
@@ -68,7 +68,7 @@ public class SudokuFrame extends JFrame {
     private final Runnable generateNxM = () -> {
         var n = (int) (Math.random() * 3) + 2;
         var m = (int) (Math.random() * 3) + 2;
-        this.grid = new Grid(Generator.generateNxM(n, m));
+        this.grid = new Grid(Generator.generateSudokuWithNxMConstraintBlock(n, m));
         board = new SudokuBoard(grid);
         updateJpanel();
 

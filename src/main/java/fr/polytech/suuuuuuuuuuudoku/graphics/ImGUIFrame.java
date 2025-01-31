@@ -45,7 +45,7 @@ public class ImGUIFrame extends Application {
         }
 
         if (ImGui.button("Generate")) {
-            grid = Generator.generateClassicNxN(16);
+            grid = Generator.generateClassicSudoku(16);
             originalGrid = grid.shallowCopy();
         }
 

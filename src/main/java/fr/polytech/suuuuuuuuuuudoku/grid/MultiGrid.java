@@ -204,6 +204,17 @@ public class MultiGrid extends Solvable<Vec3i> implements ShallowCopyable<MultiG
         return grids[pos.getZ()].getSymbolAt(pos.getX(), pos.getY());
     }
 
+    public Integer getSymbolAtPaddingBased(Vec2i pos) {
+        for (int i = 0; i < paddings.length; i++) {
+            Vec2i padding = paddings[i];
+            if (pos.getX() >= padding.getX() && pos.getX() < padding.getX() + grids[i].length()
+                    && pos.getY() >= padding.getY() && pos.getY() < padding.getY() + grids[i].length()) {
+                return getSymbolAt(new Vec3i(pos.getX() - padding.getX(), pos.getY() - padding.getY(), i));
+            }
+        }
+        return null;
+    }
+
     @Override
     public Map<Vec3i, Set<Integer>> getEmptyCellsPossibilities() {
         return emptyCellsPossibilities;

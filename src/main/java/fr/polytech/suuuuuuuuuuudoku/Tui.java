@@ -198,7 +198,11 @@ public class Tui {
                             " ".repeat(spacing));
                 }
                 textGraphics.setBackgroundColor(TextColor.ANSI.BLACK_BRIGHT);
-                textGraphics.putString(position.getX() * (spacing + 1), position.getY() + line, " ".repeat(spacing));
+                textGraphics.putString(position.getX() * (spacing + 1), position.getY() + line,
+                        ((MultiGrid) grid).getSymbolAtPaddingBased(new Vec2i(position.getX(),
+                                position.getY())) == null ? " ".repeat(spacing) :
+                                ((MultiGrid) grid).getSymbolAtPaddingBased(new Vec2i(position.getX(),
+                                        position.getY())).toString());
             } else {
                 displayGrid((Grid) grid, Vec2i.zero());
                 textGraphics.setBackgroundColor(TextColor.ANSI.BLACK_BRIGHT);

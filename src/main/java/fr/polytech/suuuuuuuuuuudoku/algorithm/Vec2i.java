@@ -106,4 +106,8 @@ public class Vec2i {
                 ", y=" + y +
                 '}';
     }
+
+    public boolean equals(int i, int j) {
+        return x == i && y == j;
+    }
 }

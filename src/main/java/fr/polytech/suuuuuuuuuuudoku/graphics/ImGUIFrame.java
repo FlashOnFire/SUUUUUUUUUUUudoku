@@ -49,7 +49,7 @@ public class ImGUIFrame extends Application {
         ImGui.end();
 
         var size = ImGui.getIO().getDisplaySize();
-        var gridSize = grid.size();
+        var gridSize = grid.getZize();
         var minSize = Math.min(size.x, size.y);
 
         var gridPixelSize = new ImVec2(minSize / gridSize.getX(), minSize / gridSize.getY());
@@ -108,7 +108,8 @@ public class ImGUIFrame extends Application {
             if (current_symbol != null && !current_symbol.isEmpty()) {
                 current_symbol = current_symbol.substring(0, current_symbol.length() - 1);
             }
-        } if (ImGui.isKeyPressed(ImGuiKey.UpArrow)) {
+        }
+        if (ImGui.isKeyPressed(ImGuiKey.UpArrow)) {
             setSelection(selected_pos.getX(), selected_pos.getY() - 1);
         } else if (ImGui.isKeyPressed(ImGuiKey.DownArrow)) {
             setSelection(selected_pos.getX(), selected_pos.getY() + 1);
@@ -148,7 +149,7 @@ public class ImGUIFrame extends Application {
     }
 
     private void setSelection(int x, int y) {
-        if (x >= 0 && x < grid.size().getX() && y >= 0 && y < grid.size().getY()) {
+        if (x >= 0 && x < grid.getZize().getX() && y >= 0 && y < grid.getZize().getY()) {
             applyLastChanges();
             selected_pos = new Vec2i(x, y);
             current_symbol = grid.getSymbolAt(x, y) == null ? null : grid.getSymbolAt(x, y).toString();

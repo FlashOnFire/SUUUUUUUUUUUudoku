@@ -7,22 +7,23 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Pair;
+import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
+import fr.polytech.suuuuuuuuuuudoku.grid.Solvable;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
+
+import static java.lang.System.exit;
 
 public class Tui {
     private final Terminal terminal;
     private final TextGraphics textGraphics;
     private int line = 0;
-    private int usedColors = 1;
+    private int usedColors = 0;
 
     public Tui() throws IOException {
         System.setProperty("com.googlecode.lanterna.terminal.UnixTerminal.sttyCommand", "stty");
@@ -37,36 +38,34 @@ public class Tui {
 
     void start() throws IOException, InterruptedException {
         welcomeMessage();
-        List<Pair<Vec2i, Grid>> grids = new ArrayList<>();
-        Vec2i[] positions = {
-                new Vec2i(0, 6),
-                new Vec2i(6, 0),
-                new Vec2i(6, 6),
-                new Vec2i(6, 12),
-                new Vec2i(12, 6),
-        };
-        for (int i = 0; i < 5; i++) {
-            var grid = CsvUtils.importGrid(Path.of("src/test/java/fr/polytech/suuuuuuuuuuudoku/resources/" +
-                    "/multigrid_2/" + i + ".csv"));
-            grids.add(new Pair<>(positions[i], grid));
+        Grid grid = null;
+        switch (selectMode()) {
+            case 0 -> { // Generate
+//                List<Pair<Vec2i, Grid>> grids = new ArrayList<>();
+//                Vec2i[] positions = {
+//                        new Vec2i(0, 6),
+//                        new Vec2i(6, 0),
+//                        new Vec2i(6, 6),
+//                        new Vec2i(6, 12),
+//                        new Vec2i(12, 6),
+//                };
+//                for (int i = 0; i < 5; i++) {
+//                    var gridd = CsvUtils.importGrid(Path.of("src/test/java/fr/polytech/suuuuuuuuuuudoku/resources/" +
+//                            "/multigrid_2/" + i + ".csv"));
+//                    grids.add(new Pair<>(positions[i], gridd));
+//                }
+//                var gridd = new MultiGrid(grids);
+//                displayMultiGrid(gridd);
+                int size = selectSize();
+                grid = Generator.generateClassicNxN(size);
+                displayGrid(grid, Vec2i.zero());
+            }
+            case 1 -> { // Enter sudoku
+                exit(0);
+            }
         }
-        var grid = new MultiGrid(grids);
-        displayMultiGrid(grid);
-//        int selectedMode = selectMode();
-//        switch (selectedMode) {
-//            case 0:
-//                // Generer un sudoku
-//                //Demander la taille du sudoku
-//                int size = selectSize();
-//                var grid = Generator.generateClassicNxN(size);
-//                displayGrid(grid, Vec2i(0,0);
-//
-//
-//                break;
-//            case 1:
-//                // Entrer un sudoku
-//                break;
-//        }
+        play(grid);
+
     }
 
     private void welcomeMessage() throws IOException {
@@ -98,7 +97,7 @@ public class Tui {
                                            .toList();
 
         // Calculate the padding which is the padding + the padding between each character + the number of blocks
-        int xPadding = padding.getX() * spacing + padding.getX();
+        int xPadding = padding.getX() * (spacing + 1);
         int yPadding = padding.getY();
         line += yPadding;
 
@@ -107,18 +106,33 @@ public class Tui {
                 // Determine the block color
                 int finalI = i;
                 int finalJ = j;
-                blocks.stream()
-                      .filter(blockConstraint ->
-                              finalI >= blockConstraint.getBlock().x()
-                                      && finalI < blockConstraint.getBlock().dx()
-                                      && finalJ >= blockConstraint.getBlock().y()
-                                      && finalJ < blockConstraint.getBlock().dy())
-                      .findFirst()
-                      .ifPresent(blockConstraint -> textGraphics.setBackgroundColor(new TextColor.Indexed((blocks.indexOf(blockConstraint) + usedColors))));
+                var blockColor = blocks.stream()
+                                       .filter(blockConstraint ->
+                                               finalI >= blockConstraint.getBlock().x()
+                                                       && finalI < blockConstraint.getBlock().dx()
+                                                       && finalJ >= blockConstraint.getBlock().y()
+                                                       && finalJ < blockConstraint.getBlock().dy())
+                                       .findFirst()
+                                       .map(blockConstraint -> {
+                                           int blockIndex = blocks.indexOf(blockConstraint) + usedColors;
+                                           float hue = (blockIndex * 50) % 360; // Hue value between 0 and 360
+                                           float saturation = 1.0f; // Saturation value between 0 and 1
+                                           float lightness = 0.25f; // Lightness value between 0 and 1
 
-                textGraphics.putString(j * (spacing + 1) + xPadding, line,
-                        grid.getSymbolAt(j, i) == null ? " ".repeat(spacing + 1) :
-                                grid.getSymbolAt(j, i) + " ".repeat(spacing));
+                                           // Convert HSL to RGB
+                                           int[] rgb = hslToRgb(hue, saturation, lightness);
+                                           return new TextColor.RGB(rgb[0], rgb[1], rgb[2]);
+                                       });
+
+                blockColor.ifPresent(textGraphics::setBackgroundColor);
+
+                // display the symbol at the right place
+                textGraphics.putString(finalJ * (spacing + 1) + xPadding, line,
+                        // Theirs no value just display the spacing
+                        grid.getSymbolAt(finalJ, finalI) == null ? " ".repeat(spacing + 1) :
+                                // Display the value with the right spacing (taking care of the end of the line)
+                                grid.getSymbolAt(finalJ, finalI) + " ".repeat(spacing - grid.getSymbolAt(finalJ,
+                                        finalI).toString().length() + 1));
                 textGraphics.setBackgroundColor(TextColor.ANSI.DEFAULT);
             }
             line++;
@@ -128,6 +142,86 @@ public class Tui {
         usedColors += blocks.size();
     }
 
+    /**
+     * Permet de jouer au Sudoku en utilisant le terminal pour les entrées utilisateur.
+     *
+     * @param grid La grille de Sudoku à résoudre.
+     * @throws IOException Si une erreur d'entrée/sortie se produit.
+     */
+    private void play(Solvable grid) throws IOException {
+        Vec2i position = Vec2i.zero();
+        KeyStroke keyStroke;
+        boolean disco = false;
+        String enteredValue = null;
+        Vec2i max;
+        if (grid instanceof MultiGrid) {
+            max = ((MultiGrid) grid).getSize();
+        } else {
+            max = ((Grid) grid).getZize();
+        }
+        int spacing = String.valueOf(Math.max(max.getY(), max.getY())).length();
+
+        do {
+            if (!disco) {
+                usedColors = 0;
+            }
+
+            if (grid instanceof MultiGrid) {
+                displayMultiGrid((MultiGrid) grid);
+                textGraphics.setBackgroundColor(TextColor.ANSI.BLACK_BRIGHT);
+                textGraphics.putString(position.getX() * 2, position.getY() + line, " ".repeat(spacing));
+            } else {
+                displayGrid((Grid) grid, Vec2i.zero());
+                textGraphics.setBackgroundColor(TextColor.ANSI.BLACK_BRIGHT);
+                textGraphics.putString(position.getX() * (spacing + 1), position.getY() + line,
+                        ((Grid) grid).getSymbolAt(position.getX(),
+                                position.getY()) == null ? " ".repeat(spacing) :
+                                ((Grid) grid).getSymbolAt(position.getX(), position.getY()).toString());
+            }
+
+            // Afficher la valeur entrée sur la grille
+            textGraphics.setBackgroundColor(TextColor.ANSI.DEFAULT);
+            String displayValue = "Valeur entrée: " + (enteredValue != null ? enteredValue : "");
+            int padding = terminal.getTerminalSize().getColumns() - 15 - displayValue.length();
+            textGraphics.putString(0, line - 1, displayValue + " ".repeat(padding));
+            terminal.flush();
+
+            keyStroke = terminal.readInput();
+            if (keyStroke.getKeyType() == KeyType.ArrowDown && position.getY() < max.getY() - 1) {
+                position = position.add(new Vec2i(0, 1));
+            } else if (keyStroke.getKeyType() == KeyType.ArrowUp && position.getY() > 0) {
+                position = position.add(new Vec2i(0, -1));
+            } else if (keyStroke.getKeyType() == KeyType.ArrowLeft && position.getX() > 0) {
+                position = position.add(new Vec2i(-1, 0));
+            } else if (keyStroke.getKeyType() == KeyType.ArrowRight && position.getX() < max.getX() - 1) {
+                position = position.add(new Vec2i(1, 0));
+            } else if (keyStroke.getKeyType() == KeyType.Enter && enteredValue != null) {
+                if (grid instanceof MultiGrid) {
+                    ((MultiGrid) grid).placeUncheckedPaddingBased(position, Integer.parseInt(enteredValue), true, true);
+                } else {
+                    grid.placeUnchecked(position, Integer.parseInt(enteredValue), true, true);
+                }
+                enteredValue = null;
+            } else if (keyStroke.getKeyType() == KeyType.Backspace && enteredValue != null) {
+                enteredValue = enteredValue.substring(0, enteredValue.length() - 1);
+            } else if (keyStroke.getKeyType() == KeyType.Character) {
+                if (keyStroke.getCharacter() == 'd') {
+                    disco = !disco;
+                } else if (Character.isDigit(keyStroke.getCharacter())) {
+                    enteredValue = enteredValue == null ? String.valueOf(keyStroke.getCharacter()) :
+                            enteredValue + keyStroke.getCharacter();
+                }
+            }
+
+        } while (keyStroke.getKeyType() != KeyType.Escape && !grid.isSolved());
+    }
+
+    /**
+     * Affiche les options de mode de jeu et permet à l'utilisateur de sélectionner une option.
+     *
+     * @return l'option sélectionnée par l'utilisateur (0 pour générer un sudoku, 1 pour entrer un sudoku)
+     * @throws IOException si une erreur d'entrée/sortie se produit
+     */
     private int selectMode() throws IOException {
         String[] options = {"> Generer un sudoku", "  Entrer un sudoku"};
         for (int i = 0; i < options.length; i++) {
@@ -172,7 +266,6 @@ public class Tui {
         KeyStroke keyStroke;
         do {
             keyStroke = terminal.readInput();
-            System.out.println(keyStroke.getKeyType());
             if (keyStroke.getKeyType() == KeyType.ArrowLeft) {
                 if (selectedSize == 0) {
                     selectedSize = possibleSizes.length - 1;
@@ -190,7 +283,7 @@ public class Tui {
             sizes = new StringBuilder();
             displaySizes(selectedSize, possibleSizes, sizes);
         } while (keyStroke.getKeyType() != KeyType.Enter);
-        line += 3;
+        line += 4;
         return possibleSizes[selectedSize];
     }
 
@@ -207,6 +300,46 @@ public class Tui {
             padding += String.valueOf(possibleSizes[i]).length() + 1;
         }
         terminal.flush();
+    }
+
+    // Function to convert HSL to RGB
+    private int[] hslToRgb(float h, float s, float l) {
+        float c = (1 - Math.abs(2 * l - 1)) * s;
+        float x = c * (1 - Math.abs((h / 60) % 2 - 1));
+        float m = l - c / 2;
+        float r = 0, g = 0, b = 0;
+
+        if (0 <= h && h < 60) {
+            r = c;
+            g = x;
+            b = 0;
+        } else if (60 <= h && h < 120) {
+            r = x;
+            g = c;
+            b = 0;
+        } else if (120 <= h && h < 180) {
+            r = 0;
+            g = c;
+            b = x;
+        } else if (180 <= h && h < 240) {
+            r = 0;
+            g = x;
+            b = c;
+        } else if (240 <= h && h < 300) {
+            r = x;
+            g = 0;
+            b = c;
+        } else if (300 <= h && h < 360) {
+            r = c;
+            g = 0;
+            b = x;
+        }
+
+        int[] rgb = new int[3];
+        rgb[0] = Math.round((r + m) * 255);
+        rgb[1] = Math.round((g + m) * 255);
+        rgb[2] = Math.round((b + m) * 255);
+        return rgb;
     }
 }
 

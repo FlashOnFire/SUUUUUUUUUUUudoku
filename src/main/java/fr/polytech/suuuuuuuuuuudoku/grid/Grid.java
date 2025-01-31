@@ -295,7 +295,7 @@ public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
         return this.innerGrid.get().length;
     }
 
-    public Vec2i size() {
+    public Vec2i getZize() {
         return new Vec2i(this.innerGrid.get().length, this.innerGrid.length() == 0 ? 0 :
                 this.innerGrid.get()[0].length);
     }

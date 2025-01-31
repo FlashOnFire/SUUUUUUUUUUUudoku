@@ -11,6 +11,7 @@ public class MultiGrid extends Solvable<Vec3i> implements ShallowCopyable<MultiG
     private final Grid[] grids;
     private final Vec2i[] paddings;
     private final List<Move3i> moves = new ArrayList<>();
+    private final Vec2i size;
     private HashMap<Vec3i, Set<Integer>> emptyCellsPossibilities = new HashMap<>();
 
     public MultiGrid(List<Pair<Vec2i, Grid>> grids) {
@@ -48,9 +49,19 @@ public class MultiGrid extends Solvable<Vec3i> implements ShallowCopyable<MultiG
             }
             indexI++;
         }
-        System.out.println("couco");
 
+        // Compute the size of the MultiGrid
+        int maxX = grids.stream()
+                        .mapToInt(pair -> pair.getFirst().getX() + pair.getSecond().length())
+                        .max()
+                        .orElse(0);
 
+        int maxY = grids.stream()
+                        .mapToInt(pair -> pair.getFirst().getY() + pair.getSecond().length())
+                        .max()
+                        .orElse(0);
+
+        this.size = new Vec2i(maxX, maxY);
     }
 
     public MultiGrid(MultiGrid other) {
@@ -59,9 +70,13 @@ public class MultiGrid extends Solvable<Vec3i> implements ShallowCopyable<MultiG
         this.grids = Arrays.stream(other.grids).map(Grid::new).toArray(Grid[]::new);
         this.emptyCellsPossibilities = new HashMap<>(other.emptyCellsPossibilities);
         this.moves.addAll(other.moves);
+        this.size = other.size;
         paddings = new Vec2i[0];
     }
 
+    public Vec2i getSize() {
+        return size;
+    }
 
     public List<AbstractConstraint<Grid[], Vec3i>> getConstraints() {
         return constraints;
@@ -118,6 +133,18 @@ public class MultiGrid extends Solvable<Vec3i> implements ShallowCopyable<MultiG
                 (pos, possibilities) -> constraints.stream()
                                                    .filter(constraint -> constraint.isPosAffected(pos))
                                                    .forEach(constraint -> constraint.getPossibilities(grids, pos).ifPresent(possibilities::retainAll)));
+    }
+
+    public void placeUncheckedPaddingBased(Vec2i pos, Integer value, boolean updatePossibilities, boolean store_move) {
+        for (int i = 0; i < paddings.length; i++) {
+            Vec2i padding = paddings[i];
+            if (pos.getX() >= padding.getX() && pos.getX() < padding.getX() + grids[i].length()
+                    && pos.getY() >= padding.getY() && pos.getY() < padding.getY() + grids[i].length()) {
+                placeUnchecked(new Vec3i(pos.getX() - padding.getX(), pos.getY() - padding.getY(), i), value,
+                        updatePossibilities, store_move);
+                return;
+            }
+        }
     }
 
     @Override

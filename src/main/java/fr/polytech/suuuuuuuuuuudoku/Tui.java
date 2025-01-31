@@ -9,6 +9,7 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Pair;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
+import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
 
@@ -21,6 +22,7 @@ public class Tui {
     private final Terminal terminal;
     private final TextGraphics textGraphics;
     private int line = 0;
+    private int usedColors = 1;
 
     public Tui() throws IOException {
         System.setProperty("com.googlecode.lanterna.terminal.UnixTerminal.sttyCommand", "stty");
@@ -85,49 +87,48 @@ public class Tui {
     }
 
     private void displayGrid(Grid grid, Vec2i padding) throws IOException {
-//        System.out.println(padding);
         var oldLine = line;
+
         // Afficher la grille
         int gridSize = grid.getInnerGrid().length();
-        int blockSize = (int) Math.sqrt(gridSize);
-        int spacing = String.valueOf(gridSize).length();
+        int spacing = String.valueOf(gridSize).length(); // Calculate the spacing between each character
+        List<BlockConstraint> blocks = grid.getConstraints().stream()
+                                           .filter(BlockConstraint.class::isInstance)
+                                           .map(BlockConstraint.class::cast)
+                                           .toList();
 
         // Calculate the padding which is the padding + the padding between each character + the number of blocks
-        int xPadding =
-                padding.getX() * spacing + padding.getX() + (padding.getX() / blockSize) * (spacing);
-        int yPadding =
-                padding.getY() + (padding.getY() / blockSize);
+        int xPadding = padding.getX() * spacing + padding.getX();
+        int yPadding = padding.getY();
         line += yPadding;
 
-//        System.out.println("xPadding: " + xPadding);
-//        System.out.println("yPadding: " + yPadding);
-//        System.out.println("line: " + line);
-
         for (int i = 0; i < gridSize; i++) {
-            if (i % blockSize == 0 && i != 0) {
-                textGraphics.putString(xPadding, line++, "-".repeat(gridSize * (spacing + 1) + blockSize - 1));
-            }
             for (int j = 0; j < gridSize; j++) {
-                int position = j * (spacing + 1) + j / blockSize + xPadding;
-                if (j % blockSize == 0 && j != 0) {
-                    textGraphics.putString(position - 1, line, "|");
-                }
+                // Determine the block color
+                int finalI = i;
+                int finalJ = j;
+                blocks.stream()
+                      .filter(blockConstraint ->
+                              finalI >= blockConstraint.getBlock().x()
+                                      && finalI < blockConstraint.getBlock().dx()
+                                      && finalJ >= blockConstraint.getBlock().y()
+                                      && finalJ < blockConstraint.getBlock().dy())
+                      .findFirst()
+                      .ifPresent(blockConstraint -> textGraphics.setBackgroundColor(new TextColor.Indexed((blocks.indexOf(blockConstraint) + usedColors))));
 
-                textGraphics.putString(position, line,
-                        grid.getSymbolAt(j, i) == null ?
-                                " ".repeat(spacing + 1) :
+                textGraphics.putString(j * (spacing + 1) + xPadding, line,
+                        grid.getSymbolAt(j, i) == null ? " ".repeat(spacing + 1) :
                                 grid.getSymbolAt(j, i) + " ".repeat(spacing));
+                textGraphics.setBackgroundColor(TextColor.ANSI.DEFAULT);
             }
             line++;
         }
         terminal.flush();
         line = oldLine;
-//        System.out.println("line: " + line);
-//        System.out.println();
+        usedColors += blocks.size();
     }
 
     private int selectMode() throws IOException {
-        // Afficher un selecteur entre generer un sudoku et entrer un sudoku
         String[] options = {"> Generer un sudoku", "  Entrer un sudoku"};
         for (int i = 0; i < options.length; i++) {
             textGraphics.putString(0, line + i, options[i]);

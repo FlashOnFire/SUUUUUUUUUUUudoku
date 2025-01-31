@@ -78,6 +78,19 @@ public class MultiGrid extends Solvable<Vec3i> implements ShallowCopyable<MultiG
         return size;
     }
 
+    public boolean isInGrid(Vec2i pos) {
+        // Check if the position is in one of the grids
+        for (int i = 0; i < paddings.length; i++) {
+            Vec2i padding = paddings[i];
+            Vec2i size = grids[i].getSize();
+            if (pos.getX() >= padding.getX() && pos.getX() < padding.getX() + size.getX()
+                    && pos.getY() >= padding.getY() && pos.getY() < padding.getY() + size.getY()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public List<AbstractConstraint<Grid[], Vec3i>> getConstraints() {
         return constraints;
     }

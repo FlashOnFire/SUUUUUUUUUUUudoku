@@ -22,9 +22,9 @@ import static java.lang.System.exit;
 public class Tui {
     private final Terminal terminal;
     private final TextGraphics textGraphics;
+    private final Thread loaderThread;
     private int line = 0;
     private int usedColors = 0;
-    private final Thread loaderThread;
 
 
     public Tui() throws IOException {
@@ -170,16 +170,19 @@ public class Tui {
      */
     private void play(Solvable<?> grid) throws IOException {
         Vec2i position = Vec2i.zero();
+        Vec2i lastPosition = Vec2i.zero();
         KeyStroke keyStroke;
         boolean disco = false;
         String enteredValue = null;
         Vec2i max;
+        int spacing;
         if (grid instanceof MultiGrid) {
+            spacing = String.valueOf(((MultiGrid) grid).getGrids()[0].getSymbols().size()).length();
             max = ((MultiGrid) grid).getSize();
         } else {
+            spacing = String.valueOf(((Grid) grid).getSymbols().size()).length();
             max = ((Grid) grid).getSize();
         }
-        int spacing = String.valueOf(Math.max(max.getY(), max.getY())).length();
 
         do {
             if (!disco) {
@@ -188,8 +191,14 @@ public class Tui {
 
             if (grid instanceof MultiGrid) {
                 displayMultiGrid((MultiGrid) grid);
+                if (!((MultiGrid) grid).isInGrid(lastPosition)) {
+                    // Clear the last position
+                    textGraphics.setBackgroundColor(TextColor.ANSI.DEFAULT);
+                    textGraphics.putString(lastPosition.getX() * (spacing + 1), lastPosition.getY() + line,
+                            " ".repeat(spacing));
+                }
                 textGraphics.setBackgroundColor(TextColor.ANSI.BLACK_BRIGHT);
-                textGraphics.putString(position.getX() * 2, position.getY() + line, " ".repeat(spacing));
+                textGraphics.putString(position.getX() * (spacing + 1), position.getY() + line, " ".repeat(spacing));
             } else {
                 displayGrid((Grid) grid, Vec2i.zero());
                 textGraphics.setBackgroundColor(TextColor.ANSI.BLACK_BRIGHT);
@@ -206,6 +215,7 @@ public class Tui {
             textGraphics.putString(0, line - 1, displayValue + " ".repeat(padding));
             terminal.flush();
 
+            lastPosition = new Vec2i(position.getX(), position.getY());
             keyStroke = terminal.readInput();
             if (keyStroke.getKeyType() == KeyType.ArrowDown && position.getY() < max.getY() - 1) {
                 position = position.add(new Vec2i(0, 1));

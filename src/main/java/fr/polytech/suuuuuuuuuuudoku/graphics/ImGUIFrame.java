@@ -72,11 +72,6 @@ public class ImGUIFrame extends Application {
         }
 
         ImGui.sameLine();
-        if (ImGui.checkbox("Slow Solve", SudokuSolver.slowSolve)) {
-            SudokuSolver.slowSolve = !SudokuSolver.slowSolve;
-        }
-
-
         if (ImGui.button("MaxiGrid")) {
             try {
                 grid = CsvUtils.importGrid(Path.of("src/test/java/fr/polytech/suuuuuuuuuuudoku/resources/100x100.csv"));
@@ -90,13 +85,16 @@ public class ImGUIFrame extends Application {
             ImGui.endDisabled();
         }
 
+        ImGui.sliderFloat("Solve Pace", SudokuSolver.solvePace, 0.0f, 1.0f);
+
         ImGui.end();
 
-        //little overlay window to show grid size
+        //little overlay window to show infos
         ImGui.setNextWindowPos(10, 10);
-        ImGui.setNextWindowSize(200, 20);
-        ImGui.begin("Grid Size", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoTitleBar);
+        ImGui.setNextWindowSize(200, 50);
+        ImGui.begin("Infos", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoTitleBar);
         ImGui.text("Size: " + ((grid != null) ? (grid.getSize().getX() + "x" + grid.getSize().getY()) : "No grid loaded"));
+        ImGui.text("Solve pace :" + SudokuSolver.solvePace[0]);
         ImGui.end();
 
         if (grid != null) {

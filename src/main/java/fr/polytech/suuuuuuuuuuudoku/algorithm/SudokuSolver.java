@@ -8,8 +8,7 @@ import java.util.*;
  * The SudokuSolver class provides methods to solve a Sudoku puzzle.
  */
 public class SudokuSolver {
-
-    public static boolean slowSolve = false;
+    public static float[] solvePace = new float[]{1.0f};
 
     /**
      * Solves the given Sudoku grid.
@@ -167,9 +166,9 @@ public class SudokuSolver {
         boolean finished = false;
 
         while (!finished) {
-            if (slowSolve) {
+            if (solvePace[0] != 1.0f) {
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep((long) (10 + (1-solvePace[0]) * (300 - 10)));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

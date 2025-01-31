@@ -96,12 +96,12 @@ public class ImGUIFrame extends Application {
         ImGui.setNextWindowPos(10, 10);
         ImGui.setNextWindowSize(200, 20);
         ImGui.begin("Grid Size", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoTitleBar);
-        ImGui.text("Size: " + ((grid != null) ? (grid.size().getX() + "x" + grid.size().getY()) : "No grid loaded"));
+        ImGui.text("Size: " + ((grid != null) ? (grid.getSize().getX() + "x" + grid.getSize().getY()) : "No grid loaded"));
         ImGui.end();
 
         if (grid != null) {
             var size = ImGui.getIO().getDisplaySize();
-            var gridSize = grid.size();
+            var gridSize = grid.getSize();
             var minSize = Math.min(size.x, size.y);
 
             var gridPixelSize = new ImVec2(minSize / gridSize.getX(), minSize / gridSize.getY());
@@ -209,7 +209,7 @@ public class ImGUIFrame extends Application {
     }
 
     private void setSelection(int x, int y) {
-        if (x >= 0 && x < grid.size().getX() && y >= 0 && y < grid.size().getY()) {
+        if (x >= 0 && x < grid.getSize().getX() && y >= 0 && y < grid.getSize().getY()) {
             applyLastChanges();
             selected_pos = new Vec2i(x, y);
             current_symbol = grid.getSymbolAt(x, y) == null ? null : grid.getSymbolAt(x, y).toString();

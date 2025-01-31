@@ -31,7 +31,6 @@ public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
         super(symbols);
         this.constraints = constraints;
         this.innerGrid = new InnerGrid(grid);
-        this.innerGrid.computeEmptyCells();
         this.computeAllEmptyCellsPossibilities();
     }
 
@@ -208,7 +207,6 @@ public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
      */
     public void setInnerGrid(InnerGrid innerGrid) {
         this.innerGrid = innerGrid;
-        this.innerGrid.computeEmptyCells();
     }
 
     /**

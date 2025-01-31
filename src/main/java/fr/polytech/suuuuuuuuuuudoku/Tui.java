@@ -24,6 +24,8 @@ public class Tui {
     private final TextGraphics textGraphics;
     private int line = 0;
     private int usedColors = 0;
+    private Thread loaderThread;
+
 
     public Tui() throws IOException {
         System.setProperty("com.googlecode.lanterna.terminal.UnixTerminal.sttyCommand", "stty");
@@ -34,6 +36,20 @@ public class Tui {
         terminal.clearScreen();
         terminal.flush();
         textGraphics = terminal.newTextGraphics();
+        loaderThread = new Thread(() -> {
+            try {
+                String[] spinner = {"|", "/", "-", "\\"};
+                int i = 0;
+                while (!Thread.currentThread().isInterrupted()) {
+                    textGraphics.putString(0, line + 1, spinner[i % spinner.length]);
+                    terminal.flush();
+                    i++;
+                    Thread.sleep(100);
+                }
+            } catch (InterruptedException | IOException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
     }
 
     void start() throws IOException, InterruptedException {
@@ -57,7 +73,9 @@ public class Tui {
 //                var gridd = new MultiGrid(grids);
 //                displayMultiGrid(gridd);
                 int size = selectSize();
+                loaderThread.start();
                 grid = Generator.generateClassicNxN(size);
+                loaderThread.interrupt();
                 displayGrid(grid, Vec2i.zero());
             }
             case 1 -> { // Enter sudoku

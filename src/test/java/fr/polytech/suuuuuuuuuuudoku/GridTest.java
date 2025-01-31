@@ -44,9 +44,9 @@ public class GridTest {
         List<Pair<Vec2i, Grid>> grids = new ArrayList<>();
         Vec2i[] positions = {
                 Vec2i.zero(),
-                new Vec2i(0, 12),
-                new Vec2i(6, 6),
                 new Vec2i(12, 0),
+                new Vec2i(6, 6),
+                new Vec2i(0, 12),
                 new Vec2i(12, 12),
         };
         for (int i = 0; i < 5; i++) {
@@ -58,8 +58,8 @@ public class GridTest {
 
         var constraints = new BlockEqualityConstraint[]{
                 new BlockEqualityConstraint(0, new Box2D(6, 6, 3, 3), 2, new Box2D(0, 0, 3, 3)),
-                new BlockEqualityConstraint(1, new Box2D(6, 0, 3, 3), 2, new Box2D(0, 6, 3, 3)),
-                new BlockEqualityConstraint(2, new Box2D(6, 0, 3, 3), 3, new Box2D(0, 6, 3, 3)),
+                new BlockEqualityConstraint(1, new Box2D(0, 6, 3, 3), 2, new Box2D(6, 0, 3, 3)),
+                new BlockEqualityConstraint(2, new Box2D(0, 6, 3, 3), 3, new Box2D(6, 0, 3, 3)),
                 new BlockEqualityConstraint(2, new Box2D(6, 6, 3, 3), 4, new Box2D(0, 0, 3, 3))
         };
 

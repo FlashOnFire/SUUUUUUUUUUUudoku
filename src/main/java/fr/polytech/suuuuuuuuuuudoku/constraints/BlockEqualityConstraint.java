@@ -44,9 +44,9 @@ public class BlockEqualityConstraint implements AbstractConstraint<Grid[], Vec3i
         for (int i = 0; i < block1.width(); i++) {
             for (int j = 0; j < block1.height(); j++) {
                 if (!grid[gridIndex1].getSymbolAt(
-                        block1.y() + i,
-                        block1.x() + j
-                ).equals(grid[gridIndex2].getSymbolAt(block2.y() + i, block2.x() + j))) {
+                        block1.x() + i,
+                        block1.y() + j
+                ).equals(grid[gridIndex2].getSymbolAt(block2.x() + i, block2.y() + j))) {
                     return false;
                 }
             }

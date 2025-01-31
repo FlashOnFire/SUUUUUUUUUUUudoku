@@ -123,9 +123,9 @@ public class ResolveTest {
         List<Pair<Vec2i, Grid>> grids = new ArrayList<>();
         Vec2i[] positions = {
                 Vec2i.zero(),
-                new Vec2i(0, 12),
-                new Vec2i(6, 6),
                 new Vec2i(12, 0),
+                new Vec2i(6, 6),
+                new Vec2i(0, 12),
                 new Vec2i(12, 12),
         };
         for (int i = 0; i < 5; i++) {
@@ -157,11 +157,11 @@ public class ResolveTest {
     public void testMultiDokuSolve2() throws FileNotFoundException {
         List<Pair<Vec2i, Grid>> grids = new ArrayList<>();
         Vec2i[] positions = {
-                new Vec2i(0, 6),
                 new Vec2i(6, 0),
+                new Vec2i(0, 6),
                 new Vec2i(6, 6),
-                new Vec2i(6, 12),
                 new Vec2i(12, 6),
+                new Vec2i(6, 12),
         };
         for (int i = 0; i < 5; i++) {
             var grid = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "/multigrid_2/" + i + ".csv"));
@@ -175,12 +175,12 @@ public class ResolveTest {
         assertTrue(grid.isSolved());
 
         grid.placeUnchecked(new Vec3i(0, 0, 0), null, false, false);
-//        grid.placeUnchecked(new Vec3i(0, 0, 1), null, false, false);
-//        grid.placeUnchecked(new Vec3i(0, 0, 2), null, false, false);
-//        grid.placeUnchecked(new Vec3i(6, 6, 0), null, false, false);
-//        grid.placeUnchecked(new Vec3i(6, 6, 0), null, false, false);
+        grid.placeUnchecked(new Vec3i(0, 0, 1), null, false, false);
+        grid.placeUnchecked(new Vec3i(0, 0, 2), null, false, false);
+        grid.placeUnchecked(new Vec3i(6, 6, 0), null, false, false);
+        grid.placeUnchecked(new Vec3i(6, 6, 0), null, false, false);
         grid.placeUnchecked(new Vec3i(0, 0, 3), null, false, false);
-//        grid.placeUnchecked(new Vec3i(0, 0, 4), null, false, false);
+        grid.placeUnchecked(new Vec3i(0, 0, 4), null, false, false);
         grid.computeAllEmptyCellsPossibilities();
         assertFalse(grid.isSolved());
         var solve = SudokuSolver.solve(grid, true, true, false);

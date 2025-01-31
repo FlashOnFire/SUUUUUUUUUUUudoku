@@ -179,7 +179,7 @@ public class ResolveTest {
 //        grid.placeUnchecked(new Vec3i(0, 0, 2), null, false, false);
 //        grid.placeUnchecked(new Vec3i(6, 6, 0), null, false, false);
 //        grid.placeUnchecked(new Vec3i(6, 6, 0), null, false, false);
-//        grid.placeUnchecked(new Vec3i(0, 0, 3), null, false, false);
+        grid.placeUnchecked(new Vec3i(0, 0, 3), null, false, false);
 //        grid.placeUnchecked(new Vec3i(0, 0, 4), null, false, false);
         grid.computeAllEmptyCellsPossibilities();
         assertFalse(grid.isSolved());

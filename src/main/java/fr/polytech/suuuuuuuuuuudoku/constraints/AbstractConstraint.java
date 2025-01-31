@@ -22,7 +22,8 @@ public interface AbstractConstraint<T, O> {
      * @return a list of classic constraints
      */
     static List<AbstractConstraint<InnerGrid, Vec2i>> getClassicConstraints(int size, Set<Integer> symbols) {
-        return getRectConstraints(size, size, symbols);
+        var sizeConstraint = (int) Math.sqrt(size);
+        return getRectConstraints(sizeConstraint, sizeConstraint, symbols);
     }
 
     /**

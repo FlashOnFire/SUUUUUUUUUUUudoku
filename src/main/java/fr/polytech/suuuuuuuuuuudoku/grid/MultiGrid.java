@@ -125,7 +125,7 @@ public class MultiGrid extends Solvable<Vec3i> implements ShallowCopyable<MultiG
         assert pos.getZ() < grids.length;
         System.out.println("MG: placing pos: " + pos + " value: " + value);
 
-        Integer oldValue = grids[pos.getZ()].getSymbolAt(pos.getX(), pos.getY());
+        Integer oldValue = grids[pos.getZ()].getSymbolAt(pos.getY(), pos.getX()); // we don't have to swap column and line, it will be do in the method
         grids[pos.getZ()].placeUnchecked(new Vec2i(pos.getX(), pos.getY()), value, updatePossibilities, false);
 
         constraints.stream()

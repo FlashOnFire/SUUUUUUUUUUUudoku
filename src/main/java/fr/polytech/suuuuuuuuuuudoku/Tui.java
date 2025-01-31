@@ -24,7 +24,7 @@ public class Tui {
     private final TextGraphics textGraphics;
     private int line = 0;
     private int usedColors = 0;
-    private Thread loaderThread;
+    private final Thread loaderThread;
 
 
     public Tui() throws IOException {
@@ -168,7 +168,7 @@ public class Tui {
      * @param grid La grille de Sudoku à résoudre.
      * @throws IOException Si une erreur d'entrée/sortie se produit.
      */
-    private void play(Solvable grid) throws IOException {
+    private void play(Solvable<?> grid) throws IOException {
         Vec2i position = Vec2i.zero();
         KeyStroke keyStroke;
         boolean disco = false;
@@ -219,7 +219,7 @@ public class Tui {
                 if (grid instanceof MultiGrid) {
                     ((MultiGrid) grid).placeUncheckedPaddingBased(position, Integer.parseInt(enteredValue), true, true);
                 } else {
-                    grid.placeUnchecked(position, Integer.parseInt(enteredValue), true, true);
+                    ((Grid) grid).placeUnchecked(position, Integer.parseInt(enteredValue), true, true);
                 }
                 enteredValue = null;
             } else if (keyStroke.getKeyType() == KeyType.Backspace && enteredValue != null) {

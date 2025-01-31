@@ -1,9 +1,11 @@
 package fr.polytech.suuuuuuuuuuudoku.graphics;
 
+import fr.polytech.suuuuuuuuuuudoku.CsvUtils;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
+import fr.polytech.suuuuuuuuuuudoku.grid.ObservableGrid;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.app.Application;
@@ -13,11 +15,16 @@ import imgui.flag.ImGuiKey;
 import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 
+import java.io.FileNotFoundException;
+import java.nio.file.Path;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class ImGUIFrame extends Application {
     Grid originalGrid;
     Grid grid;
     Vec2i selected_pos = null;
     String current_symbol = null;
+    AtomicBoolean solving = new AtomicBoolean(false);
 
     @Override
     protected void configure(Configuration config) {
@@ -26,49 +33,109 @@ public class ImGUIFrame extends Application {
 
     @Override
     protected void preRun() {
-        grid = Generator.generateRandomGridN(6);
-        originalGrid = grid.shallowCopy();
     }
 
     @Override
     public void process() {
-        if (ImGui.begin("Suuuuuuuuuuudoku")) {
-            if (ImGui.button("Generate")) {
-                grid = Generator.generateRandomGridN(6);
+        ImGui.begin("Suuuuuuuuuuudoku");
+
+        boolean disable = solving.get();
+        if (disable) {
+            ImGui.beginDisabled();
+        }
+
+        if (ImGui.button("Generate")) {
+            grid = Generator.generateClassicNxN(16);
+            originalGrid = grid.shallowCopy();
+        }
+
+        if (grid == null) {
+            ImGui.beginDisabled();
+        }
+        ImGui.sameLine();
+        if (ImGui.button("Solve")) {
+            selected_pos = null;
+            new Thread(() -> {
+                solving.set(true);
+                grid = SudokuSolver.solve(new ObservableGrid(grid, innerGrid -> grid.setInnerGrid(innerGrid)), true, true, true).getSecond().getGrid();
+                solving.set(false);
+            }).start();
+        }
+
+        ImGui.sameLine();
+        if (ImGui.button("Reset")) {
+            grid = originalGrid.shallowCopy();
+        }
+
+        if (grid == null) {
+            ImGui.endDisabled();
+        }
+
+        ImGui.sameLine();
+        if (ImGui.checkbox("Slow Solve", SudokuSolver.slowSolve)) {
+            SudokuSolver.slowSolve = !SudokuSolver.slowSolve;
+        }
+
+
+        if (ImGui.button("MaxiGrid")) {
+            try {
+                grid = CsvUtils.importGrid(Path.of("src/test/java/fr/polytech/suuuuuuuuuuudoku/resources/100x100.csv"));
                 originalGrid = grid.shallowCopy();
-            }
-            ImGui.sameLine();
-            if (ImGui.button("Solve")) {
-                grid = SudokuSolver.solve(grid, true, true, true).getSecond();
-            }
-            ImGui.sameLine();
-            if (ImGui.button("Reset")) {
-                grid = originalGrid.shallowCopy();
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
             }
         }
+
+        if (disable) {
+            ImGui.endDisabled();
+        }
+
         ImGui.end();
 
-        var size = ImGui.getIO().getDisplaySize();
-        var gridSize = grid.getZize();
-        var minSize = Math.min(size.x, size.y);
+        //little overlay window to show grid size
+        ImGui.setNextWindowPos(10, 10);
+        ImGui.setNextWindowSize(200, 20);
+        ImGui.begin("Grid Size", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoTitleBar);
+        ImGui.text("Size: " + ((grid != null) ? (grid.size().getX() + "x" + grid.size().getY()) : "No grid loaded"));
+        ImGui.end();
 
-        var gridPixelSize = new ImVec2(minSize / gridSize.getX(), minSize / gridSize.getY());
-        gridPixelSize.x = Math.min(gridPixelSize.x, 50);
-        gridPixelSize.y = Math.min(gridPixelSize.y, 50);
+        if (grid != null) {
+            var size = ImGui.getIO().getDisplaySize();
+            var gridSize = grid.size();
+            var minSize = Math.min(size.x, size.y);
 
-        var fullGridPixelSize = new ImVec2(gridPixelSize.x * gridSize.getX(), gridPixelSize.y * gridSize.getY());
+            var gridPixelSize = new ImVec2(minSize / gridSize.getX(), minSize / gridSize.getY());
+            gridPixelSize.x = Math.min(gridPixelSize.x, 50);
+            gridPixelSize.y = Math.min(gridPixelSize.y, 50);
 
-        ImGui.setNextWindowPos(size.x / 2 - fullGridPixelSize.x / 2, size.y / 2 - fullGridPixelSize.y / 2);
-        ImGui.setNextWindowSize(fullGridPixelSize.x, fullGridPixelSize.y);
+            var fullGridPixelSize = new ImVec2(gridPixelSize.x * gridSize.getX(), gridPixelSize.y * gridSize.getY());
+
+            ImGui.setNextWindowPos(size.x / 2 - fullGridPixelSize.x / 2, size.y / 2 - fullGridPixelSize.y / 2);
+            ImGui.setNextWindowSize(fullGridPixelSize.x, fullGridPixelSize.y);
 
 
-        ImGui.pushStyleColor(ImGuiCol.WindowBg, ImGui.getColorU32(0.6f, 0.6f, 0.6f, 1.0f));
-        ImGui.begin(
-                "Grid",
-                null,
-                ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoCollapse
-        );
+            ImGui.pushStyleColor(ImGuiCol.WindowBg, ImGui.getColorU32(0.6f, 0.6f, 0.6f, 1.0f));
+            ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, new ImVec2(0, 0));
+            ImGui.begin(
+                    "Grid",
+                    null,
+                    ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoTitleBar
+            );
 
+            drawGrid(gridSize, gridPixelSize);
+
+            ImGui.popStyleColor();
+            ImGui.popStyleVar();
+
+            handleInput();
+
+            ImGui.end();
+        }
+
+        //ImGui.showDemoWindow();
+    }
+
+    private void drawGrid(Vec2i gridSize, ImVec2 gridPixelSize) {
         ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, 0, 0);
         for (int y = 0; y < gridSize.getY(); y++) {
             for (int x = 0; x < gridSize.getX(); x++) {
@@ -85,12 +152,9 @@ public class ImGUIFrame extends Application {
                     ImGui.popStyleColor();
                 } else {
                     if (ImGui.button(
-                            (grid.getSymbolAt(x, y) == null ? " " : grid.getSymbolAt(
-                                    x,
-                                    y
-                            ).toString()) + "##" + y + ":" + x,
+                            (grid.getSymbolAt(x, y) == null ? " " : grid.getSymbolAt(x, y).toString()) + "##" + y + ":" + x,
                             gridPixelSize
-                    )) {
+                    ) && !solving.get()) {
                         setSelection(x, y);
                         System.out.println("Selected: " + selected_pos);
                     }
@@ -100,8 +164,9 @@ public class ImGUIFrame extends Application {
             ImGui.newLine();
         }
         ImGui.popStyleVar();
+    }
 
-
+    private void handleInput() {
         if (ImGui.isKeyPressed(ImGuiKey.Delete)) {
             current_symbol = null;
         } else if (ImGui.isKeyPressed(ImGuiKey.Backspace)) {
@@ -141,15 +206,10 @@ public class ImGUIFrame extends Application {
             applyLastChanges();
             selected_pos = null;
         }
-
-        ImGui.end();
-        ImGui.popStyleColor();
-
-        ImGui.showDemoWindow();
     }
 
     private void setSelection(int x, int y) {
-        if (x >= 0 && x < grid.getZize().getX() && y >= 0 && y < grid.getZize().getY()) {
+        if (x >= 0 && x < grid.size().getX() && y >= 0 && y < grid.size().getY()) {
             applyLastChanges();
             selected_pos = new Vec2i(x, y);
             current_symbol = grid.getSymbolAt(x, y) == null ? null : grid.getSymbolAt(x, y).toString();

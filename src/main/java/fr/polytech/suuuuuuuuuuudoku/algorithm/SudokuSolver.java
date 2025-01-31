@@ -9,6 +9,8 @@ import java.util.*;
  */
 public class SudokuSolver {
 
+    public static boolean slowSolve = false;
+
     /**
      * Solves the given Sudoku grid.
      *
@@ -48,10 +50,11 @@ public class SudokuSolver {
 
     /**
      * Finds all solutions to the given Sudoku grid.
-     * @param grid: the Sudoku grid to solve
-     * @param deducing: whether to use deduction
+     *
+     * @param grid:         the Sudoku grid to solve
+     * @param deducing:     whether to use deduction
      * @param backtracking: whether to use backtracking
-     * @param store_moves: whether to store the moves
+     * @param store_moves:  whether to store the moves
      * @return a list of all solutions to the Sudoku grid
      */
     public static <C, T extends Solvable<C> & ShallowCopyable<T>> List<T> findAllSolutions(T grid, boolean deducing, boolean backtracking, boolean store_moves) {
@@ -85,8 +88,9 @@ public class SudokuSolver {
 
     /**
      * Checks if the given Sudoku grid has more than one solution.
-     * @param grid: the Sudoku grid to solve
-     * @param deducing: whether to use deduction
+     *
+     * @param grid:         the Sudoku grid to solve
+     * @param deducing:     whether to use deduction
      * @param backtracking: whether to use backtracking
      * @return true if the Sudoku grid has more than one solution, false otherwise
      */
@@ -163,6 +167,13 @@ public class SudokuSolver {
         boolean finished = false;
 
         while (!finished) {
+            if (slowSolve) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             finished = true;
 
             var emptyCells = new ArrayDeque<>(grid.getEmptyCellsPossibilities().keySet());

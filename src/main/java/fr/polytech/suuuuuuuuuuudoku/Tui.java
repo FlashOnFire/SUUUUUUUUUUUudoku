@@ -94,9 +94,9 @@ public class Tui {
 
         // Calculate the padding which is the padding + the padding between each character + the number of blocks
         int xPadding =
-                padding.getLine() * spacing + padding.getLine() + (padding.getLine() / blockSize) * (spacing);
+                padding.getX() * spacing + padding.getX() + (padding.getX() / blockSize) * (spacing);
         int yPadding =
-                padding.getColumn() + (padding.getColumn() / blockSize);
+                padding.getY() + (padding.getY() / blockSize);
         line += yPadding;
 
 //        System.out.println("xPadding: " + xPadding);

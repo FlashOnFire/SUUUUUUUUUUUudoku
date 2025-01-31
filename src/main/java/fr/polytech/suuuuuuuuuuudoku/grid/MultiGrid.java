@@ -16,8 +16,8 @@ public class MultiGrid extends Solvable<Vec3i> implements ShallowCopyable<MultiG
     public MultiGrid(List<Pair<Vec2i, Grid>> grids) {
         super(grids.getFirst().getSecond().getSymbols());
 
-        grids.sort(Comparator.comparing((Pair<Vec2i, Grid> pair) -> pair.getFirst().getLine())
-                             .thenComparing(pair -> pair.getFirst().getColumn()));
+        grids.sort(Comparator.comparing((Pair<Vec2i, Grid> pair) -> pair.getFirst().getX())
+                             .thenComparing(pair -> pair.getFirst().getY()));
         this.grids = grids.stream().map(Pair::getSecond).toArray(Grid[]::new);
         this.paddings = grids.stream().map(Pair::getFirst).toArray(Vec2i[]::new);
         this.constraints = new ArrayList<>();
@@ -27,9 +27,9 @@ public class MultiGrid extends Solvable<Vec3i> implements ShallowCopyable<MultiG
             int indexJ = 0;
             for (Pair<Vec2i, Grid> j : grids) {
                 if (i != j) {
-                    var usedI = new Box2D(i.getFirst().getLine(), i.getFirst().getColumn(), i.getSecond().length(),
+                    var usedI = new Box2D(i.getFirst().getX(), i.getFirst().getY(), i.getSecond().length(),
                             i.getSecond().length());
-                    var usedJ = new Box2D(j.getFirst().getLine(), j.getFirst().getColumn(), j.getSecond().length(),
+                    var usedJ = new Box2D(j.getFirst().getX(), j.getFirst().getY(), j.getSecond().length(),
                             j.getSecond().length());
                     var overlap = usedI.overlap(usedJ);
                     if (overlap != null) {
@@ -90,7 +90,7 @@ public class MultiGrid extends Solvable<Vec3i> implements ShallowCopyable<MultiG
             int finalI = i;
             grids[i].getEmptyCellsPossibilities().forEach(
                     (pos, possibilities) -> emptyCellsPossibilities.put(
-                            new Vec3i(pos.getLine(), pos.getColumn(), finalI),
+                            new Vec3i(pos.getX(), pos.getY(), finalI),
                             possibilities
                     ));
         }
@@ -104,7 +104,7 @@ public class MultiGrid extends Solvable<Vec3i> implements ShallowCopyable<MultiG
             int finalI = i;
             grids[i].getEmptyCellsPossibilities().forEach(
                     (pos, possibilities) -> emptyCellsPossibilities.put(
-                            new Vec3i(pos.getLine(), pos.getColumn(), finalI),
+                            new Vec3i(pos.getX(), pos.getY(), finalI),
                             possibilities
                     ));
         }
@@ -122,12 +122,11 @@ public class MultiGrid extends Solvable<Vec3i> implements ShallowCopyable<MultiG
 
     @Override
     public void placeUnchecked(Vec3i pos, Integer value, boolean updatePossibilities, boolean store_move) {
-        assert pos.getDepth() < grids.length;
+        assert pos.getZ() < grids.length;
         System.out.println("MG: placing pos: " + pos + " value: " + value);
 
-        Integer oldValue = grids[pos.getDepth()].getSymbolAt(pos.getLine(), pos.getColumn());
-        grids[pos.getDepth()].placeUnchecked(new Vec2i(pos.getLine(), pos.getColumn()), value, updatePossibilities,
-                false);
+        Integer oldValue = grids[pos.getZ()].getSymbolAt(pos.getX(), pos.getY());
+        grids[pos.getZ()].placeUnchecked(new Vec2i(pos.getX(), pos.getY()), value, updatePossibilities, false);
 
         constraints.stream()
                    .filter(c -> c instanceof BlockEqualityConstraint)
@@ -135,8 +134,8 @@ public class MultiGrid extends Solvable<Vec3i> implements ShallowCopyable<MultiG
                    .filter(c -> c.isPosAffected(pos)).forEach(constraint -> {
                        Vec3i correspondingPos = constraint.getCorrespondingPosition(pos);
                        System.out.println("MG: Placing corresponding pos: " + correspondingPos + " value: " + value);
-                       grids[correspondingPos.getDepth()].placeUnchecked(
-                               new Vec2i(correspondingPos.getLine(), correspondingPos.getColumn()),
+                       grids[correspondingPos.getZ()].placeUnchecked(
+                               new Vec2i(correspondingPos.getX(), correspondingPos.getY()),
                                value,
                                updatePossibilities,
                                false
@@ -161,8 +160,8 @@ public class MultiGrid extends Solvable<Vec3i> implements ShallowCopyable<MultiG
     }
 
     public Integer getSymbolAt(Vec3i pos) {
-        assert pos.getDepth() < grids.length;
-        return grids[pos.getDepth()].getSymbolAt(pos.getLine(), pos.getColumn());
+        assert pos.getZ() < grids.length;
+        return grids[pos.getZ()].getSymbolAt(pos.getX(), pos.getY());
     }
 
     @Override

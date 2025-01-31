@@ -1,32 +1,32 @@
 package fr.polytech.suuuuuuuuuuudoku.algorithm;
 
 public class Box2D {
-    private final int line, column, line2, column2;
+    private final int x, y, dx, dy;
 
-    public Box2D(int line, int column, int width, int length) {
-        this.line = line;
-        this.column = column;
-        this.line2 = line + width;
-        this.column2 = column + length;
+    public Box2D(int x, int y, int width, int length) {
+        this.x = x;
+        this.y = y;
+        this.dx = x + width;
+        this.dy = y + length;
     }
 
-    static public Box2D absolute(int line, int column, int line2, int column2) {
-        return new Box2D(line, column, line2 - line, column2 - column);
+    static public Box2D absolute(int x, int y, int dx, int dy) {
+        return new Box2D(x, y, dx - x, dy - y);
     }
 
     public boolean contains(Vec2i vec2i) {
-        return contains(vec2i.getLine(), vec2i.getColumn());
+        return contains(vec2i.getX(), vec2i.getY());
     }
 
-    public boolean contains(int posColumn, int posLine) {
-        return posColumn >= line && posColumn < line2 && posLine >= column && posLine < column2;
+    public boolean contains(int posX, int posY) {
+        return posX >= x && posX < dx && posY >= y && posY < dy;
     }
 
     public Box2D overlap(Box2D other) {
-        int newX = Math.max(this.line, other.line);
-        int newY = Math.max(this.column, other.column);
-        int newDx = Math.min(this.line2, other.line2);
-        int newDy = Math.min(this.column2, other.column2);
+        int newX = Math.max(this.x, other.x);
+        int newY = Math.max(this.y, other.y);
+        int newDx = Math.min(this.dx, other.dx);
+        int newDy = Math.min(this.dy, other.dy);
 
         if (newX >= newDx || newY >= newDy) {
             return null; // No overlap
@@ -35,32 +35,32 @@ public class Box2D {
         return new Box2D(newX, newY, newDx - newX, newDy - newY);
     }
 
-    public int line() {
-        return line;
+    public int x() {
+        return x;
     }
 
-    public int column() {
-        return column;
+    public int y() {
+        return y;
     }
 
-    public int line2() {
-        return line2;
+    public int dx() {
+        return dx;
     }
 
-    public int column2() {
-        return column2;
+    public int dy() {
+        return dy;
     }
 
     public int width() {
-        return line2 - line;
+        return dx - x;
     }
 
     public int height() {
-        return column2 - column;
+        return dy - y;
     }
 
     public Box2D substract(Box2D other) {
-        return Box2D.absolute(line - other.line, column - other.column, line2 - other.line, column2 - other.column);
+      return Box2D.absolute(x - other.x, y - other.y, dx - other.x, dy - other.y);
     }
 
     @Override
@@ -68,15 +68,15 @@ public class Box2D {
         if (o == null || getClass() != o.getClass()) return false;
 
         Box2D box2D = (Box2D) o;
-        return line == box2D.line && column == box2D.column && line2 == box2D.line2 && column2 == box2D.column2;
+        return x == box2D.x && y == box2D.y && dx == box2D.dx && dy == box2D.dy;
     }
 
     @Override
     public int hashCode() {
-        int result = line;
-        result = 31 * result + column;
-        result = 31 * result + line2;
-        result = 31 * result + column2;
+        int result = x;
+        result = 31 * result + y;
+        result = 31 * result + dx;
+        result = 31 * result + dy;
         return result;
     }
 }

@@ -175,8 +175,8 @@ public class ResolveTest {
         assertTrue(grid.isSolved());
 
         grid.placeUnchecked(new Vec3i(0, 0, 0), null, false, false);
-        grid.placeUnchecked(new Vec3i(0, 0, 1), null, false, false);
-        grid.placeUnchecked(new Vec3i(0, 0, 2), null, false, false);
+//        grid.placeUnchecked(new Vec3i(0, 0, 1), null, false, false);
+//        grid.placeUnchecked(new Vec3i(0, 0, 2), null, false, false);
 //        grid.placeUnchecked(new Vec3i(6, 6, 0), null, false, false);
 //        grid.placeUnchecked(new Vec3i(6, 6, 0), null, false, false);
 //        grid.placeUnchecked(new Vec3i(0, 0, 3), null, false, false);

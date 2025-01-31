@@ -268,7 +268,7 @@ public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
     }
 
     public Integer getSymbolAt(Vec2i pos) {
-        return this.innerGrid.get()[pos.getColumn()][pos.getLine()];
+        return this.innerGrid.get()[pos.getY()][pos.getX()];
     }
 
     public Integer getSymbolAt(int x, int y) {

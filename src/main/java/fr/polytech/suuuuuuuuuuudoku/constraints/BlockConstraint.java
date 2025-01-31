@@ -55,15 +55,14 @@ public class BlockConstraint implements AbstractConstraint<InnerGrid, Vec2i> {
      *
      * @param grid the grid to check the possibilities against
      * @param pos  the position to check the possibilities for
-     * @return an Optional containing a list of possible symbols, or an empty Optional if the position is not within
-     * the block
+     * @return an Optional containing a list of possible symbols, or an empty Optional if the position is not within the block
      * @throws AssertionError if the position is out of the grid bounds or the grid cell is empty
      */
     @Override
     public Optional<Set<Integer>> getPossibilities(InnerGrid grid, Vec2i pos) {
-        assert pos.getLine() < grid.get()[0].length;
-        assert pos.getColumn() < grid.length();
-        assert grid.get()[pos.getColumn()][pos.getLine()] == null;
+        assert pos.getX() < grid.get()[0].length;
+        assert pos.getY() < grid.length();
+        assert grid.get()[pos.getY()][pos.getX()] == null;
 
         if (!isInBlock(pos)) {
             return Optional.empty();
@@ -74,8 +73,8 @@ public class BlockConstraint implements AbstractConstraint<InnerGrid, Vec2i> {
 
         // Return the symbols that are not present in the block
         var possibilities = symbols.stream()
-                                   .filter(c -> !set.contains(c))
-                                   .collect(Collectors.toSet());
+                .filter(c -> !set.contains(c))
+                .collect(Collectors.toSet());
 
         return Optional.of(possibilities);
     }
@@ -112,8 +111,8 @@ public class BlockConstraint implements AbstractConstraint<InnerGrid, Vec2i> {
      */
     private Set<Integer> extractBlock(InnerGrid grid) {
         HashSet<Integer> set = new HashSet<>();
-        for (int i = box.column(); i < box.column2(); i++) {
-            set.addAll(Arrays.asList(grid.get()[i]).subList(box.line(), box.line2()));
+        for (int i = box.y(); i < box.dy(); i++) {
+            set.addAll(Arrays.asList(grid.get()[i]).subList(box.x(), box.dx()));
         }
         set.removeIf(Objects::isNull);
 

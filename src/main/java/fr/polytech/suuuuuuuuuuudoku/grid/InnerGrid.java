@@ -43,7 +43,7 @@ public class InnerGrid {
             for (Integer cell : lines) {
                 if (cell == null) {
                     System.out.print("  ");
-                } else {
+                } else{
                     System.out.print(cell + " ");
                 }
             }
@@ -66,11 +66,11 @@ public class InnerGrid {
     }
 
     public Integer at(Vec2i pos) {
-        return grid[pos.getColumn()][pos.getLine()];
+        return grid[pos.getY()][pos.getX()];
     }
 
     public void set(Vec2i pos, Integer value) {
-        grid[pos.getColumn()][pos.getLine()] = value;
+        grid[pos.getY()][pos.getX()] = value;
     }
 
     /**

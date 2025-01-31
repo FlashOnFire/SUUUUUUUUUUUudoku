@@ -44,14 +44,14 @@ public class ColumnConstraint implements AbstractConstraint<InnerGrid, Vec2i> {
             // This is a workaround to use the variable i in the lambda
             int finalI = i;
             Integer[] column = Arrays.stream(grid.get())
-                                     .map(line -> line[finalI])
-                                     .filter(Objects::nonNull)
-                                     .toArray(Integer[]::new);
+                    .map(line -> line[finalI])
+                    .filter(Objects::nonNull)
+                    .toArray(Integer[]::new);
 
             if (!symbols.containsAll(Arrays.asList(column))
                     || Arrays.stream(column)
-                             .distinct()
-                             .count() != column.length) {
+                    .distinct()
+                    .count() != column.length) {
                 return false;
             }
         }
@@ -68,14 +68,14 @@ public class ColumnConstraint implements AbstractConstraint<InnerGrid, Vec2i> {
      */
     @Override
     public Optional<Set<Integer>> getPossibilities(InnerGrid grid, Vec2i pos) {
-        assert pos.getColumn() < grid.length();
-        assert pos.getLine() < grid.get()[0].length;
+        assert pos.getY() < grid.length();
+        assert pos.getX() < grid.get()[0].length;
         assert grid.at(pos) == null;
 
         var column = Arrays.stream(grid.get())
-                           .map(line -> line[pos.getLine()])
-                           .filter(Objects::nonNull)
-                           .collect(Collectors.toSet());
+                .map(line -> line[pos.getX()])
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
 
         var list = symbols.stream().filter(c -> !column.contains(c)).collect(Collectors.toSet());
 
@@ -86,7 +86,7 @@ public class ColumnConstraint implements AbstractConstraint<InnerGrid, Vec2i> {
      * Checks if the two given positions have an effect on each other with respect to the constraint.
      */
     public boolean isAffectedBy(Vec2i pos1, Vec2i pos2) {
-        return pos1.getLine() == pos2.getLine();
+        return pos1.getX() == pos2.getX();
     }
 
     /**

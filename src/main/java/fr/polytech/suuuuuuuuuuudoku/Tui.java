@@ -177,7 +177,7 @@ public class Tui {
         if (grid instanceof MultiGrid) {
             max = ((MultiGrid) grid).getSize();
         } else {
-            max = ((Grid) grid).getZize();
+            max = ((Grid) grid).getSize();
         }
         int spacing = String.valueOf(Math.max(max.getY(), max.getY())).length();
 

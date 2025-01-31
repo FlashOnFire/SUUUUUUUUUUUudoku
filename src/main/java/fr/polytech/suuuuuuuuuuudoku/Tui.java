@@ -40,11 +40,13 @@ public class Tui {
             try {
                 String[] spinner = {"|", "/", "-", "\\"};
                 int i = 0;
-                while (!Thread.currentThread().isInterrupted()) {
-                    textGraphics.putString(0, line + 1, spinner[i % spinner.length]);
-                    terminal.flush();
-                    i++;
-                    Thread.sleep(100);
+                synchronized (this) {
+                    while (!Thread.currentThread().isInterrupted()) {
+                        textGraphics.putString(0, line + 1, spinner[i % spinner.length]);
+                        terminal.flush();
+                        i++;
+                        this.wait(100);
+                    }
                 }
             } catch (InterruptedException | IOException e) {
                 Thread.currentThread().interrupt();

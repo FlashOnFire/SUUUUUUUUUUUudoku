@@ -172,6 +172,9 @@ public class ImGUIFrame extends Application {
         } else if (ImGui.isKeyPressed(ImGuiKey.Backspace)) {
             if (current_symbol != null && !current_symbol.isEmpty()) {
                 current_symbol = current_symbol.substring(0, current_symbol.length() - 1);
+                if (current_symbol.isEmpty()) {
+                    current_symbol = null;
+                }
             }
         }
         if (ImGui.isKeyPressed(ImGuiKey.UpArrow)) {

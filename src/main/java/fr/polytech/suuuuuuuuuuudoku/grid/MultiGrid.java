@@ -1,13 +1,12 @@
 package fr.polytech.suuuuuuuuuuudoku.grid;
 
 import fr.polytech.suuuuuuuuuuudoku.algorithm.*;
-import fr.polytech.suuuuuuuuuuudoku.constraints.AbstractConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockEqualityConstraint;
 
 import java.util.*;
 
 public class MultiGrid extends Solvable<Vec3i> implements ShallowCopyable<MultiGrid> {
-    final List<AbstractConstraint<Grid[], Vec3i>> constraints;
+    final List<BlockEqualityConstraint> constraints;
     private final Grid[] grids;
     private final Vec2i[] paddings;
     private final List<Move3i> moves = new ArrayList<>();
@@ -91,7 +90,7 @@ public class MultiGrid extends Solvable<Vec3i> implements ShallowCopyable<MultiG
         return false;
     }
 
-    public List<AbstractConstraint<Grid[], Vec3i>> getConstraints() {
+    public List<BlockEqualityConstraint> getConstraints() {
         return constraints;
     }
 
@@ -169,8 +168,6 @@ public class MultiGrid extends Solvable<Vec3i> implements ShallowCopyable<MultiG
         grids[pos.getZ()].placeUnchecked(new Vec2i(pos.getX(), pos.getY()), value, updatePossibilities, false);
 
         constraints.stream()
-                   .filter(c -> c instanceof BlockEqualityConstraint)
-                   .map(c -> (BlockEqualityConstraint) c)
                    .filter(c -> c.isPosAffected(pos)).forEach(constraint -> {
                        Vec3i correspondingPos = constraint.getCorrespondingPosition(pos);
                        System.out.println("MG: Placing corresponding pos: " + correspondingPos + " value: " + value);

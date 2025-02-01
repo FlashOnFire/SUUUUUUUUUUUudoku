@@ -2,7 +2,6 @@ package fr.polytech.suuuuuuuuuuudoku.algorithm;
 
 import fr.polytech.suuuuuuuuuuudoku.constraints.*;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
-import fr.polytech.suuuuuuuuuuudoku.grid.InnerGrid;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
 import java.util.*;
@@ -101,7 +100,7 @@ public class Generator {
      * @param grid: A solved grid
      * @return A list of constraints with random positions for each GeneralSymbolConstraint
      */
-    static List<AbstractConstraint<InnerGrid, Vec2i>> createRandomConstraints(Grid grid) {
+    static List<AbstractConstraint> createRandomConstraints(Grid grid) {
         int length = grid.length();
 
         List<List<Vec2i>> positionList = new ArrayList<>(Collections.nCopies(length, new ArrayList<>()));
@@ -115,8 +114,7 @@ public class Generator {
                 }
             }
         }
-
-        List<AbstractConstraint<InnerGrid, Vec2i>> constraints = new ArrayList<>();
+        List<AbstractConstraint> constraints = new ArrayList<>();
         for (int i = 0; i < length; i++) {
             List<Vec2i> listInConstraint = new ArrayList<>();
             for (int j = 0; j < length; j++) {

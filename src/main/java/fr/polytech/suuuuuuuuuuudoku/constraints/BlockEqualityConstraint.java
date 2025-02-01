@@ -13,9 +13,8 @@ import java.util.Set;
  * @param gridIndex1 The set of symbols to be checked within the block.
  */
 public record BlockEqualityConstraint(int gridIndex1, Box2D block1, int gridIndex2,
-                                      Box2D block2) implements AbstractConstraint<Grid[], Vec3i> {
+                                      Box2D block2) {
 
-    @Override
     public boolean isSatisfied(Grid[] grid) {
         for (int i = 0; i < block1.width(); i++) {
             for (int j = 0; j < block1.height(); j++) {
@@ -31,7 +30,6 @@ public record BlockEqualityConstraint(int gridIndex1, Box2D block1, int gridInde
         return true;
     }
 
-    @Override
     public Optional<Set<Integer>> getPossibilities(Grid[] grid, Vec3i pos) {
         if (pos.getZ() != gridIndex1 && pos.getZ() != gridIndex2) {
             return Optional.empty();
@@ -50,12 +48,6 @@ public record BlockEqualityConstraint(int gridIndex1, Box2D block1, int gridInde
         return Optional.of(possibilities);
     }
 
-    @Override
-    public boolean isAffectedBy(Vec3i pos1, Vec3i pos2) {
-        return pos1.getZ() != pos2.getZ() && isPosAffected(pos1) && isPosAffected(pos2);
-    }
-
-    @Override
     public boolean isPosAffected(Vec3i pos) {
         return (pos.getZ() == gridIndex1 && block1.contains(pos.getX(), pos.getY()))
                 ||

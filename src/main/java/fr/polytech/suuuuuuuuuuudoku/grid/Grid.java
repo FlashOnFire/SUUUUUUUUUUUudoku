@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Represents a Sudoku grid with constraints.
  */
 public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
-    final List<AbstractConstraint<InnerGrid, Vec2i>> constraints;
+    final List<AbstractConstraint> constraints;
     private final ArrayList<Move2i> moves = new ArrayList<>();
     /**
      * The Sudoku grid represented as a 2D array of Strings.
@@ -27,7 +27,7 @@ public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
      * @param grid        the initial grid
      * @param constraints the list of constraints
      */
-    public Grid(Integer[][] grid, List<AbstractConstraint<InnerGrid, Vec2i>> constraints, Set<Integer> symbols) {
+    public Grid(Integer[][] grid, List<AbstractConstraint> constraints, Set<Integer> symbols) {
         super(symbols);
         this.constraints = constraints;
         this.innerGrid = new InnerGrid(grid);
@@ -278,7 +278,7 @@ public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
      *
      * @return the list of constraints
      */
-    public List<AbstractConstraint<InnerGrid, Vec2i>> getConstraints() {
+    public List<AbstractConstraint> getConstraints() {
         return constraints;
     }
 

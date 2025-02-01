@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * Interface representing a constraint in the Sudoku solver.
  */
-public interface AbstractConstraint<T, O> {
+public interface AbstractConstraint {
 
     /**
      * Generates the classic constraints for a Sudoku grid.
@@ -21,7 +21,7 @@ public interface AbstractConstraint<T, O> {
      * @param symbols the set of symbols used in the grid
      * @return a list of classic constraints
      */
-    static List<AbstractConstraint<InnerGrid, Vec2i>> getClassicConstraints(int size, Set<Integer> symbols) {
+    static List<AbstractConstraint> getClassicConstraints(int size, Set<Integer> symbols) {
         var sizeConstraint = (int) Math.sqrt(size);
         return getRectConstraints(sizeConstraint, sizeConstraint, symbols);
     }
@@ -34,8 +34,8 @@ public interface AbstractConstraint<T, O> {
      * @param symbols: the set of symbols used in the grid
      * @return a list of rectangular constraints
      */
-    static List<AbstractConstraint<InnerGrid, Vec2i>> getRectConstraints(int width, int height, Set<Integer> symbols) {
-        List<AbstractConstraint<InnerGrid, Vec2i>> constraintList = new ArrayList<>();
+    static List<AbstractConstraint> getRectConstraints(int width, int height, Set<Integer> symbols) {
+        List<AbstractConstraint> constraintList = new ArrayList<>();
         var length = width * height;
         for (int i = 0; i < length; i += width) {
             for (int j = 0; j < length; j += height) {
@@ -56,7 +56,7 @@ public interface AbstractConstraint<T, O> {
      * @param grid the Sudoku grid
      * @return true if the constraint is satisfied, false otherwise
      */
-    boolean isSatisfied(T grid);
+    boolean isSatisfied(InnerGrid grid);
 
     /**
      * Gets the possible values for a given position in the grid.
@@ -66,7 +66,7 @@ public interface AbstractConstraint<T, O> {
      * @return an Optional containing a list of possible values, or an empty Optional if this constraint does not
      * affect the position
      */
-    Optional<Set<Integer>> getPossibilities(T grid, O pos);
+    Optional<Set<Integer>> getPossibilities(InnerGrid grid, Vec2i pos);
 
     /**
      * Checks if the two given positions have an effect on each other with respect to the constraint.
@@ -74,7 +74,7 @@ public interface AbstractConstraint<T, O> {
      * @param pos1 the first position
      * @param pos2 the second position
      */
-    boolean isAffectedBy(O pos1, O pos2);
+    boolean isAffectedBy(Vec2i pos1, Vec2i pos2);
 
     /**
      * Checks if the given position is affected by the constraint.
@@ -82,5 +82,5 @@ public interface AbstractConstraint<T, O> {
      * @param pos the position to check
      * @return true if the position is affected by the constraint, false otherwise
      */
-    boolean isPosAffected(O pos);
+    boolean isPosAffected(Vec2i pos);
 }

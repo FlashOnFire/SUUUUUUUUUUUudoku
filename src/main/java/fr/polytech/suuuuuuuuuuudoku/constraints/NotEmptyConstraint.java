@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * This class represents a constraint that ensures no cell in the grid is empty.
  */
-public class NotEmptyConstraint implements AbstractConstraint<InnerGrid, Vec2i> {
+public class NotEmptyConstraint implements AbstractConstraint {
 
     /**
      * Checks if the constraint is satisfied for the given grid.

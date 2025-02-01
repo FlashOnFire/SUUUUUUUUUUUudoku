@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 /**
  * Represents a constraint that checks for the presence of specific symbols within a defined block in a grid.
  */
-public class BlockConstraint implements AbstractConstraint<InnerGrid, Vec2i> {
+public class BlockConstraint implements AbstractConstraint {
     /**
      * The set of symbols to be checked within the block.
      */

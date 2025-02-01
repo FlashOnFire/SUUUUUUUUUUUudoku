@@ -11,9 +11,7 @@ import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
-import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
-import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
-import fr.polytech.suuuuuuuuuuudoku.grid.Solvable;
+import fr.polytech.suuuuuuuuuuudoku.grid.*;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
 import java.io.IOException;
@@ -139,15 +137,7 @@ public class Tui {
                         options[selectedOption].substring(0, 2) + "[X] " + options[selectedOption].substring(6) :
                         options[selectedOption].substring(0, 2) + "[ ] " + options[selectedOption].substring(6);
             }
-            for (int i = 0; i < options.length; i++) {
-                if (i == selectedOption) {
-                    options[i] = "> " + options[i].substring(2);
-                } else {
-                    options[i] = "  " + options[i].substring(2);
-                }
-                textGraphics.putString(0, line + i, options[i]);
-            }
-            terminal.flush();
+            displayOptions(options, selectedOption);
         } while (keyStroke.getKeyType() != KeyType.Enter);
 
         line++;
@@ -173,6 +163,18 @@ public class Tui {
         }
 
         return grid;
+    }
+
+    private void displayOptions(String[] options, int selectedOption) throws IOException {
+        for (int i = 0; i < options.length; i++) {
+            if (i == selectedOption) {
+                options[i] = "> " + options[i].substring(2);
+            } else {
+                options[i] = "  " + options[i].substring(2);
+            }
+            textGraphics.putString(0, line + i, options[i]);
+        }
+        terminal.flush();
     }
 
     private void gameOver() throws IOException, InterruptedException {
@@ -290,8 +292,6 @@ public class Tui {
      * @throws IOException Si une erreur d'entrée/sortie se produit.
      */
     private void play(Solvable<?> grid) throws IOException {
-
-
         Vec2i position = Vec2i.zero();
         Vec2i lastPosition = Vec2i.zero();
         KeyStroke keyStroke;
@@ -299,6 +299,8 @@ public class Tui {
         String enteredValue = null;
         Vec2i max;
         int spacing;
+        int timeLinePos = -1;
+
         if (grid instanceof MultiGrid) {
             spacing = String.valueOf(((MultiGrid) grid).getGrids()[0].getSymbols().size()).length();
             max = ((MultiGrid) grid).getSize();
@@ -344,6 +346,19 @@ public class Tui {
             String displayValue = "Valeur entrée: " + (enteredValue != null ? enteredValue : "");
             int padding = terminal.getTerminalSize().getColumns() - 15 - displayValue.length();
             textGraphics.putString(0, line - 1, displayValue + " ".repeat(padding));
+
+            // display move navigator
+            line += max.getY() + 1;
+            List<?> moveList;
+            if (grid instanceof MultiGrid) {
+                moveList = ((MultiGrid) grid).getMoves();
+            } else {
+                moveList = ((Grid) grid).getMoves();
+            }
+            if (!moveList.isEmpty()) {
+                showTimeLine(moveList.size(), timeLinePos);
+            }
+            line -= max.getY() + 1;
             terminal.flush();
 
             lastPosition = new Vec2i(position.getX(), position.getY());
@@ -373,6 +388,29 @@ public class Tui {
                 enteredValue = null;
             } else if (keyStroke.getKeyType() == KeyType.Backspace && enteredValue != null) {
                 enteredValue = enteredValue.substring(0, enteredValue.length() - 1);
+            } else if (keyStroke.getKeyType() == KeyType.PageUp && (timeLinePos > 0 || timeLinePos == -1)) {
+                if (timeLinePos == -1) {
+                    timeLinePos = moveList.size() - 1;
+                }
+                timeLinePos--;
+                if (moveList.get(timeLinePos) instanceof Move2i) {
+                    var move = (Move2i) moveList.get(timeLinePos);
+                    ((Grid) grid).placeUnchecked(move.position(), move.previous_value(), true, false);
+                } else if (moveList.get(timeLinePos) instanceof Move3i) {
+                    var move = (Move3i) moveList.get(timeLinePos);
+                    ((MultiGrid) grid).placeUnchecked(move.position(), move.previous_value(), true, false);
+                }
+
+            } else if (keyStroke.getKeyType() == KeyType.PageDown && timeLinePos < moveList.size() - 1) {
+                timeLinePos++;
+                if (moveList.get(timeLinePos) instanceof Move2i) {
+                    var move = (Move2i) moveList.get(timeLinePos);
+                    ((Grid) grid).placeUnchecked(move.position(), move.value(), true, false);
+                } else if (moveList.get(timeLinePos) instanceof Move3i) {
+                    var move = (Move3i) moveList.get(timeLinePos);
+                    ((MultiGrid) grid).placeUnchecked(move.position(), move.value(), true, false);
+                }
+
             } else if (keyStroke.getKeyType() == KeyType.Character) {
 
                 if (Character.isDigit(keyStroke.getCharacter())) {
@@ -398,9 +436,22 @@ public class Tui {
                 }
             }
 
+
         } while (keyStroke.getKeyType() != KeyType.Escape);
 
         line += max.getY() + 1;
+    }
+
+    private void showTimeLine(int size, int timeLinePos) {
+        // display something like <-----|-->
+        textGraphics.putString(0, line + 1, "<");
+        textGraphics.putString(1, line + 1, "-".repeat(size));
+        textGraphics.putString(size + 1, line + 1, ">");
+        if (timeLinePos != -1) {
+            textGraphics.putString(timeLinePos + 1, line + 1, "|");
+        } else {
+            textGraphics.putString(size, line + 1, "|");
+        }
     }
 
     /**
@@ -426,15 +477,7 @@ public class Tui {
             } else if (keyStroke.getKeyType() == KeyType.ArrowUp && selectedOption == 1) {
                 selectedOption = 0;
             }
-            for (int i = 0; i < options.length; i++) {
-                if (i == selectedOption) {
-                    options[i] = "> " + options[i].substring(2);
-                } else {
-                    options[i] = "  " + options[i].substring(2);
-                }
-                textGraphics.putString(0, line + i, options[i]);
-            }
-            terminal.flush();
+            displayOptions(options, selectedOption);
         } while (keyStroke.getKeyType() != KeyType.Enter);
         line += options.length + 1;
         return selectedOption;

@@ -20,6 +20,9 @@ import java.util.List;
 
 import static java.lang.System.exit;
 
+/**
+ * The Tui class represents a text-based user interface for the Sudoku game.
+ */
 public class Tui {
     static String RESSOURCES_PATH = "src/test/java/fr/polytech/suuuuuuuuuuudoku/resources/";
     private final Terminal terminal;
@@ -28,7 +31,11 @@ public class Tui {
     private int line = 0;
     private int usedColors = 0;
 
-
+    /**
+     * Constructs a new Tui instance and initializes the terminal.
+     *
+     * @throws IOException if an I/O error occurs
+     */
     public Tui() throws IOException {
         System.setProperty("com.googlecode.lanterna.terminal.UnixTerminal.sttyCommand", "stty");
         DefaultTerminalFactory defaultTerminalFactory = new DefaultTerminalFactory();
@@ -41,9 +48,15 @@ public class Tui {
 
     }
 
+    /**
+     * Starts the Tui and handles the main game loop.
+     *
+     * @throws IOException          if an I/O error occurs
+     * @throws InterruptedException if the thread is interrupted
+     */
     void start() throws IOException, InterruptedException {
         welcomeMessage();
-        Solvable<?> grid = null;
+        Solvable<?> grid;
         switch (selectMode(new String[]{"> Generer un sudoku", "  Entrer un sudoku", "  Ouvrir un fichier"})) {
             case 0 -> { // Generate
                 int size = selectSize();
@@ -56,7 +69,7 @@ public class Tui {
                 grid = new Grid(new Integer[size][size], SymbolSets.generateSymbols(size));
             }
             case 2 -> { // Open a file
-                //List all the files in the resources folder
+                // List all the files in the resources folder
                 var files = new java.io.File(RESSOURCES_PATH).listFiles();
                 if (files == null) {
                     textGraphics.putString(0, line, "Aucun fichier trouvé");
@@ -71,19 +84,20 @@ public class Tui {
                 } else {
                     grid = CsvUtils.importGrid(files[selected].toPath());
                 }
-
             }
-            default -> {
-                throw new IllegalStateException("Unexpected value: " + selectMode(new String[]{"> Generer un sudoku",
-                        "  Entrer un sudoku", "  Ouvrir un fichier"}));
-            }
+            default ->
+                    throw new IllegalStateException("Unexpected value: " + selectMode(new String[]{"> Generer un " +
+                            "sudoku",
+                            "  Entrer un sudoku", "  Ouvrir un fichier"}));
         }
         showHelper();
         play(grid);
         gameOver();
-
     }
 
+    /**
+     * Starts the loader animation in a separate thread.
+     */
     private void startLoader() {
         if (loaderThread != null && loaderThread.isAlive()) {
             loaderThread.interrupt();
@@ -107,14 +121,21 @@ public class Tui {
         loaderThread.start();
     }
 
+    /**
+     * Stops the loader animation.
+     */
     private void stopLoader() {
         if (loaderThread != null) {
             loaderThread.interrupt();
         }
     }
 
+    /**
+     * Displays a welcome message on the terminal.
+     *
+     * @throws IOException if an I/O error occurs
+     */
     private void welcomeMessage() throws IOException {
-        // Afficher un message de bienvenue
         textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
         String welcomeMessage = "Bienvenue dans le jeu de Sudoku !";
         textGraphics.putString(0, 0, welcomeMessage);
@@ -123,8 +144,14 @@ public class Tui {
         textGraphics.setForegroundColor(TextColor.ANSI.DEFAULT);
     }
 
+    /**
+     * Solves the given Sudoku grid using selected solving methods.
+     *
+     * @param grid The Sudoku grid to solve
+     * @return The solved Sudoku grid
+     * @throws IOException if an I/O error occurs
+     */
     private Solvable<?> solve(Solvable<?> grid) throws IOException {
-        // Show a selector to choose the solving methods
         String[] options = {"> [ ] Deducing", "  [ ] Backtracking "};
         for (int i = 0; i < options.length; i++) {
             textGraphics.putString(0, line + i,
@@ -132,7 +159,6 @@ public class Tui {
         }
         terminal.flush();
 
-        // Wait for the user input
         boolean[] selectedOptions = {false, false};
         int selectedOption = 0;
         KeyStroke keyStroke;
@@ -152,7 +178,6 @@ public class Tui {
         } while (keyStroke.getKeyType() != KeyType.Enter);
 
         line++;
-        //check that at least one option is selected
         if (!selectedOptions[0] && !selectedOptions[1]) {
             textGraphics.putString(0, line, "Vous devez sélectionner au moins une méthode de résolution");
             terminal.flush();
@@ -168,7 +193,6 @@ public class Tui {
         stopLoader();
         line--;
 
-        // clean the selector
         for (int i = 0; i < options.length; i++) {
             textGraphics.putString(0, line + i, " ".repeat(options[i].length()));
         }
@@ -176,6 +200,13 @@ public class Tui {
         return grid;
     }
 
+    /**
+     * Displays the given options and highlights the selected option.
+     *
+     * @param options        The options to display
+     * @param selectedOption The index of the selected option
+     * @throws IOException if an I/O error occurs
+     */
     private void displayOptions(String[] options, int selectedOption) throws IOException {
         for (int i = 0; i < options.length; i++) {
             if (i == selectedOption) {
@@ -188,6 +219,12 @@ public class Tui {
         terminal.flush();
     }
 
+    /**
+     * Displays the game over message and exits the application.
+     *
+     * @throws IOException          if an I/O error occurs
+     * @throws InterruptedException if the thread is interrupted
+     */
     private void gameOver() throws IOException, InterruptedException {
         textGraphics.setForegroundColor(TextColor.ANSI.RED);
 
@@ -228,12 +265,23 @@ public class Tui {
         exit(0);
     }
 
+    /**
+     * Displays a multi-grid Sudoku on the terminal.
+     *
+     * @param grid The MultiGrid object containing multiple Sudoku grids.
+     */
     private void displayMultiGrid(MultiGrid grid) {
         for (int i = 0; i < grid.getGrids().length; i++) {
             displayGrid(grid.getGrids()[i], grid.getPaddings()[i]);
         }
     }
 
+    /**
+     * Displays the given Sudoku grid on the terminal with the specified padding.
+     *
+     * @param grid    The Sudoku grid to display.
+     * @param padding The padding to apply around the grid.
+     */
     private void displayGrid(Grid grid, Vec2i padding) {
         var oldLine = line;
 
@@ -291,10 +339,10 @@ public class Tui {
     }
 
     /**
-     * Permet de jouer au Sudoku en utilisant le terminal pour les entrées utilisateur.
+     * Allows playing Sudoku using the terminal for user inputs.
      *
-     * @param grid La grille de Sudoku à résoudre.
-     * @throws IOException Si une erreur d'entrée/sortie se produit.
+     * @param grid The Sudoku grid to solve.
+     * @throws IOException If an I/O error occurs.
      */
     private void play(Solvable<?> grid) throws IOException {
 
@@ -446,6 +494,11 @@ public class Tui {
     }
 
 
+    /**
+     * Displays the user interface instructions.
+     *
+     * @throws IOException if an I/O error occurs
+     */
     private void showHelper() throws IOException {
         textGraphics.putString(0, line, "Utilisez les touches fléchées pour vous déplacer dans la grille");
         textGraphics.putString(0, line + 1, "Utilisez les touches numériques pour entrer une valeur");
@@ -462,6 +515,12 @@ public class Tui {
         terminal.flush();
     }
 
+    /**
+     * Displays a timeline of moves made in the game.
+     *
+     * @param size        The total number of moves.
+     * @param timeLinePos The current position in the timeline.
+     */
     private void showTimeLine(int size, int timeLinePos) {
         // display something like <-----|-->
         textGraphics.putString(0, line + 1, "<");
@@ -475,10 +534,10 @@ public class Tui {
     }
 
     /**
-     * Affiche les options de mode de jeu et permet à l'utilisateur de sélectionner une option.
+     * Displays the game mode options and allows the user to select an option.
      *
-     * @return l'option sélectionnée par l'utilisateur (0 pour générer un sudoku, 1 pour entrer un sudoku)
-     * @throws IOException si une erreur d'entrée/sortie se produit
+     * @return the option selected by the user (0 to generate a sudoku, 1 to enter a sudoku)
+     * @throws IOException if an I/O error occurs
      */
     private int selectMode(String[] options) throws IOException {
         for (int i = 0; i < options.length; i++) {
@@ -502,15 +561,21 @@ public class Tui {
         return selectedOption;
     }
 
+    /**
+     * Prompts the user to select the size of the Sudoku grid.
+     *
+     * @return The size of the Sudoku grid selected by the user.
+     * @throws IOException if an I/O error occurs.
+     */
     private int selectSize() throws IOException {
         int selectedSize = 0;
         int[] possibleSizes = {4, 9, 16};
         textGraphics.putString(0, line, "Entrez la taille du sudoku");
 
-        // Afficher un selecteur pour les tailles possibles
+        // Display a selector for the possible sizes
         displaySizes(selectedSize, possibleSizes);
 
-        // Attendre l'input de l'utilisateur
+        // Wait for user input
         KeyStroke keyStroke;
         do {
             keyStroke = terminal.readInput();
@@ -534,6 +599,13 @@ public class Tui {
         return possibleSizes[selectedSize];
     }
 
+    /**
+     * Displays the possible sizes for the Sudoku grid and highlights the selected size.
+     *
+     * @param selectedSize  The index of the currently selected size.
+     * @param possibleSizes An array of possible sizes for the Sudoku grid.
+     * @throws IOException If an I/O error occurs.
+     */
     private void displaySizes(int selectedSize, int[] possibleSizes) throws IOException {
         int padding = 0;
         for (int i = 0; i < possibleSizes.length; i++) {
@@ -549,7 +621,14 @@ public class Tui {
         terminal.flush();
     }
 
-    // Function to convert HSL to RGB
+    /**
+     * Converts HSL (Hue, Saturation, Lightness) color values to RGB (Red, Green, Blue) color values.
+     *
+     * @param h The hue value, in degrees (0-360).
+     * @param s The saturation value, as a percentage (0-1).
+     * @param l The lightness value, as a percentage (0-1).
+     * @return An array containing the RGB values, each ranging from 0 to 255.
+     */
     private int[] hslToRgb(float h, float s, float l) {
         float c = (1 - Math.abs(2 * l - 1)) * s;
         float x = c * (1 - Math.abs((h / 60) % 2 - 1));

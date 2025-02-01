@@ -8,11 +8,13 @@ import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
+import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
 import fr.polytech.suuuuuuuuuuudoku.grid.Solvable;
+import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
 import java.io.IOException;
 import java.util.List;
@@ -61,30 +63,30 @@ public class Tui {
             case 0 -> { // Generate
 //                List<Pair<Vec2i, Grid>> grids = new ArrayList<>();
 //                Vec2i[] positions = {
-//                        new Vec2i(0, 6),
 //                        new Vec2i(6, 0),
+//                        new Vec2i(0, 6),
 //                        new Vec2i(6, 6),
-//                        new Vec2i(6, 12),
 //                        new Vec2i(12, 6),
+//                        new Vec2i(6, 12),
 //                };
 //                for (int i = 0; i < 5; i++) {
 //                    var gridd = CsvUtils.importGrid(Path.of("src/test/java/fr/polytech/suuuuuuuuuuudoku/resources/" +
 //                            "/multigrid_2/" + i + ".csv"));
 //                    grids.add(new Pair<>(positions[i], gridd));
 //                }
-//                var gridd = new MultiGrid(grids);
-//                displayMultiGrid(gridd);
+//                grid = new MultiGrid(grids);
                 int size = selectSize();
                 loaderThread.start();
                 grid = Generator.generateClassicSudoku(size);
                 loaderThread.interrupt();
-                displayGrid(grid, Vec2i.zero());
             }
-            case 1 -> { // Enter sudoku
-                exit(0);
+            case 1 -> {
+                int size = selectSize();
+                grid = new Grid(new Integer[size][size], SymbolSets.generateSymbols(size));
             }
         }
         play(grid);
+        gameOver();
 
     }
 
@@ -99,13 +101,56 @@ public class Tui {
 
     }
 
-    private void displayMultiGrid(MultiGrid grid) throws IOException {
+    private void gameOver() throws IOException, InterruptedException {
+        textGraphics.setForegroundColor(TextColor.ANSI.RED);
+
+        textGraphics.putString(0, line, "  __  __               _   _____  _                  _          _           " +
+                "    __   _ \n");
+        textGraphics.setForegroundColor(TextColor.ANSI.BLUE);
+
+        textGraphics.putString(0, line + 1, " |  \\/  |             (_) |  __ \\( )                (_)        (_)    " +
+                "         /_/  | |\n");
+        textGraphics.setForegroundColor(TextColor.ANSI.YELLOW);
+
+        textGraphics.putString(0, line + 2, " | \\  / | ___ _ __ ___ _  | |  | |/  __ ___   _____  _ _ __     _  ___ " +
+                " _   _  ___  | |\n");
+        textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
+
+        textGraphics.putString(0, line + 3, " | |\\/| |/ _ \\ '__/ __| | | |  | |  / _` \\ \\ / / _ \\| | '__|   | |/" +
+                " _ \\| | | |/ _ \\ | |\n");
+        textGraphics.setForegroundColor(TextColor.ANSI.BLUE);
+
+        textGraphics.putString(0, line + 4, " | |  | |  __/ | | (__| | | |__| | | (_| |\\ V / (_) | | |      | | (_) " +
+                "| |_| |  __/ |_|\n");
+        textGraphics.setForegroundColor(TextColor.ANSI.MAGENTA);
+
+        textGraphics.putString(0, line + 5, " |_|  |_|\\___|_|  \\___|_| |_____/   \\__,_| \\_/ \\___/|_|_|      | " +
+                "|\\___/ \\__,_|\\___| (_)\n");
+        textGraphics.setForegroundColor(TextColor.ANSI.CYAN);
+
+        textGraphics.putString(0, line + 6, "                                                              _/ |      " +
+                "               \n");
+        textGraphics.setForegroundColor(TextColor.ANSI.WHITE);
+
+        textGraphics.putString(0, line + 7, "                                                             |__/       " +
+                "               \n");
+        terminal.flush();
+
+        // Sleep for 3 seconds
+        Thread.sleep(2000);
+        exit(0);
+    }
+
+    private void displayMultiGrid(MultiGrid grid, boolean flush) throws IOException {
         for (int i = 0; i < grid.getGrids().length; i++) {
-            displayGrid(grid.getGrids()[i], grid.getPaddings()[i]);
+            displayGrid(grid.getGrids()[i], grid.getPaddings()[i], false);
+        }
+        if (flush) {
+            terminal.flush();
         }
     }
 
-    private void displayGrid(Grid grid, Vec2i padding) throws IOException {
+    private void displayGrid(Grid grid, Vec2i padding, boolean flush) throws IOException {
         var oldLine = line;
 
         // Afficher la grille
@@ -157,7 +202,9 @@ public class Tui {
             }
             line++;
         }
-        terminal.flush();
+        if (flush) {
+            terminal.flush();
+        }
         line = oldLine;
         usedColors += blocks.size();
     }
@@ -169,6 +216,8 @@ public class Tui {
      * @throws IOException Si une erreur d'entrée/sortie se produit.
      */
     private void play(Solvable<?> grid) throws IOException {
+
+
         Vec2i position = Vec2i.zero();
         Vec2i lastPosition = Vec2i.zero();
         KeyStroke keyStroke;
@@ -184,13 +233,17 @@ public class Tui {
             max = ((Grid) grid).getSize();
         }
 
+        if (grid.isSolved()) {
+            return;
+        }
+
         do {
             if (!disco) {
                 usedColors = 0;
             }
 
             if (grid instanceof MultiGrid) {
-                displayMultiGrid((MultiGrid) grid);
+                displayMultiGrid((MultiGrid) grid, false);
                 if (!((MultiGrid) grid).isInGrid(lastPosition)) {
                     // Clear the last position
                     textGraphics.setBackgroundColor(TextColor.ANSI.DEFAULT);
@@ -204,7 +257,7 @@ public class Tui {
                                 ((MultiGrid) grid).getSymbolAtPaddingBased(new Vec2i(position.getX(),
                                         position.getY())).toString());
             } else {
-                displayGrid((Grid) grid, Vec2i.zero());
+                displayGrid((Grid) grid, Vec2i.zero(), false);
                 textGraphics.setBackgroundColor(TextColor.ANSI.BLACK_BRIGHT);
                 textGraphics.putString(position.getX() * (spacing + 1), position.getY() + line,
                         ((Grid) grid).getSymbolAt(position.getX(),
@@ -221,6 +274,7 @@ public class Tui {
 
             lastPosition = new Vec2i(position.getX(), position.getY());
             keyStroke = terminal.readInput();
+
             if (keyStroke.getKeyType() == KeyType.ArrowDown && position.getY() < max.getY() - 1) {
                 position = position.add(new Vec2i(0, 1));
             } else if (keyStroke.getKeyType() == KeyType.ArrowUp && position.getY() > 0) {
@@ -236,18 +290,38 @@ public class Tui {
                     ((Grid) grid).placeUnchecked(position, Integer.parseInt(enteredValue), true, true);
                 }
                 enteredValue = null;
+            } else if (keyStroke.getKeyType() == KeyType.Delete) {
+                if (grid instanceof MultiGrid) {
+                    ((MultiGrid) grid).placeUncheckedPaddingBased(position, null, true, true);
+                } else {
+                    ((Grid) grid).placeUnchecked(position, null, true, true);
+                }
+                enteredValue = null;
             } else if (keyStroke.getKeyType() == KeyType.Backspace && enteredValue != null) {
                 enteredValue = enteredValue.substring(0, enteredValue.length() - 1);
             } else if (keyStroke.getKeyType() == KeyType.Character) {
-                if (keyStroke.getCharacter() == 'd') {
-                    disco = !disco;
-                } else if (Character.isDigit(keyStroke.getCharacter())) {
+
+                if (Character.isDigit(keyStroke.getCharacter())) {
                     enteredValue = enteredValue == null ? String.valueOf(keyStroke.getCharacter()) :
                             enteredValue + keyStroke.getCharacter();
+                } else {
+                    switch (keyStroke.getCharacter()) {
+                        case 'd' -> disco = !disco;
+                        case 's' -> {
+                            if (grid instanceof MultiGrid) {
+                                grid = SudokuSolver.solve((MultiGrid) grid, true, true, true).getSecond();
+                            } else {
+                                grid = SudokuSolver.solve((Grid) grid, true, true, true).getSecond();
+                            }
+                        }
+                        case 'q' -> exit(0);
+                    }
                 }
             }
 
-        } while (keyStroke.getKeyType() != KeyType.Escape && !grid.isSolved());
+        } while (keyStroke.getKeyType() != KeyType.Escape);
+
+        line += max.getY() + 1;
     }
 
     /**

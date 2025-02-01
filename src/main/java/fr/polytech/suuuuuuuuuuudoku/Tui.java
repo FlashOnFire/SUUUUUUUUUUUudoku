@@ -24,7 +24,7 @@ import static java.lang.System.exit;
 public class Tui {
     private final Terminal terminal;
     private final TextGraphics textGraphics;
-    private final Thread loaderThread;
+    private Thread loaderThread;
     private int line = 0;
     private int usedColors = 0;
 
@@ -38,22 +38,7 @@ public class Tui {
         terminal.clearScreen();
         terminal.flush();
         textGraphics = terminal.newTextGraphics();
-        loaderThread = new Thread(() -> {
-            try {
-                String[] spinner = {"|", "/", "-", "\\"};
-                int i = 0;
-                synchronized (this) {
-                    while (!Thread.currentThread().isInterrupted()) {
-                        textGraphics.putString(0, line + 1, spinner[i % spinner.length]);
-                        terminal.flush();
-                        i++;
-                        this.wait(100);
-                    }
-                }
-            } catch (InterruptedException | IOException e) {
-                Thread.currentThread().interrupt();
-            }
-        });
+
     }
 
     void start() throws IOException, InterruptedException {
@@ -76,9 +61,9 @@ public class Tui {
 //                }
 //                grid = new MultiGrid(grids);
                 int size = selectSize();
-                loaderThread.start();
+                startLoader();
                 grid = Generator.generateClassicSudoku(size);
-                loaderThread.interrupt();
+                stopLoader();
             }
             case 1 -> {
                 int size = selectSize();
@@ -90,6 +75,35 @@ public class Tui {
 
     }
 
+    private void startLoader() {
+        if (loaderThread != null && loaderThread.isAlive()) {
+            loaderThread.interrupt();
+        }
+        loaderThread = new Thread(() -> {
+            try {
+                String[] spinner = {"|", "/", "-", "\\"};
+                int i = 0;
+                synchronized (this) {
+                    while (!Thread.currentThread().isInterrupted()) {
+                        textGraphics.putString(0, line + 1, spinner[i % spinner.length]);
+                        terminal.flush();
+                        i++;
+                        this.wait(100);
+                    }
+                }
+            } catch (InterruptedException | IOException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+        loaderThread.start();
+    }
+
+    private void stopLoader() {
+        if (loaderThread != null) {
+            loaderThread.interrupt();
+        }
+    }
+
     private void welcomeMessage() throws IOException {
         // Afficher un message de bienvenue
         textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
@@ -98,7 +112,59 @@ public class Tui {
         line += 2;
         terminal.flush();
         textGraphics.setForegroundColor(TextColor.ANSI.DEFAULT);
+    }
 
+    private Solvable<?> solve(Solvable<?> grid) throws IOException {
+        // Show a selector to choose the solving methods
+        String[] options = {"> [ ] Deducing", "  [ ] Backtracking "};
+        for (int i = 0; i < options.length; i++) {
+            textGraphics.putString(0, line + i, options[i]);
+        }
+        terminal.flush();
+
+        // Wait for the user input
+        boolean[] selectedOptions = {false, false};
+        int selectedOption = 0;
+        KeyStroke keyStroke;
+        do {
+            keyStroke = terminal.readInput();
+            if (keyStroke.getKeyType() == KeyType.ArrowDown && selectedOption == 0) {
+                selectedOption = 1;
+            } else if (keyStroke.getKeyType() == KeyType.ArrowUp && selectedOption == 1) {
+                selectedOption = 0;
+            } else if (keyStroke.getKeyType() == KeyType.Character && keyStroke.getCharacter() == ' ') {
+                selectedOptions[selectedOption] = !selectedOptions[selectedOption];
+                options[selectedOption] = selectedOptions[selectedOption] ?
+                        options[selectedOption].substring(0, 2) + "[X] " + options[selectedOption].substring(6) :
+                        options[selectedOption].substring(0, 2) + "[ ] " + options[selectedOption].substring(6);
+            }
+            for (int i = 0; i < options.length; i++) {
+                if (i == selectedOption) {
+                    options[i] = "> " + options[i].substring(2);
+                } else {
+                    options[i] = "  " + options[i].substring(2);
+                }
+                textGraphics.putString(0, line + i, options[i]);
+            }
+            terminal.flush();
+        } while (keyStroke.getKeyType() != KeyType.Enter);
+
+        line++;
+//        startLoader();
+        if (grid instanceof MultiGrid) {
+            grid = SudokuSolver.solve((MultiGrid) grid, selectedOptions[0], selectedOptions[1], true).getSecond();
+        } else {
+            grid = SudokuSolver.solve((Grid) grid, selectedOptions[0], selectedOptions[1], true).getSecond();
+        }
+//        stopLoader();
+        line--;
+
+        // clean the selector
+        for (int i = 0; i < options.length; i++) {
+            textGraphics.putString(0, line + i, " ".repeat(options[i].length()));
+        }
+
+        return grid;
     }
 
     private void gameOver() throws IOException, InterruptedException {
@@ -308,11 +374,9 @@ public class Tui {
                     switch (keyStroke.getCharacter()) {
                         case 'd' -> disco = !disco;
                         case 's' -> {
-                            if (grid instanceof MultiGrid) {
-                                grid = SudokuSolver.solve((MultiGrid) grid, true, true, true).getSecond();
-                            } else {
-                                grid = SudokuSolver.solve((Grid) grid, true, true, true).getSecond();
-                            }
+                            line += max.getY() + 1;
+                            grid = solve(grid);
+                            line -= max.getY() + 1;
                         }
                         case 'q' -> exit(0);
                     }

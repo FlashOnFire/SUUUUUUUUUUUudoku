@@ -6,7 +6,6 @@ import fr.polytech.suuuuuuuuuuudoku.grid.InnerGrid;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
 import java.util.*;
-import java.util.stream.IntStream;
 
 public class Generator {
     /**
@@ -155,23 +154,16 @@ public class Generator {
         do {
             seedGrid = new Grid(innerGrid, symbols, blockRows, blockColumns);
 
-            var pos = new HashSet<Vec2i>();
-            while (pos.size() < blockRows * blockColumns) {
-                var x = (int) (Math.random() * blockRows);
-                var y = (int) (Math.random() * blockColumns);
-                pos.add(new Vec2i(x, y));
+            var symbolsArray = new ArrayList<>(symbols.stream().toList());
+            Collections.shuffle(symbolsArray);
+            for (var i = 0; i < blockColumns * blockRows; i++) {
+                seedGrid.placeUnchecked(new Vec2i(i, i), symbolsArray.get(i % symbolsArray.size()), false, false);
             }
 
-            var posArray = pos.toArray(Vec2i[]::new);
-            var symbolsArray = symbols.toArray(Integer[]::new);
-
-            Grid finalSeedGrid = seedGrid;
-            IntStream.range(0, blockRows * blockColumns).forEach(i -> finalSeedGrid.placeUnchecked(posArray[i],
-                    symbolsArray[i], false,
-                    false));
             seedGrid.computeAllEmptyCellsPossibilities();
 
             var pair = SudokuSolver.solve(seedGrid, true, true, false);
+
             state = pair.getFirst();
             solvedGrid = pair.getSecond();
         } while (state != SolvingState.SOLVED);

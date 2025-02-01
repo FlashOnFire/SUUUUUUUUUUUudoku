@@ -217,16 +217,13 @@ public class Tui {
         exit(0);
     }
 
-    private void displayMultiGrid(MultiGrid grid, boolean flush) throws IOException {
+    private void displayMultiGrid(MultiGrid grid) {
         for (int i = 0; i < grid.getGrids().length; i++) {
-            displayGrid(grid.getGrids()[i], grid.getPaddings()[i], false);
-        }
-        if (flush) {
-            terminal.flush();
+            displayGrid(grid.getGrids()[i], grid.getPaddings()[i]);
         }
     }
 
-    private void displayGrid(Grid grid, Vec2i padding, boolean flush) throws IOException {
+    private void displayGrid(Grid grid, Vec2i padding) {
         var oldLine = line;
 
         // Afficher la grille
@@ -278,9 +275,6 @@ public class Tui {
             }
             line++;
         }
-        if (flush) {
-            terminal.flush();
-        }
         line = oldLine;
         usedColors += blocks.size();
     }
@@ -319,7 +313,7 @@ public class Tui {
             }
 
             if (grid instanceof MultiGrid) {
-                displayMultiGrid((MultiGrid) grid, false);
+                displayMultiGrid((MultiGrid) grid);
                 if (!((MultiGrid) grid).isInGrid(lastPosition)) {
                     // Clear the last position
                     textGraphics.setBackgroundColor(TextColor.ANSI.DEFAULT);
@@ -333,7 +327,7 @@ public class Tui {
                                 ((MultiGrid) grid).getSymbolAtPaddingBased(new Vec2i(position.getX(),
                                         position.getY())).toString());
             } else {
-                displayGrid((Grid) grid, Vec2i.zero(), false);
+                displayGrid((Grid) grid, Vec2i.zero());
                 textGraphics.setBackgroundColor(TextColor.ANSI.BLACK_BRIGHT);
                 textGraphics.putString(position.getX() * (spacing + 1), position.getY() + line,
                         ((Grid) grid).getSymbolAt(position.getX(),
@@ -396,14 +390,18 @@ public class Tui {
                 }
                 timeLinePos--;
                 if (moveList.get(timeLinePos) instanceof Move2i move) {
+                    assert grid instanceof Grid;
                     ((Grid) grid).placeUnchecked(move.position(), move.previous_value(), true, false);
                 } else if (moveList.get(timeLinePos) instanceof Move3i move) {
+                    assert grid instanceof MultiGrid;
                     ((MultiGrid) grid).placeUnchecked(move.position(), move.previous_value(), true, false);
                 }
             } else if (keyStroke.getKeyType() == KeyType.PageDown && timeLinePos < moveList.size()) {
                 if (moveList.get(timeLinePos) instanceof Move2i move) {
+                    assert grid instanceof Grid;
                     ((Grid) grid).placeUnchecked(move.position(), move.value(), true, false);
                 } else if (moveList.get(timeLinePos) instanceof Move3i move) {
+                    assert grid instanceof MultiGrid;
                     ((MultiGrid) grid).placeUnchecked(move.position(), move.value(), true, false);
                 }
                 timeLinePos++;
@@ -486,8 +484,7 @@ public class Tui {
         textGraphics.putString(0, line, "Entrez la taille du sudoku");
 
         // Afficher un selecteur pour les tailles possibles
-        StringBuilder sizes = new StringBuilder();
-        displaySizes(selectedSize, possibleSizes, sizes);
+        displaySizes(selectedSize, possibleSizes);
 
         // Attendre l'input de l'utilisateur
         KeyStroke keyStroke;
@@ -507,14 +504,13 @@ public class Tui {
                 }
             }
 
-            sizes = new StringBuilder();
-            displaySizes(selectedSize, possibleSizes, sizes);
+            displaySizes(selectedSize, possibleSizes);
         } while (keyStroke.getKeyType() != KeyType.Enter);
         line += 4;
         return possibleSizes[selectedSize];
     }
 
-    private void displaySizes(int selectedSize, int[] possibleSizes, StringBuilder sizes) throws IOException {
+    private void displaySizes(int selectedSize, int[] possibleSizes) throws IOException {
         int padding = 0;
         for (int i = 0; i < possibleSizes.length; i++) {
             if (i == selectedSize) {

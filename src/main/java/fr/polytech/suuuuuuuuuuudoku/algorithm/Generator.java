@@ -152,7 +152,7 @@ public class Generator {
         do {
             seedGrid = new Grid(innerGrid, symbols, blockRows, blockColumns);
 
-            var symbolsArray = new ArrayList<>(symbols.stream().toList());
+            var symbolsArray = new ArrayList<>(symbols);
             Collections.shuffle(symbolsArray);
             for (var i = 0; i < blockColumns * blockRows; i++) {
                 seedGrid.placeUnchecked(new Vec2i(i, i), symbolsArray.get(i % symbolsArray.size()), false, false);

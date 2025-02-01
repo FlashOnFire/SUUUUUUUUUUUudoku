@@ -22,6 +22,16 @@ public class Vec2i {
     }
 
     /**
+     * Constructs a Vec2i  cloning another Vec2i.
+     *
+     * @param other the Vec2i to clone
+     */
+    public Vec2i(Vec2i other) {
+        this.x = other.x;
+        this.y = other.y;
+    }
+
+    /**
      * Generates a random Vec2i with coordinates between 0 and x_max and 0 and y_max.
      *
      * @param x_max the maximum x-coordinate

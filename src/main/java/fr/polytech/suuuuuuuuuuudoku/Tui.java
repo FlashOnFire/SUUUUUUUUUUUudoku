@@ -299,7 +299,7 @@ public class Tui {
         String enteredValue = null;
         Vec2i max;
         int spacing;
-        int timeLinePos = -1;
+        int timeLinePos = 0;
 
         if (grid instanceof MultiGrid) {
             spacing = String.valueOf(((MultiGrid) grid).getGrids()[0].getSymbols().size()).length();
@@ -374,10 +374,12 @@ public class Tui {
                 position = position.add(new Vec2i(1, 0));
             } else if (keyStroke.getKeyType() == KeyType.Enter && enteredValue != null) {
                 if (grid instanceof MultiGrid) {
-                    ((MultiGrid) grid).placeUncheckedPaddingBased(position, Integer.parseInt(enteredValue), true, true);
+                    ((MultiGrid) grid).placeUncheckedPaddingBased(new Vec2i(position), Integer.parseInt(enteredValue),
+                            true, true);
                 } else {
-                    ((Grid) grid).placeUnchecked(position, Integer.parseInt(enteredValue), true, true);
+                    ((Grid) grid).placeUnchecked(new Vec2i(position), Integer.parseInt(enteredValue), true, true);
                 }
+                timeLinePos = -1;
                 enteredValue = null;
             } else if (keyStroke.getKeyType() == KeyType.Delete) {
                 if (grid instanceof MultiGrid) {
@@ -390,27 +392,21 @@ public class Tui {
                 enteredValue = enteredValue.substring(0, enteredValue.length() - 1);
             } else if (keyStroke.getKeyType() == KeyType.PageUp && (timeLinePos > 0 || timeLinePos == -1)) {
                 if (timeLinePos == -1) {
-                    timeLinePos = moveList.size() - 1;
+                    timeLinePos = moveList.size();
                 }
                 timeLinePos--;
-                if (moveList.get(timeLinePos) instanceof Move2i) {
-                    var move = (Move2i) moveList.get(timeLinePos);
+                if (moveList.get(timeLinePos) instanceof Move2i move) {
                     ((Grid) grid).placeUnchecked(move.position(), move.previous_value(), true, false);
-                } else if (moveList.get(timeLinePos) instanceof Move3i) {
-                    var move = (Move3i) moveList.get(timeLinePos);
+                } else if (moveList.get(timeLinePos) instanceof Move3i move) {
                     ((MultiGrid) grid).placeUnchecked(move.position(), move.previous_value(), true, false);
                 }
-
-            } else if (keyStroke.getKeyType() == KeyType.PageDown && timeLinePos < moveList.size() - 1) {
-                timeLinePos++;
-                if (moveList.get(timeLinePos) instanceof Move2i) {
-                    var move = (Move2i) moveList.get(timeLinePos);
+            } else if (keyStroke.getKeyType() == KeyType.PageDown && timeLinePos < moveList.size()) {
+                if (moveList.get(timeLinePos) instanceof Move2i move) {
                     ((Grid) grid).placeUnchecked(move.position(), move.value(), true, false);
-                } else if (moveList.get(timeLinePos) instanceof Move3i) {
-                    var move = (Move3i) moveList.get(timeLinePos);
+                } else if (moveList.get(timeLinePos) instanceof Move3i move) {
                     ((MultiGrid) grid).placeUnchecked(move.position(), move.value(), true, false);
                 }
-
+                timeLinePos++;
             } else if (keyStroke.getKeyType() == KeyType.Character) {
 
                 if (Character.isDigit(keyStroke.getCharacter())) {
@@ -429,6 +425,7 @@ public class Tui {
                                 textGraphics.setBackgroundColor(TextColor.ANSI.DEFAULT);
                             }
                             line -= max.getY() + 1;
+                            timeLinePos = -1;
 
                         }
                         case 'q' -> exit(0);
@@ -445,12 +442,12 @@ public class Tui {
     private void showTimeLine(int size, int timeLinePos) {
         // display something like <-----|-->
         textGraphics.putString(0, line + 1, "<");
-        textGraphics.putString(1, line + 1, "-".repeat(size));
-        textGraphics.putString(size + 1, line + 1, ">");
+        textGraphics.putString(1, line + 1, "-".repeat(size + 2));
+        textGraphics.putString(size + 2, line + 1, ">");
         if (timeLinePos != -1) {
             textGraphics.putString(timeLinePos + 1, line + 1, "|");
         } else {
-            textGraphics.putString(size, line + 1, "|");
+            textGraphics.putString(size + 1, line + 1, "|");
         }
     }
 

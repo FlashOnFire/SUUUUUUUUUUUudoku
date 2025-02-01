@@ -44,20 +44,8 @@ public class Tui {
         Grid grid = null;
         switch (selectMode()) {
             case 0 -> { // Generate
-//                List<Pair<Vec2i, Grid>> grids = new ArrayList<>();
-//                Vec2i[] positions = {
-//                        new Vec2i(6, 0),
-//                        new Vec2i(0, 6),
-//                        new Vec2i(6, 6),
-//                        new Vec2i(12, 6),
-//                        new Vec2i(6, 12),
-//                };
-//                for (int i = 0; i < 5; i++) {
-//                    var gridd = CsvUtils.importGrid(Path.of("src/test/java/fr/polytech/suuuuuuuuuuudoku/resources/" +
-//                            "/multigrid_2/" + i + ".csv"));
-//                    grids.add(new Pair<>(positions[i], gridd));
-//                }
-//                grid = new MultiGrid(grids);
+//                var grid = CsvUtils.importMultiGrid(Path.of("src/test/java/fr/polytech/suuuuuuuuuuudoku/resources/"
+//                + "/multigrid_2"));
                 int size = selectSize();
                 startLoader();
                 grid = Generator.generateClassicSudoku(size);

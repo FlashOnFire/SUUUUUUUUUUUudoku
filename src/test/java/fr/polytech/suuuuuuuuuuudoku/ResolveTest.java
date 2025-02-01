@@ -1,15 +1,16 @@
 package fr.polytech.suuuuuuuuuuudoku;
 
-import fr.polytech.suuuuuuuuuuudoku.algorithm.*;
+import fr.polytech.suuuuuuuuuuudoku.algorithm.Box2D;
+import fr.polytech.suuuuuuuuuuudoku.algorithm.SolvingState;
+import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
+import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec3i;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
-import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -120,19 +121,7 @@ public class ResolveTest {
 
     @Test
     public void testMultiDokuSolve() throws FileNotFoundException {
-        List<Pair<Vec2i, Grid>> grids = new ArrayList<>();
-        Vec2i[] positions = {
-                Vec2i.zero(),
-                new Vec2i(12, 0),
-                new Vec2i(6, 6),
-                new Vec2i(0, 12),
-                new Vec2i(12, 12),
-        };
-        for (int i = 0; i < 5; i++) {
-            var grid = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "/multigrid_1/" + i + ".csv"));
-            grids.add(new Pair<>(positions[i], grid));
-        }
-        var grid = new MultiGrid(grids);
+        var grid = CsvUtils.importMultiGrid(Path.of(RESSOURCES_PATH + "/multigrid_1"));
 
         for (var g : grid.getGrids()) {
             assertTrue(g.isSolved());
@@ -155,19 +144,7 @@ public class ResolveTest {
 
     @Test
     public void testMultiDokuSolve2() throws FileNotFoundException {
-        List<Pair<Vec2i, Grid>> grids = new ArrayList<>();
-        Vec2i[] positions = {
-                new Vec2i(6, 0),
-                new Vec2i(0, 6),
-                new Vec2i(6, 6),
-                new Vec2i(12, 6),
-                new Vec2i(6, 12),
-        };
-        for (int i = 0; i < 5; i++) {
-            var grid = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "/multigrid_2/" + i + ".csv"));
-            grids.add(new Pair<>(positions[i], grid));
-        }
-        var grid = new MultiGrid(grids);
+        var grid = CsvUtils.importMultiGrid(Path.of(RESSOURCES_PATH + "/multigrid_2"));
 
         for (var g : grid.getGrids()) {
             assertTrue(g.isSolved());

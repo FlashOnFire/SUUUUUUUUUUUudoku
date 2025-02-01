@@ -15,11 +15,13 @@ import fr.polytech.suuuuuuuuuuudoku.grid.*;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import static java.lang.System.exit;
 
 public class Tui {
+    static String RESSOURCES_PATH = "src/test/java/fr/polytech/suuuuuuuuuuudoku/resources/";
     private final Terminal terminal;
     private final TextGraphics textGraphics;
     private Thread loaderThread;
@@ -41,21 +43,42 @@ public class Tui {
 
     void start() throws IOException, InterruptedException {
         welcomeMessage();
-        Grid grid = null;
-        switch (selectMode()) {
+        Solvable<?> grid = null;
+        switch (selectMode(new String[]{"> Generer un sudoku", "  Entrer un sudoku", "  Ouvrir un fichier"})) {
             case 0 -> { // Generate
-//                var grid = CsvUtils.importMultiGrid(Path.of("src/test/java/fr/polytech/suuuuuuuuuuudoku/resources/"
-//                + "/multigrid_2"));
                 int size = selectSize();
                 startLoader();
                 grid = Generator.generateClassicSudoku(size);
                 stopLoader();
             }
-            case 1 -> {
+            case 1 -> { // Enter
                 int size = selectSize();
                 grid = new Grid(new Integer[size][size], SymbolSets.generateSymbols(size));
             }
+            case 2 -> { // Open a file
+                //List all the files in the resources folder
+                var files = new java.io.File(RESSOURCES_PATH).listFiles();
+                if (files == null) {
+                    textGraphics.putString(0, line, "Aucun fichier trouvé");
+                    terminal.flush();
+                    return;
+                }
+                String[] options = Arrays.stream(files).map(file -> "  " + file.getName()).toArray(String[]::new);
+                options[0] = "> " + options[0].substring(2);
+                int selected = selectMode(options);
+                if (files[selected].isDirectory()) {
+                    grid = CsvUtils.importMultiGrid(files[selected].toPath());
+                } else {
+                    grid = CsvUtils.importGrid(files[selected].toPath());
+                }
+
+            }
+            default -> {
+                throw new IllegalStateException("Unexpected value: " + selectMode(new String[]{"> Generer un sudoku",
+                        "  Entrer un sudoku", "  Ouvrir un fichier"}));
+            }
         }
+        showHelper();
         play(grid);
         gameOver();
 
@@ -274,6 +297,7 @@ public class Tui {
      * @throws IOException Si une erreur d'entrée/sortie se produit.
      */
     private void play(Solvable<?> grid) throws IOException {
+
         Vec2i position = Vec2i.zero();
         Vec2i lastPosition = Vec2i.zero();
         KeyStroke keyStroke;
@@ -289,10 +313,6 @@ public class Tui {
         } else {
             spacing = String.valueOf(((Grid) grid).getSymbols().size()).length();
             max = ((Grid) grid).getSize();
-        }
-
-        if (grid.isSolved()) {
-            return;
         }
 
         do {
@@ -425,6 +445,23 @@ public class Tui {
         line += max.getY() + 1;
     }
 
+
+    private void showHelper() throws IOException {
+        textGraphics.putString(0, line, "Utilisez les touches fléchées pour vous déplacer dans la grille");
+        textGraphics.putString(0, line + 1, "Utilisez les touches numériques pour entrer une valeur");
+        textGraphics.putString(0, line + 2, "Utilisez la touche 'Entrée' pour valider une valeur");
+        textGraphics.putString(0, line + 3, "Utilisez la touche 'Suppr' pour effacer une valeur");
+        textGraphics.putString(0, line + 4, "Utilisez la touche 'Page Up' pour revenir en arrière");
+        textGraphics.putString(0, line + 5, "Utilisez la touche 'Page Down' pour avancer dans le temps");
+        textGraphics.putString(0, line + 6, "Utilisez la touche 'Espacement' pour activer/désactiver des options " +
+                "(solver)");
+        textGraphics.putString(0, line + 7, "Utilisez la touche 'd' pour activer/désactiver le mode disco");
+        textGraphics.putString(0, line + 8, "Utilisez la touche 's' pour résoudre la grille");
+        textGraphics.putString(0, line + 9, "Utilisez la touche 'q' pour quitter");
+        line += 10;
+        terminal.flush();
+    }
+
     private void showTimeLine(int size, int timeLinePos) {
         // display something like <-----|-->
         textGraphics.putString(0, line + 1, "<");
@@ -443,8 +480,7 @@ public class Tui {
      * @return l'option sélectionnée par l'utilisateur (0 pour générer un sudoku, 1 pour entrer un sudoku)
      * @throws IOException si une erreur d'entrée/sortie se produit
      */
-    private int selectMode() throws IOException {
-        String[] options = {"> Generer un sudoku", "  Entrer un sudoku"};
+    private int selectMode(String[] options) throws IOException {
         for (int i = 0; i < options.length; i++) {
             textGraphics.putString(0, line + i, options[i]);
         }
@@ -455,10 +491,10 @@ public class Tui {
         KeyStroke keyStroke;
         do {
             keyStroke = terminal.readInput();
-            if (keyStroke.getKeyType() == KeyType.ArrowDown && selectedOption == 0) {
-                selectedOption = 1;
-            } else if (keyStroke.getKeyType() == KeyType.ArrowUp && selectedOption == 1) {
-                selectedOption = 0;
+            if (keyStroke.getKeyType() == KeyType.ArrowDown && selectedOption < options.length - 1) {
+                selectedOption++;
+            } else if (keyStroke.getKeyType() == KeyType.ArrowUp && selectedOption > 0) {
+                selectedOption--;
             }
             displayOptions(options, selectedOption);
         } while (keyStroke.getKeyType() != KeyType.Enter);

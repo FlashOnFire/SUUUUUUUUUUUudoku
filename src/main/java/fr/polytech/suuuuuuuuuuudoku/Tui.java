@@ -118,7 +118,8 @@ public class Tui {
         // Show a selector to choose the solving methods
         String[] options = {"> [ ] Deducing", "  [ ] Backtracking "};
         for (int i = 0; i < options.length; i++) {
-            textGraphics.putString(0, line + i, options[i]);
+            textGraphics.putString(0, line + i,
+                    options[i] + " ".repeat(terminal.getTerminalSize().getColumns() - options[i].length()));
         }
         terminal.flush();
 
@@ -150,13 +151,20 @@ public class Tui {
         } while (keyStroke.getKeyType() != KeyType.Enter);
 
         line++;
-//        startLoader();
+        //check that at least one option is selected
+        if (!selectedOptions[0] && !selectedOptions[1]) {
+            textGraphics.putString(0, line, "Vous devez sélectionner au moins une méthode de résolution");
+            terminal.flush();
+            line--;
+            return grid;
+        }
+        startLoader();
         if (grid instanceof MultiGrid) {
             grid = SudokuSolver.solve((MultiGrid) grid, selectedOptions[0], selectedOptions[1], true).getSecond();
         } else {
             grid = SudokuSolver.solve((Grid) grid, selectedOptions[0], selectedOptions[1], true).getSecond();
         }
-//        stopLoader();
+        stopLoader();
         line--;
 
         // clean the selector
@@ -376,7 +384,14 @@ public class Tui {
                         case 's' -> {
                             line += max.getY() + 1;
                             grid = solve(grid);
+                            if (!grid.isSolved()) {
+                                //display a message
+                                textGraphics.setBackgroundColor(TextColor.ANSI.RED);
+                                textGraphics.putString(0, line, "La grille n'a pas pu être résolue");
+                                textGraphics.setBackgroundColor(TextColor.ANSI.DEFAULT);
+                            }
                             line -= max.getY() + 1;
+
                         }
                         case 'q' -> exit(0);
                     }
@@ -427,7 +442,7 @@ public class Tui {
 
     private int selectSize() throws IOException {
         int selectedSize = 0;
-        int[] possibleSizes = {4, 9, 16, 25, 36, 49, 64, 81, 100};
+        int[] possibleSizes = {4, 9, 16};
         textGraphics.putString(0, line, "Entrez la taille du sudoku");
 
         // Afficher un selecteur pour les tailles possibles

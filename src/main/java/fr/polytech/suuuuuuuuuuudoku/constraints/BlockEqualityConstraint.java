@@ -80,10 +80,6 @@ public record BlockEqualityConstraint(int gridIndex1, Box2D block1, int gridInde
         }
     }
 
-    public Vec2i getPadding() {
-        return new Vec2i(block1.x() - block2.x(), block1.y() - block2.y());
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

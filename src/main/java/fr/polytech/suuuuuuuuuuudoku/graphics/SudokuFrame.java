@@ -60,21 +60,7 @@ public class SudokuFrame extends JFrame {
         getContentPane().add(board, BorderLayout.CENTER);
         getContentPane().add(buttonPanel, BorderLayout.EAST);
         getContentPane().setBackground(background_color);
-    }    private final Runnable generate = () -> {
-        this.grid = new Grid(Generator.generateClassicSudoku(lengthClassicSudoku * lengthClassicSudoku));
-        lengthClassicSudoku = (lengthClassicSudoku) % 4 + 1;
-        if (lengthClassicSudoku < 2) lengthClassicSudoku = 2;
-        board = new SudokuBoard(grid);
-        updateJpanel();
-
-        getContentPane().remove(board);
-        getContentPane().remove(buttonPanel);
-        getContentPane().add(board, BorderLayout.CENTER);
-        getContentPane().add(buttonPanel, BorderLayout.EAST);
-
-        getContentPane().revalidate();
-        System.out.println("Generated!");
-    };
+    }
 
     public static void main(String[] args) throws IOException, InterruptedException {
         var grid = Generator.generateClassicSudoku(16);
@@ -84,9 +70,10 @@ public class SudokuFrame extends JFrame {
             SudokuFrame frame = new SudokuFrame(grid);
             frame.setVisible(true);
         });
-    }    private final Runnable generateRandom = () -> {
-        var length = (int) (Math.random() * 6) + 4;
-        this.grid = new Grid(Generator.generateSudokuWithRandomBlockConstraint(length));
+    }    private final Runnable generate = () -> {
+        this.grid = new Grid(Generator.generateClassicSudoku(lengthClassicSudoku * lengthClassicSudoku));
+        lengthClassicSudoku = (lengthClassicSudoku) % 4 + 1;
+        if (lengthClassicSudoku < 2) lengthClassicSudoku = 2;
         board = new SudokuBoard(grid);
         updateJpanel();
 
@@ -105,10 +92,11 @@ public class SudokuFrame extends JFrame {
 
         buttonPanel = new SudokuOptions(background_color, solve, reset, generate, generateRandom, generateNxM, hint);
         getContentPane().add(buttonPanel, BorderLayout.EAST);
-    }    private final Runnable generateNxM = () -> {
-        var n = (int) (Math.random() * 3) + 2;
-        var m = (int) (Math.random() * 3) + 2;
-        this.grid = new Grid(Generator.generateSudokuWithNxMConstraintBlock(n, m));
+    }
+
+    private final Runnable generateRandom = () -> {
+        var length = (int) (Math.random() * 6) + 4;
+        this.grid = new Grid(Generator.generateSudokuWithRandomBlockConstraint(length));
         board = new SudokuBoard(grid);
         updateJpanel();
 
@@ -123,7 +111,21 @@ public class SudokuFrame extends JFrame {
 
 
 
+    private final Runnable generateNxM = () -> {
+        var n = (int) (Math.random() * 3) + 2;
+        var m = (int) (Math.random() * 3) + 2;
+        this.grid = new Grid(Generator.generateSudokuWithBlockConstraints(n, m));
+        board = new SudokuBoard(grid);
+        updateJpanel();
 
+        getContentPane().remove(board);
+        getContentPane().remove(buttonPanel);
+        getContentPane().add(board, BorderLayout.CENTER);
+        getContentPane().add(buttonPanel, BorderLayout.EAST);
+
+        getContentPane().revalidate();
+        System.out.println("Generated!");
+    };
 
 
 }

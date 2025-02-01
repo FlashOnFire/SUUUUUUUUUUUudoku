@@ -6,43 +6,42 @@ import fr.polytech.suuuuuuuuuuudoku.grid.InnerGrid;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Generator {
     /**
-     * Generate a classic grid of size NxN
+     * Generates a classic NxN grid
      *
      * @param n: The size of the grid
-     * @return A grid to be played
+     * @return A playable grid
      */
     public static Grid generateClassicSudoku(int n) {
         //assert n is perfect square
-        assert Math.sqrt(n) == Math.floor(Math.sqrt(n));
+        int sqrt = (int) Math.sqrt(n);
+        assert sqrt * sqrt == n;
 
-        return generateSudokuWithNxMConstraintBlock((int) Math.floor(Math.sqrt(n)), (int) Math.floor(Math.sqrt(n)));
+        return generateSudokuWithBlockConstraints((int) Math.sqrt(n), (int) Math.sqrt(n));
     }
 
     /**
-     * Generate a random grid with blocks constraints of size NxM
+     * Generates a random grid with block constraints of size NxM
      *
-     * @param n: The number of rows
-     * @param m: The number of columns
-     * @return A grid to be played
+     * @param blockRows:    The number of block rows
+     * @param blockColumns: The number of block columns
+     * @return A playable grid
      */
-    public static Grid generateSudokuWithNxMConstraintBlock(int n, int m) {
-        var solvedGrid = createSolvedSudoku(n, m);
-        return removeRandomCells(solvedGrid, n * m);
+    public static Grid generateSudokuWithBlockConstraints(int blockRows, int blockColumns) {
+        var solvedGrid = createSolvedSudoku(blockRows, blockColumns);
+        return removeRandomCells(solvedGrid, blockRows * blockColumns);
     }
 
     /**
-     * Generate a grid with random block constraints
+     * Generates a grid with random block constraints
      *
      * @param lengthInnerGrid: The length of the inner grid
-     * @return A grid to be played
+     * @return A playable grid
      */
     public static Grid generateSudokuWithRandomBlockConstraint(int lengthInnerGrid) {
-        System.out.println("Generating random grid of size " + lengthInnerGrid + "x" + lengthInnerGrid);
         var symbols = SymbolSets.generateSymbols(lengthInnerGrid);
         Vec2i dividers = findDividers(lengthInnerGrid);
         Grid solvedGrid = createSolvedSudoku(dividers.getX(), dividers.getY());
@@ -55,11 +54,11 @@ public class Generator {
     }
 
     /**
-     * Suppress randoms cells from a solved grid to generate a random sudoku grid to solve
+     * Removes random cells from a solved grid to generate a random Sudoku grid to solve
      *
      * @param solvedGrid:      The solved grid
      * @param lengthInnerGrid: The length of the inner grid
-     * @return A grid to be played
+     * @return A playable grid
      */
     private static Grid removeRandomCells(Grid solvedGrid, int lengthInnerGrid) {
         Vec2i lastMovePos;
@@ -69,7 +68,7 @@ public class Generator {
         do {
             Vec2i randomPos;
             do {
-                randomPos = new Vec2i(random.nextInt(0, lengthInnerGrid), random.nextInt(0, lengthInnerGrid));
+                randomPos = Vec2i.random(lengthInnerGrid, lengthInnerGrid);
             } while (emptyCells.contains(randomPos));
 
             lastMovePos = randomPos;
@@ -82,19 +81,13 @@ public class Generator {
     }
 
     /**
-     * Find 2 dividers of a number
+     * Finds 2 dividers of a number
      *
-     * @param n: The number to find the dividers
+     * @param n: The number to find dividers for
      * @return A position with the dividers inside
      */
     private static Vec2i findDividers(int n) {
-        int x = (int) Math.sqrt(n);
-        int y = n / x;
-        if (x * y == n) {
-            return new Vec2i(x, y);
-        }
-
-        for (int i = x; i > 0; i--) {
+        for (int i = (int) Math.sqrt(n); i > 0; i--) {
             if (n % i == 0) {
                 return new Vec2i(i, n / i);
             }
@@ -103,27 +96,27 @@ public class Generator {
     }
 
     /**
-     * Generate random constraints for a solved grid
-     * Use a solved grid of NxM blocks to generate random constraints (shuffle the constraints positions)
+     * Generates random constraints for a solved grid
+     * Uses a solved NxM block grid to generate random constraints (shuffles the positions of the constraints)
      *
-     * @param grid:             A solved grid
+     * @param grid: A solved grid
      * @return A list of constraints with random positions for each GeneralSymbolConstraint
      */
     static List<AbstractConstraint<InnerGrid, Vec2i>> createRandomConstraints(Grid grid) {
         int length = grid.length();
-        List<List<Vec2i>> positionList = IntStream.range(0, length)
-                .mapToObj(_ -> new ArrayList<Vec2i>())
-                .collect(Collectors.toList());
+
+        List<List<Vec2i>> positionList = new ArrayList<>(Collections.nCopies(length, new ArrayList<>()));
         for (int x = 0; x < length; x++) {
             for (int y = 0; y < length; y++) {
                 Integer symbol = grid.getSymbolAt(x, y);
                 if (symbol != null) {
-                    positionList.get(symbol-1).add(new Vec2i(x, y));
+                    positionList.get(symbol - 1).add(new Vec2i(x, y));
                 } else {
                     System.out.println("Error: symbol is null");
                 }
             }
         }
+
         List<AbstractConstraint<InnerGrid, Vec2i>> constraints = new ArrayList<>();
         for (int i = 0; i < length; i++) {
             List<Vec2i> listInConstraint = new ArrayList<>();
@@ -133,7 +126,8 @@ public class Generator {
                 listInConstraint.add(pos);
                 positionList.get(i).remove(pos);
             }
-            constraints.add(new GeneralSymbolConstraint(SymbolSets.generateSymbols(length), listInConstraint.toArray(Vec2i[]::new)));
+            constraints.add(new GeneralSymbolConstraint(SymbolSets.generateSymbols(length),
+                    listInConstraint.toArray(Vec2i[]::new)));
         }
         constraints.add(new LineConstraint(grid.getSymbols()));
         constraints.add(new ColumnConstraint(grid.getSymbols()));
@@ -142,16 +136,16 @@ public class Generator {
     }
 
     /**
-     * Generate a random solved grid of size NxM * NxM
+     * Generates a random solved grid of size NxM * NxM
      *
-     * @param n: The number of rows
-     * @param m: The number of columns
+     * @param blockRows:    The number of block rows
+     * @param blockColumns: The number of block columns
      * @return A solved grid
      */
-    private static Grid createSolvedSudoku(int n, int m) {
-        var symbols = SymbolSets.generateSymbols(n * m);
-        var innerGrid = new Integer[n * m][n * m];
-        for (var i = 0; i < n; i++) {
+    private static Grid createSolvedSudoku(int blockRows, int blockColumns) {
+        var symbols = SymbolSets.generateSymbols(blockRows * blockColumns);
+        var innerGrid = new Integer[blockRows * blockColumns][blockRows * blockColumns];
+        for (var i = 0; i < blockRows; i++) {
             Arrays.fill(innerGrid[i], null);
         }
 
@@ -159,12 +153,12 @@ public class Generator {
         SolvingState state;
         Grid solvedGrid;
         do {
-            seedGrid = new Grid(innerGrid, symbols, n, m);
+            seedGrid = new Grid(innerGrid, symbols, blockRows, blockColumns);
 
             var pos = new HashSet<Vec2i>();
-            while (pos.size() < n * m) {
-                var x = (int) (Math.random() * n);
-                var y = (int) (Math.random() * m);
+            while (pos.size() < blockRows * blockColumns) {
+                var x = (int) (Math.random() * blockRows);
+                var y = (int) (Math.random() * blockColumns);
                 pos.add(new Vec2i(x, y));
             }
 
@@ -172,7 +166,8 @@ public class Generator {
             var symbolsArray = symbols.toArray(Integer[]::new);
 
             Grid finalSeedGrid = seedGrid;
-            IntStream.range(0, n * m).forEach(i -> finalSeedGrid.placeUnchecked(posArray[i], symbolsArray[i], false,
+            IntStream.range(0, blockRows * blockColumns).forEach(i -> finalSeedGrid.placeUnchecked(posArray[i],
+                    symbolsArray[i], false,
                     false));
             seedGrid.computeAllEmptyCellsPossibilities();
 

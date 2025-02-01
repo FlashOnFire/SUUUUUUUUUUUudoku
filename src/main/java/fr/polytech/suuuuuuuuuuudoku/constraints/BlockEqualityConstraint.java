@@ -9,35 +9,11 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-public class BlockEqualityConstraint implements AbstractConstraint<Grid[], Vec3i> {
-    /**
-     * The set of symbols to be checked within the block.
-     */
-    private final int gridIndex1, gridIndex2;
-    private final Box2D block1, block2;
-
-    public BlockEqualityConstraint(int gridIndex1, Box2D block1, int gridIndex2, Box2D block2) {
-        this.gridIndex1 = gridIndex1;
-        this.block1 = block1;
-        this.gridIndex2 = gridIndex2;
-        this.block2 = block2;
-    }
-
-    public int getGridIndex1() {
-        return gridIndex1;
-    }
-
-    public int getGridIndex2() {
-        return gridIndex2;
-    }
-
-    public Box2D getBlock1() {
-        return block1;
-    }
-
-    public Box2D getBlock2() {
-        return block2;
-    }
+/**
+ * @param gridIndex1 The set of symbols to be checked within the block.
+ */
+public record BlockEqualityConstraint(int gridIndex1, Box2D block1, int gridIndex2,
+                                      Box2D block2) implements AbstractConstraint<Grid[], Vec3i> {
 
     @Override
     public boolean isSatisfied(Grid[] grid) {
@@ -117,12 +93,4 @@ public class BlockEqualityConstraint implements AbstractConstraint<Grid[], Vec3i
                 || (gridIndex1 == that.gridIndex2 && gridIndex2 == that.gridIndex1 && block1.equals(that.block2) && block2.equals(that.block1));
     }
 
-    @Override
-    public int hashCode() {
-        int result = gridIndex1;
-        result = 31 * result + gridIndex2;
-        result = 31 * result + block1.hashCode();
-        result = 31 * result + block2.hashCode();
-        return result;
-    }
 }

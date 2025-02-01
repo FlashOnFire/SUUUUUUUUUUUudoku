@@ -4,6 +4,7 @@
   jdk23,
   gradle,
   makeWrapper,
+  libGL
 }: let
   jdk = jdk23;
   self = stdenv.mkDerivation (finalAttrs: {
@@ -16,6 +17,10 @@
       (gradle.override {java = jdk;})
       jdk
       makeWrapper
+    ];
+
+    buildInputs = [
+      libGL
     ];
 
     mitmCache = gradle.fetchDeps {
@@ -32,12 +37,24 @@
 
     doCheck = true;
 
-    installPhase = ''
-      mkdir -p $out/{bin,share/suuuuuuuuuudoku}
-      cp build/libs/SUUUUUUUUUUUudoku-1.0-SNAPSHOT.jar $out/share/suuuuuuuuuudoku
+    gradleBuildTask = "buildAllJars";
 
-      makeWrapper ${jdk}/bin/java $out/bin/suuuuuuuuuudoku \
-        --add-flags "-jar $out/share/suuuuuuuuuudoku/SUUUUUUUUUUUudoku-1.0-SNAPSHOT.jar"
+    installPhase = ''
+      export LD_LIBRARY_PATH=${lib.makeLibraryPath [libGL]}
+      mkdir -p $out/{bin,share/suuuuuuuuuudoku}
+      cp build/libs/imGUI-1.0-SNAPSHOT.jar $out/share/suuuuuuuuuudoku
+      cp build/libs/swing-1.0-SNAPSHOT.jar $out/share/suuuuuuuuuudoku
+      cp build/libs/tui-1.0-SNAPSHOT.jar $out/share/suuuuuuuuuudoku
+
+      makeWrapper ${jdk}/bin/java $out/bin/imGUI \
+        --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [libGL]} \
+        --add-flags "-jar $out/share/suuuuuuuuuudoku/imGUI-1.0-SNAPSHOT.jar"
+
+      makeWrapper ${jdk}/bin/java $out/bin/swing \
+        --add-flags "-jar $out/share/suuuuuuuuuudoku/swing-1.0-SNAPSHOT.jar"
+
+      makeWrapper ${jdk}/bin/java $out/bin/tui \
+        --add-flags "-jar $out/share/suuuuuuuuuudoku/tui-1.0-SNAPSHOT.jar"
     '';
 
     meta.sourceProvenance = with lib.sourceTypes; [

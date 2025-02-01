@@ -21,6 +21,7 @@
 
       perSystem = {
         self',
+        lib,
         pkgs,
         ...
       }: {
@@ -31,6 +32,8 @@
 
         devShells.default = pkgs.mkShell {
           inputsFrom = with self'.packages; [SUUUUUUUUUUUudoku];
+
+          LD_LIBRARY_PATH = lib.makeLibraryPath [pkgs.libGL];
         };
 
         formatter = pkgs.alejandra;

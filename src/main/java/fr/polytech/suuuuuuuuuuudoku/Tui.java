@@ -48,6 +48,11 @@ public class Tui {
 
     }
 
+    public static void main(String[] args) throws IOException, InterruptedException {
+        Tui tui = new Tui();
+        tui.start();
+    }
+
     /**
      * Starts the Tui and handles the main game loop.
      *

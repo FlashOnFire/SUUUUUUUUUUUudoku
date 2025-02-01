@@ -26,6 +26,10 @@ public class ImGUIFrame extends Application {
     String current_symbol = null;
     AtomicBoolean solving = new AtomicBoolean(false);
 
+    public static void main(String[] args) {
+        launch(new ImGUIFrame());
+    }
+
     @Override
     protected void configure(Configuration config) {
         config.setTitle("Suuuuuuuuuuudoku");

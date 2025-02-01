@@ -33,10 +33,44 @@ tasks.test {
     useJUnitPlatform()
 }
 
+tasks.register("buildAllJars") {
+    dependsOn("tuiJar", "guiSwingJar", "guiImGUIJar")
+}
+
 tasks.jar {
     manifest {
         attributes["Main-Class"] = application.mainClass
     }
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.register<Jar>("tuiJar") {
+    archiveBaseName.set("tui")
+    manifest {
+        attributes["Main-Class"] = "fr.polytech.suuuuuuuuuuudoku.Tui"
+    }
+    from(sourceSets.main.get().output)
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.register<Jar>("guiSwingJar") {
+    archiveBaseName.set("swing")
+    manifest {
+        attributes["Main-Class"] = "fr.polytech.suuuuuuuuuuudoku.graphics.SudokuFrame"
+    }
+    from(sourceSets.main.get().output)
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.register<Jar>("guiImGUIJar") {
+    archiveBaseName.set("imGUI")
+    manifest {
+        attributes["Main-Class"] = "fr.polytech.suuuuuuuuuuudoku.graphics.ImGUIFrame"
+    }
+    from(sourceSets.main.get().output)
     from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

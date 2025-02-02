@@ -2,6 +2,79 @@
 
 Projet mené par Eymeric Dechelette, Thibaut Laracine et Guillaume Calderon
 
+## Fonctionnalités
+
+Ce SUUUUUUUUUUUudoku dispose des fonctionalité suivantes :
+
+- Génération de grille
+
+  Vous pouvez générer une grille de sudoku de taille avec des performance résonnable jusqu'a 16\*16
+
+- Résolution de grille
+
+  Vous pouvez résoudre une grille de sudoku de taille avec des performance résonnable jusqu'a 100\*100
+  Vous pouvez aussi résoudre des multi-doku (prés codé via des fichier dans le dossier `src/test/java/fr/polytech/suuuuuuuuuuudoku/resources`)
+
+- Consulter l'historique des modifications
+
+  Vous pouvez consulter l'historique des modifications de la grille (particulièrement utile pour les résolutions automatique)
+
+- Résolution manuelle
+
+  Vous pouvez résoudre une grille de sudoku de manière manuelle
+
+- Interface graphique
+
+  Vous pouvez utiliser une interface graphique pour jouer au sudokus
+
+- Interface en ligne de commande
+
+  Vous pouvez utiliser une interface en ligne de commande pour jouer au sudokus
+
+## Utilisation
+
+### Lancer le programme
+
+#### Utilisateur nix
+
+La methode privilégiée pour lancer le programme est d'utiliser nix, cas celui-ci vous assure d'avoir un environement identique au autre utilisateur de nix.
+
+Si vous disposez de nix, vous pouvez lancer la compilation avec la commande suivante :
+
+```bash
+nix build
+```
+
+Vous pouvez ensuite lancer les differents executables avec les commande suivante :
+
+```bash
+./result/bin/tui # Interface en ligne de commande
+./result/bin/imGUI # Interface graphique avec imGUI
+./result/bin/swing # Interface graphique avec swing
+```
+
+#### Utilisateur linux classique
+
+Il vous faudra installer les dépendances suivantes :
+
+- `openjdk-23`
+- `gradle`
+- `libGL`
+
+Vous pouvez ensuite lancer la compilation avec la commande suivante :
+
+```bash
+./gradlew buildAllJars
+```
+
+Vous pouvez ensuite lancer les differents executables avec les commande suivante :
+
+```bash
+java -jar ./build/libs/imGUI-1.0-SNAPSHOT.jar # Interface en ligne de commande
+java -jar ./build/libs/tui-1.0-SNAPSHOT.jar # Interface graphique avec imGUI
+java -jar ./build/libs/swing-1.0-SNAPSHOT.jar # Interface graphique avec swing
+```
+
 ### Diagramme de cas d'utilisation :
 
 ```mermaid
@@ -194,7 +267,7 @@ classDiagram
 
 <!-- END_CLASS -->
 
-### Diagramme d'activité du générateur  :
+### Diagramme d'activité du générateur :
 
 ```
 TODO
@@ -206,7 +279,7 @@ TODO
 stateDiagram
 queue_init: Ajouter grille à la queue
 boucle: La queue est vide ?
-if_solved: La grille est résolu ? 
+if_solved: La grille est résolu ?
 partial: PARTIELLEMENT RESOLU
 suppress: On supprime un element de la queue
 SudokuSolver.doBacktracking: BACKTRACKING
@@ -223,7 +296,7 @@ state SudokuSolver.solve {
     boucle_test --> suppress: Non
     suppress --> if_solved
     boucle_test --> INSOLVABLE: Oui, on ne peut pas résoudre
-    INSOLVABLE --> [*] 
+    INSOLVABLE --> [*]
 
     state is_solved_test <<choice>>
     if_solved --> is_solved_test
@@ -238,9 +311,9 @@ state SudokuSolver.solve {
     if_deduced --> is_deduced_test
     is_backtracking_test --> SudokuSolver.doBacktracking: Oui
     is_deduced_test --> SudokuSolver.doBacktracking:Non, alors on fait forcement du backtracking et on récupère les possibilités engendrée
-    is_deduced_test --> SudokuSolver.solveDeduction: Oui  
+    is_deduced_test --> SudokuSolver.solveDeduction: Oui
 
-    if_solved_bis : La grille est résolu ? 
+    if_solved_bis : La grille est résolu ?
     SudokuSolver.solveDeduction --> if_solved_bis
     state is_solved_bis_test <<choice>>
     if_solved_bis --> is_solved_bis_test
@@ -252,14 +325,14 @@ state SudokuSolver.solve {
     is_unsolvable_test --> INSOLVABLE:Non
     is_unsolvable_test --> if_backtracking: Oui
 
-    if_backtracking: Doit on essayer le backtracking ? 
+    if_backtracking: Doit on essayer le backtracking ?
     state is_backtracking_test <<choice>>
     if_backtracking --> is_backtracking_test
     is_backtracking_test --> partial: Non, on ne peut pas aller plus loin juste avec le déduction
 
-    
+
     partial --> [*]
 
-    
+
 }
 ```

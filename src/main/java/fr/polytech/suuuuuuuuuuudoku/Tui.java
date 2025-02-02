@@ -192,6 +192,7 @@ public class Tui {
             return grid;
         }
         startLoader();
+        grid.computeAllEmptyCellsPossibilities();
         if (grid instanceof MultiGrid) {
             grid = SudokuSolver.solve((MultiGrid) grid, selectedOptions[0], selectedOptions[1], true).getSecond();
         } else {

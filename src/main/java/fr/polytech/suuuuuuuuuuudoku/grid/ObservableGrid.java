@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-public class ObservableGrid extends Solvable<Vec2i> implements ShallowCopyable<ObservableGrid> {
+public class ObservableGrid extends Solvable implements ShallowCopyable<ObservableGrid> {
     private final GridListener listener;
     private Grid grid;
 
@@ -20,12 +20,12 @@ public class ObservableGrid extends Solvable<Vec2i> implements ShallowCopyable<O
         this.listener = listener;
     }
 
-    public void setGrid(Grid grid) {
-        this.grid = grid;
-    }
-
     public Grid getGrid() {
         return grid;
+    }
+
+    public void setGrid(Grid grid) {
+        this.grid = grid;
     }
 
     @Override

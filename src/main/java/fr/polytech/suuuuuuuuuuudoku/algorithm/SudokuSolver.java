@@ -2,7 +2,10 @@ package fr.polytech.suuuuuuuuuuudoku.algorithm;
 
 import fr.polytech.suuuuuuuuuuudoku.grid.Solvable;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * The SudokuSolver class provides methods to solve a Sudoku puzzle.
@@ -17,7 +20,9 @@ public class SudokuSolver {
      * @param backtracking whether to use backtracking if deduction fails
      * @return the solving state of the Sudoku grid
      */
-    public static <C, T extends Solvable<C> & ShallowCopyable<T>> Pair<SolvingState, T> solve(T grid, boolean deducing, boolean backtracking, boolean store_moves) {
+    public static <T extends Solvable & ShallowCopyable<T>> Pair<SolvingState, T> solve(T grid, boolean deducing,
+                                                                                        boolean backtracking,
+                                                                                        boolean store_moves) {
         assert deducing || backtracking : "At least one of deducing or backtracking must be enabled";
 
         ArrayDeque<T> currentList = new ArrayDeque<>();
@@ -56,7 +61,9 @@ public class SudokuSolver {
      * @param store_moves:  whether to store the moves
      * @return a list of all solutions to the Sudoku grid
      */
-    public static <C, T extends Solvable<C> & ShallowCopyable<T>> List<T> findAllSolutions(T grid, boolean deducing, boolean backtracking, boolean store_moves) {
+    public static <T extends Solvable & ShallowCopyable<T>> List<T> findAllSolutions(T grid, boolean deducing,
+                                                                                     boolean backtracking,
+                                                                                     boolean store_moves) {
         assert deducing || backtracking : "At least one of deducing or backtracking must be enabled";
 
         ArrayDeque<T> currentList = new ArrayDeque<>();
@@ -93,7 +100,9 @@ public class SudokuSolver {
      * @param backtracking: whether to use backtracking
      * @return true if the Sudoku grid has more than one solution, false otherwise
      */
-    public static <C, T extends Solvable<C> & ShallowCopyable<T>> boolean hasMoreThanOneSolution(T grid, boolean deducing, boolean backtracking) {
+    public static <T extends Solvable & ShallowCopyable<T>> boolean hasMoreThanOneSolution(T grid,
+                                                                                           boolean deducing,
+                                                                                           boolean backtracking) {
         assert deducing || backtracking : "At least one of deducing or backtracking must be enabled";
 
         ArrayDeque<T> currentList = new ArrayDeque<>();
@@ -131,14 +140,14 @@ public class SudokuSolver {
      * @param grid the Sudoku grid to solve
      * @return the solving state of the Sudoku grid
      */
-    private static <C, T extends Solvable<C> & ShallowCopyable<T>> List<T> doBacktracking(T grid, boolean store_moves) {
+    private static <T extends Solvable & ShallowCopyable<T>> List<T> doBacktracking(T grid, boolean store_moves) {
         // System.out.println("Backtracking");
 
         assert !grid.getEmptyCellsPossibilities().isEmpty() : "No empty cells";
 
         var cell = grid.getEmptyCellsPossibilities().entrySet().stream()
-                .min(Comparator.comparingInt(e -> e.getValue().size()))
-                .orElseThrow();
+                       .min(Comparator.comparingInt(e -> e.getValue().size()))
+                       .orElseThrow();
         // System.out.println("Trying " + cell.getKey() + " with " + cell.getValue());
 
         // disable assert to allow solving with only backtracking
@@ -160,7 +169,7 @@ public class SudokuSolver {
      * @param grid the Sudoku grid to solve
      * @return the solving state of the Sudoku grid
      */
-    private static <C, T extends Solvable<C>> SolvingState solveDeduction(T grid, boolean store_moves) {
+    private static <T extends Solvable> SolvingState solveDeduction(T grid, boolean store_moves) {
         // System.out.println("Deduction");
 
         boolean finished = false;
@@ -168,7 +177,7 @@ public class SudokuSolver {
         while (!finished) {
             if (solvePace[0] != 1.0f) {
                 try {
-                    Thread.sleep((long) (10 + (1-solvePace[0]) * (300 - 10)));
+                    Thread.sleep((long) (10 + (1 - solvePace[0]) * (300 - 10)));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

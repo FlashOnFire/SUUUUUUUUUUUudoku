@@ -11,7 +11,10 @@ import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
-import fr.polytech.suuuuuuuuuuudoku.grid.*;
+import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
+import fr.polytech.suuuuuuuuuuudoku.grid.Move2i;
+import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
+import fr.polytech.suuuuuuuuuuudoku.grid.Solvable;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
 import java.io.IOException;
@@ -61,7 +64,7 @@ public class Tui {
      */
     void start() throws IOException, InterruptedException {
         welcomeMessage();
-        Solvable<?> grid;
+        Solvable grid;
         switch (selectMode(new String[]{"> Generer un sudoku", "  Entrer un sudoku", "  Ouvrir un fichier"})) {
             case 0 -> { // Generate
                 int size = selectSize();
@@ -90,10 +93,9 @@ public class Tui {
                     grid = CsvUtils.importGrid(files[selected].toPath());
                 }
             }
-            default ->
-                    throw new IllegalStateException("Unexpected value: " + selectMode(new String[]{"> Generer un " +
-                            "sudoku",
-                            "  Entrer un sudoku", "  Ouvrir un fichier"}));
+            default -> throw new IllegalStateException("Unexpected value: " + selectMode(new String[]{"> Generer un " +
+                    "sudoku",
+                    "  Entrer un sudoku", "  Ouvrir un fichier"}));
         }
         showHelper();
         play(grid);
@@ -156,7 +158,7 @@ public class Tui {
      * @return The solved Sudoku grid
      * @throws IOException if an I/O error occurs
      */
-    private Solvable<?> solve(Solvable<?> grid) throws IOException {
+    private Solvable solve(Solvable grid) throws IOException {
         String[] options = {"> [ ] Deducing", "  [ ] Backtracking "};
         for (int i = 0; i < options.length; i++) {
             textGraphics.putString(0, line + i,
@@ -349,7 +351,7 @@ public class Tui {
      * @param grid The Sudoku grid to solve.
      * @throws IOException If an I/O error occurs.
      */
-    private void play(Solvable<?> grid) throws IOException {
+    private void play(Solvable grid) throws IOException {
 
         Vec2i position = Vec2i.zero();
         Vec2i lastPosition = Vec2i.zero();
@@ -383,9 +385,9 @@ public class Tui {
                 }
                 textGraphics.setBackgroundColor(TextColor.ANSI.BLACK_BRIGHT);
                 textGraphics.putString(position.getX() * (spacing + 1), position.getY() + line,
-                        ((MultiGrid) grid).getSymbolAtPaddingBased(new Vec2i(position.getX(),
+                        ((MultiGrid) grid).getSymbolAt(new Vec2i(position.getX(),
                                 position.getY())) == null ? " ".repeat(spacing) :
-                                ((MultiGrid) grid).getSymbolAtPaddingBased(new Vec2i(position.getX(),
+                                ((MultiGrid) grid).getSymbolAt(new Vec2i(position.getX(),
                                         position.getY())).toString());
             } else {
                 displayGrid((Grid) grid, Vec2i.zero());
@@ -404,7 +406,7 @@ public class Tui {
 
             // display move navigator
             line += max.getY() + 1;
-            List<?> moveList;
+            List<Move2i> moveList;
             if (grid instanceof MultiGrid) {
                 moveList = ((MultiGrid) grid).getMoves();
             } else {
@@ -428,20 +430,12 @@ public class Tui {
             } else if (keyStroke.getKeyType() == KeyType.ArrowRight && position.getX() < max.getX() - 1) {
                 position = position.add(new Vec2i(1, 0));
             } else if (keyStroke.getKeyType() == KeyType.Enter && enteredValue != null) {
-                if (grid instanceof MultiGrid) {
-                    ((MultiGrid) grid).placeUncheckedPaddingBased(new Vec2i(position), Integer.parseInt(enteredValue),
-                            true, true);
-                } else {
-                    ((Grid) grid).placeUnchecked(new Vec2i(position), Integer.parseInt(enteredValue), true, true);
-                }
+                grid.placeUnchecked(new Vec2i(position), Integer.parseInt(enteredValue),
+                        true, true);
                 timeLinePos = -1;
                 enteredValue = null;
             } else if (keyStroke.getKeyType() == KeyType.Delete) {
-                if (grid instanceof MultiGrid) {
-                    ((MultiGrid) grid).placeUncheckedPaddingBased(position, null, true, true);
-                } else {
-                    ((Grid) grid).placeUnchecked(position, null, true, true);
-                }
+                grid.placeUnchecked(position, null, true, true);
                 enteredValue = null;
             } else if (keyStroke.getKeyType() == KeyType.Backspace && enteredValue != null) {
                 enteredValue = enteredValue.substring(0, enteredValue.length() - 1);
@@ -450,21 +444,11 @@ public class Tui {
                     timeLinePos = moveList.size();
                 }
                 timeLinePos--;
-                if (moveList.get(timeLinePos) instanceof Move2i move) {
-                    assert grid instanceof Grid;
-                    ((Grid) grid).placeUnchecked(move.position(), move.previous_value(), true, false);
-                } else if (moveList.get(timeLinePos) instanceof Move3i move) {
-                    assert grid instanceof MultiGrid;
-                    ((MultiGrid) grid).placeUnchecked(move.position(), move.previous_value(), true, false);
-                }
+                grid.placeUnchecked(moveList.get(timeLinePos).position(),
+                        moveList.get(timeLinePos).previous_value(), true, false);
             } else if (keyStroke.getKeyType() == KeyType.PageDown && timeLinePos < moveList.size()) {
-                if (moveList.get(timeLinePos) instanceof Move2i move) {
-                    assert grid instanceof Grid;
-                    ((Grid) grid).placeUnchecked(move.position(), move.value(), true, false);
-                } else if (moveList.get(timeLinePos) instanceof Move3i move) {
-                    assert grid instanceof MultiGrid;
-                    ((MultiGrid) grid).placeUnchecked(move.position(), move.value(), true, false);
-                }
+                grid.placeUnchecked(moveList.get(timeLinePos).position(), moveList.get(timeLinePos).value(), true
+                        , false);
                 timeLinePos++;
             } else if (keyStroke.getKeyType() == KeyType.Character) {
 

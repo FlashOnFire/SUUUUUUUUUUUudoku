@@ -3,7 +3,7 @@ package fr.polytech.suuuuuuuuuuudoku;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Box2D;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.SolvingState;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec3i;
+import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
@@ -128,13 +128,11 @@ public class ResolveTest {
         }
         assertTrue(grid.isSolved());
 
-        grid.placeUnchecked(new Vec3i(0, 0, 0), null, false, false);
-        grid.placeUnchecked(new Vec3i(0, 0, 1), null, false, false);
-        grid.placeUnchecked(new Vec3i(0, 0, 2), null, false, false);
-        grid.placeUnchecked(new Vec3i(6, 6, 0), null, false, false);
-        grid.placeUnchecked(new Vec3i(6, 6, 0), null, false, false);
-        grid.placeUnchecked(new Vec3i(0, 0, 3), null, false, false);
-        grid.placeUnchecked(new Vec3i(0, 0, 4), null, false, false);
+        grid.placeUnchecked(Vec2i.zero(), null, false, false);
+        grid.placeUnchecked(new Vec2i(12, 0), null, false, false);
+        grid.placeUnchecked(new Vec2i(6, 6), null, false, false);
+        grid.placeUnchecked(new Vec2i(0, 12), null, false, false);
+        grid.placeUnchecked(new Vec2i(12, 12), null, false, false);
         grid.computeAllEmptyCellsPossibilities();
         assertFalse(grid.isSolved());
         var solve = SudokuSolver.solve(grid, true, true, false);
@@ -151,13 +149,12 @@ public class ResolveTest {
         }
         assertTrue(grid.isSolved());
 
-        grid.placeUnchecked(new Vec3i(0, 0, 0), null, false, false);
-        grid.placeUnchecked(new Vec3i(0, 0, 1), null, false, false);
-        grid.placeUnchecked(new Vec3i(0, 0, 2), null, false, false);
-        grid.placeUnchecked(new Vec3i(6, 6, 0), null, false, false);
-        grid.placeUnchecked(new Vec3i(6, 6, 0), null, false, false);
-        grid.placeUnchecked(new Vec3i(0, 0, 3), null, false, false);
-        grid.placeUnchecked(new Vec3i(0, 0, 4), null, false, false);
+        grid.placeUnchecked(new Vec2i(6, 0), null, false, false);
+        grid.placeUnchecked(new Vec2i(0, 6), null, false, false);
+        grid.placeUnchecked(new Vec2i(6, 6), null, false, false);
+        grid.placeUnchecked(new Vec2i(12, 6), null, false, false);
+        grid.placeUnchecked(new Vec2i(12, 6), null, false, false);
+        grid.placeUnchecked(new Vec2i(6, 12), null, false, false);
         grid.computeAllEmptyCellsPossibilities();
         assertFalse(grid.isSolved());
         var solve = SudokuSolver.solve(grid, true, true, false);

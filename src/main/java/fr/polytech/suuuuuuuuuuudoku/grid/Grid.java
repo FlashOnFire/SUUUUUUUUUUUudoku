@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Represents a Sudoku grid with constraints.
  */
-public class Grid extends Solvable<Vec2i> implements ShallowCopyable<Grid> {
+public class Grid extends Solvable implements ShallowCopyable<Grid> {
     final List<AbstractConstraint> constraints;
     private final ArrayList<Move2i> moves = new ArrayList<>();
     /**

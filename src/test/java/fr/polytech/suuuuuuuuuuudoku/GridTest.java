@@ -1,7 +1,6 @@
 package fr.polytech.suuuuuuuuuuudoku;
 
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Box2D;
-import fr.polytech.suuuuuuuuuuudoku.constraints.BlockEqualityConstraint;
+import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -34,19 +33,11 @@ public class GridTest {
 
     @Test
     public void testMultigrid() throws FileNotFoundException {
-        var constraints = new BlockEqualityConstraint[]{
-                new BlockEqualityConstraint(0, new Box2D(6, 6, 3, 3), 2, new Box2D(0, 0, 3, 3)),
-                new BlockEqualityConstraint(1, new Box2D(0, 6, 3, 3), 2, new Box2D(6, 0, 3, 3)),
-                new BlockEqualityConstraint(2, new Box2D(0, 6, 3, 3), 3, new Box2D(6, 0, 3, 3)),
-                new BlockEqualityConstraint(2, new Box2D(6, 6, 3, 3), 4, new Box2D(0, 0, 3, 3))
-        };
-
         var grid = CsvUtils.importMultiGrid(Path.of(RESSOURCES_PATH + "multigrid_1"));
 
-        assertEquals(constraints.length, grid.getConstraints().size());
-        for (BlockEqualityConstraint constraint : constraints) {
-            assertTrue(grid.getConstraints().contains(constraint));
-        }
+        assertEquals(5, grid.getGrids().length);
+        assertEquals(1, grid.getSymbolAt(new Vec2i(10, 10)));
+        assertEquals(7, grid.getSymbolAt(Vec2i.zero()));
     }
 
 }

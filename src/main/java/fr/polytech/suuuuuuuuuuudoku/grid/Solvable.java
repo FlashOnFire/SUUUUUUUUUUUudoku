@@ -1,9 +1,11 @@
 package fr.polytech.suuuuuuuuuuudoku.grid;
 
+import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
+
 import java.util.Map;
 import java.util.Set;
 
-public abstract class Solvable<T> {
+public abstract class Solvable {
     final Set<Integer> symbols;
 
     protected Solvable(Set<Integer> symbols) {
@@ -24,7 +26,7 @@ public abstract class Solvable<T> {
 
     public abstract void computeAllEmptyCellsPossibilities();
 
-    public abstract void placeUnchecked(T pos, Integer value, boolean updatePossibilities, boolean store_move);
+    public abstract void placeUnchecked(Vec2i pos, Integer value, boolean updatePossibilities, boolean store_move);
 
-    public abstract Map<T, Set<Integer>> getEmptyCellsPossibilities();
+    public abstract Map<Vec2i, Set<Integer>> getEmptyCellsPossibilities();
 }

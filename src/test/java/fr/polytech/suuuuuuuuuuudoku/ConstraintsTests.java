@@ -40,7 +40,7 @@ public class ConstraintsTests {
         }, List.of(
                 new BlockConstraint(symbolSet, new Box2D(0, 0, 2, 2))
         ), symbolSet);
-        assertFalse(grid.areConstraintsSatisfied(false));
+        assertTrue(grid.areConstraintsSatisfied(false));
     }
 
     @Test

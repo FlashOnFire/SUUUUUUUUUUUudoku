@@ -25,6 +25,10 @@ public class SudokuSolver {
                                                                                         boolean store_moves) {
         assert deducing || backtracking : "At least one of deducing or backtracking must be enabled";
 
+        if (!grid.areConstraintsSatisfied(true)) {
+            return new Pair<>(SolvingState.UNSOLVABLE, null);
+        }
+
         ArrayDeque<T> currentList = new ArrayDeque<>();
         currentList.add(grid.shallowCopy());
 

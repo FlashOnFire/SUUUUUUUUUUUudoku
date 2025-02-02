@@ -13,11 +13,13 @@ Ce SUUUUUUUUUUUudoku dispose des fonctionalité suivantes :
 - Résolution de grille
 
   Vous pouvez résoudre une grille de sudoku de taille avec des performance résonnable jusqu'a 100\*100
-  Vous pouvez aussi résoudre des multi-doku (prés codé via des fichier dans le dossier `src/test/java/fr/polytech/suuuuuuuuuuudoku/resources`)
+  Vous pouvez aussi résoudre des multi-doku (prés codé via des fichier dans le dossier
+  `src/test/java/fr/polytech/suuuuuuuuuuudoku/resources`)
 
 - Consulter l'historique des modifications
 
-  Vous pouvez consulter l'historique des modifications de la grille (particulièrement utile pour les résolutions automatique)
+  Vous pouvez consulter l'historique des modifications de la grille (particulièrement utile pour les résolutions
+  automatique)
 
 - Résolution manuelle
 
@@ -37,7 +39,8 @@ Ce SUUUUUUUUUUUudoku dispose des fonctionalité suivantes :
 
 #### Utilisateur nix
 
-La methode privilégiée pour lancer le programme est d'utiliser nix, cas celui-ci vous assure d'avoir un environement identique au autre utilisateur de nix.
+La methode privilégiée pour lancer le programme est d'utiliser nix, cas celui-ci vous assure d'avoir un environement
+identique au autre utilisateur de nix.
 
 Si vous disposez de nix, vous pouvez lancer la compilation avec la commande suivante :
 
@@ -109,159 +112,337 @@ classDiagram
     direction BT
     class AbstractConstraint {
         <<Interface>>
-        + getPossibilities(Integer[][], Vec2i) Optional~Set~Integer~~
         + getClassicConstraints(int, Set~Integer~) List~AbstractConstraint~
-        + isSatisfied(Integer[][]) boolean
+        + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
+        + getRectConstraints(int, int, Set~Integer~) List~AbstractConstraint~
         + isAffectedBy(Vec2i, Vec2i) boolean
         + isPosAffected(Vec2i) boolean
+        + isSatisfied(InnerGrid) boolean
     }
     class BlockConstraint {
-        + BlockConstraint(Set~Integer~, int, int, int, int)
-        - int y
-        - int dy
-        - int dx
-        - int x
-        + isSatisfied(Integer[][]) boolean
-        + isInBlock(Vec2i) boolean
-        - extractBlock(Integer[][]) Set~Integer~
-        + isPosAffected(Vec2i) boolean
+        + BlockConstraint(Set~Integer~, Box2D)
+        - extractBlock(InnerGrid) List~Integer~
+        + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
         + isAffectedBy(Vec2i, Vec2i) boolean
-        + getPossibilities(Integer[][], Vec2i) Optional~Set~Integer~~
-        int dx
-        int dy
-        int x
-        int y
+        + isInBlock(Vec2i) boolean
+        + isPosAffected(Vec2i) boolean
+        + isSatisfied(InnerGrid) boolean
+        Box2D block
+    }
+    class Box2D {
+        + Box2D(int, int, int, int)
+        + absolute(int, int, int, int) Box2D
+        + contains(int, int) boolean
+        + contains(Vec2i) boolean
+        + dx() int
+        + dy() int
+        + equals(Object) boolean
+        + hashCode() int
+        + height() int
+        + overlap(Box2D) Box2D
+        + substract(Box2D) Box2D
+        + width() int
+        + x() int
+        + y() int
     }
     class ColumnConstraint {
         + ColumnConstraint(Set~Integer~)
-        + isSatisfied(Integer[][]) boolean
+        + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
         + isAffectedBy(Vec2i, Vec2i) boolean
-        + getPossibilities(Integer[][], Vec2i) Optional~Set~Integer~~
         + isPosAffected(Vec2i) boolean
+        + isSatisfied(InnerGrid) boolean
     }
     class CsvUtils {
         + CsvUtils()
-        + importGrid(Path) Grid
         + exportGrid(Path, Grid) void
+        + exportMultiGrid(Path, MultiGrid) void
+        + importGrid(Path) Grid
+        + importMultiGrid(Path) MultiGrid
+    }
+    class GeneralSymbolConstraint {
+        + GeneralSymbolConstraint(Set~Integer~, Vec2i[])
+        - Vec2i[] positionList
+        - extractValues(InnerGrid) Set~Integer~
+        + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
+        + isAffectedBy(Vec2i, Vec2i) boolean
+        - isInPositionList(Vec2i) boolean
+        + isPosAffected(Vec2i) boolean
+        + isSatisfied(InnerGrid) boolean
+        Vec2i[] positionList
     }
     class Generator {
         + Generator()
-        + generate9x9() Grid
+        ~ createRandomConstraints(Grid) List~AbstractConstraint~
+        - createSolvedSudoku(int, int) Grid
+        - findDividers(int) Vec2i
+        + generateClassicSudoku(int) Grid
+        + generateSudokuWithBlockConstraints(int, int) Grid
+        + generateSudokuWithRandomBlockConstraint(int) Grid
+        - removeRandomCells(Grid, int) Grid
     }
     class Grid {
-        + Grid(Integer[][], List~AbstractConstraint~, Set~Integer~)
         + Grid(Integer[][], Set~Integer~)
         + Grid(Grid)
-        - InnerGrid grid
-        - Set~Integer~ symbols
-        - List~AbstractConstraint~ constraints
+        + Grid(Integer[][], Set~Integer~, int, int)
+        + Grid(Integer[][], List~AbstractConstraint~, Set~Integer~)
+        ~ List~AbstractConstraint~ constraints
         - HashMap~Vec2i, Set~ Integer~~ emptyCellsPossibilities
-        + computeAllEmptyCellsPossibilities() void
-        + tryPlace(Vec2i, Integer, boolean) boolean
-        + display() void
-        + computeChangedEmptyCellsPossibilities(Vec2i, boolean) void
-        + areConstraintsSatisfied(boolean) boolean
+        - InnerGrid innerGrid
+        - ArrayList~Move2i~ moves
         + applyNakedPairs() boolean
-        + placeUnchecked(Vec2i, Integer, boolean) void
+        + areConstraintsSatisfied(boolean) boolean
+        + computeAllEmptyCellsPossibilities() void
+        + computeChangedEmptyCellsPossibilities(Vec2i, boolean) void
+        + display() void
+        + getSymbolAt(Vec2i) Integer
+        + getSymbolAt(int, int) Integer
         + length() int
-        InnerGrid grid
-        boolean solved
-        Set~Integer~ symbols
+        + placeUnchecked(Vec2i, Integer, boolean, boolean) void
+        + shallowCopy() Grid
+        + tryPlace(Vec2i, Integer, boolean, boolean) boolean
         List~AbstractConstraint~ constraints
         HashMap~Vec2i, Set~ Integer~~ emptyCellsPossibilities
+        InnerGrid innerGrid
+        List~Move2i~ moves
+        Vec2i size
+        Set~Integer~ symbols
+    }
+    class GridListener {
+        <<Interface>>
+        + onGridChange(InnerGrid) void
+    }
+    class ImGUIFrame {
+        + ImGUIFrame()
+        - applyLastChanges() void
+        # configure(Configuration) void
+        - drawGrid(Vec2i, ImVec2) void
+        - handleInput() void
+        - keyPress(int) void
+        + main(String[]) void
+        # preRun() void
+        + process() void
+        - setSelection(int, int) void
+        Integer? currentSymbol
     }
     class InnerGrid {
         + InnerGrid(Integer[][])
         + InnerGrid(InnerGrid)
-        - Integer[][] grid
-        + hashCode() int
-        + equals(Object) boolean
-        + display() void
+        + at(Vec2i) Integer
         + computeEmptyCells() HashSet~Vec2i~
+        + display() void
+        + equals(Object) boolean
+        + get() Integer[][]
+        + hashCode() int
         + length() int
-        Integer[][] inner
-        Integer[][] grid
+        + set(Vec2i, Integer) void
     }
     class LineConstraint {
         + LineConstraint(Set~Integer~)
-        + isPosAffected(Vec2i) boolean
-        + isSatisfied(Integer[][]) boolean
-        + getPossibilities(Integer[][], Vec2i) Optional~Set~Integer~~
+        + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
         + isAffectedBy(Vec2i, Vec2i) boolean
+        + isPosAffected(Vec2i) boolean
+        + isSatisfied(InnerGrid) boolean
     }
     class Main {
         + Main()
         + main(String[]) void
     }
+    class Move2i {
+        + Move2i(Vec2i, Integer, Integer)
+        + position() Vec2i
+        + previous_value() Integer
+        + value() Integer
+    }
+    class MultiGrid {
+        + MultiGrid(List~Pair~ Vec2i, Grid~~)
+        + MultiGrid(MultiGrid)
+        - HashMap~Vec2i, Set~ Integer~~ emptyCellsPossibilities
+        - Grid[] grids
+        - List~Move2i~ moves
+        - Vec2i[] paddings
+        - Vec2i size
+        + areConstraintsSatisfied(boolean) boolean
+        + computeAllEmptyCellsPossibilities() void
+        + gatherEmptyCellsPossibilities() void
+        + getSymbolAt(Vec2i) Integer
+        + isInGrid(Vec2i) boolean
+        + placeUnchecked(Vec2i, Integer, boolean, boolean) void
+        + shallowCopy() MultiGrid
+        Map~Vec2i, Set~ Integer~~ emptyCellsPossibilities
+        Grid[] grids
+        List~Move2i~ moves
+        Vec2i[] paddings
+        Vec2i size
+    }
     class NotEmptyConstraint {
         + NotEmptyConstraint()
-        + isPosAffected(Vec2i) boolean
-        + isSatisfied(Integer[][]) boolean
-        + getPossibilities(Integer[][], Vec2i) Optional~Set~Integer~~
+        + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
         + isAffectedBy(Vec2i, Vec2i) boolean
+        + isPosAffected(Vec2i) boolean
+        + isSatisfied(InnerGrid) boolean
     }
-    class SolvingState {
-        <<enumeration>>
-        + SolvingState()
-        + valueOf(String) SolvingState
-        + values() SolvingState[]
+    class ObservableGrid {
+        + ObservableGrid(Grid, GridListener)
+        - Grid grid
+        + areConstraintsSatisfied(boolean) boolean
+        + computeAllEmptyCellsPossibilities() void
+        + placeUnchecked(Vec2i, Integer, boolean, boolean) void
+        + shallowCopy() ObservableGrid
+        Map~Vec2i, Set~ Integer~~ emptyCellsPossibilities
+        Grid grid
     }
-    class SudokuBoard {
-        ~ SudokuBoard(Grid)
-        + update(Integer[][]) void
-        + recoverPreviousSudoku(Grid) void
-    }
-    class SudokuFrame {
-        + SudokuFrame(Grid)
-    }
-    class SudokuOptions {
-        + SudokuOptions(Color, Runnable, Runnable)
-        - applyMaterialDesign(JButton) void
-    }
-    class SudokuSolver {
-        + SudokuSolver()
-        + solve(Grid, boolean, boolean) SolvingState
-        - doBacktracking(Grid) List~Grid~
-        - solveDeduction(Grid) SolvingState
-        - findAllSolutions(Grid, boolean, boolean) List~Grid~
-    }
-    class SymbolSets {
-        + SymbolSets()
-        + generateSymbols(int) Set~Integer~
-    }
-    class Vec2i {
-        + Vec2i(int, int)
-        - int y
-        - int x
-        + toString() String
-        + hashCode() int
-        + equals(Object) boolean
-        int x
-        int y
-    }
+    class Pair~K, V~ {
++ Pair(K, V)
+- K first
+- V second
+K first
+V second
+}
+class ShallowCopyable~T~ {
+<<Interface>>
++ shallowCopy() T
+ }
+class Solvable {
+# Solvable(Set~Integer~)
++ areConstraintsSatisfied(boolean) boolean
++ computeAllEmptyCellsPossibilities() void
++ placeUnchecked(Vec2i, Integer, boolean, boolean) void
+Map~Vec2i, Set~ Integer~~ emptyCellsPossibilities
+boolean solved
+}
+class SolvingState {
+<<enumeration>>
++ SolvingState()
++ valueOf(String) SolvingState
++ values() SolvingState[]
+}
+class SudokuBoard {
+~ SudokuBoard(Grid)
++ recoverPreviousSudoku(Grid) void
++ update(Integer[][], boolean) void
+}
+class SudokuFrame {
++ SudokuFrame(Grid)
++ main(String[]) void
+- updateJpanel() void
+}
+class SudokuOptions {
++ SudokuOptions(Color, Runnable, Runnable, Runnable, Runnable, Runnable, Runnable)
+- applyMaterialDesign(JButton) void
+}
+class SudokuSolver {
++ SudokuSolver()
+- doBacktracking(T, boolean) List~T~
++ findAllSolutions(T, boolean, boolean, boolean) List~T~
++ hasMoreThanOneSolution(T, boolean, boolean) boolean
++ solve(T, boolean, boolean, boolean) Pair~SolvingState, T~
+- solveDeduction(T, boolean) SolvingState
+}
+class SymbolSets {
++ SymbolSets()
++ generateSymbols(int) Set~Integer~
+}
+class Tui {
++ Tui()
+- displayGrid(Grid, Vec2i) void
+- displayMultiGrid(MultiGrid) void
+- displayOptions(String[], int) void
+- displaySizes(int, int[]) void
+- gameOver() void
+- hslToRgb(float, float, float) int[]
++ main(String[]) void
+- play(Solvable) void
+- selectMode(String[]) int
+- selectSize() int
+- showHelper() void
+- showTimeLine(int, int) void
+- solve(Solvable) Solvable
+~ start() void
+- startLoader() void
+- stopLoader() void
+- welcomeMessage() void
+}
+class Utils {
++ Utils()
++ applyMapping(O[][], M[][], HashMap~O, M~) M[][]
+}
+class Vec2i {
++ Vec2i(Vec2i)
++ Vec2i(int, int)
+- int x
+- int y
++ absolute() Vec2i
++ add(Vec2i) Vec2i
++ equals(int, int) boolean
++ equals(Object) boolean
++ hashCode() int
++ random(int, int) Vec2i
++ substract(Vec2i) Vec2i
++ toString() String
++ zero() Vec2i
+int x
+int y
+}
 
-    AbstractConstraint ..> BlockConstraint: «create»
-    AbstractConstraint ..> ColumnConstraint: «create»
-    AbstractConstraint ..> LineConstraint: «create»
-    AbstractConstraint ..> NotEmptyConstraint: «create»
-    BlockConstraint ..> AbstractConstraint
-    ColumnConstraint ..> AbstractConstraint
-    CsvUtils ..> Grid: «create»
-    Generator ..> Grid: «create»
-    Generator ..> Vec2i: «create»
-    Grid "1" *--> "constraints *" AbstractConstraint
-    Grid "1" *--> "grid 1" InnerGrid
-    Grid ..> InnerGrid: «create»
-    Grid "1" *--> "emptyCellsPossibilities *" Vec2i
-    InnerGrid ..> Vec2i: «create»
-    LineConstraint ..> AbstractConstraint
-    Main ..> SudokuFrame: «create»
-    NotEmptyConstraint ..> AbstractConstraint
-    SudokuBoard "1" *--> "grid 1" Grid
-    SudokuBoard ..> InnerGrid: «create»
-    SudokuFrame ..> SudokuBoard: «create»
-    SudokuFrame ..> SudokuOptions: «create»
-    SudokuSolver ..> Grid: «create»
+AbstractConstraint  ..>  BlockConstraint: «create»
+AbstractConstraint  ..>  Box2D: «create»
+AbstractConstraint  ..>  ColumnConstraint : «create»
+AbstractConstraint  ..>  LineConstraint: «create»
+AbstractConstraint  ..>  NotEmptyConstraint: «create»
+BlockConstraint  ..>  AbstractConstraint
+BlockConstraint "1" *--> "box 1" Box2D
+ColumnConstraint  ..>  AbstractConstraint
+CsvUtils  ..>  Grid: «create»
+CsvUtils  ..>  MultiGrid : «create»
+CsvUtils  ..>  Pair~K, V~: «create»
+CsvUtils  ..>  Vec2i: «create»
+GeneralSymbolConstraint  ..>  AbstractConstraint
+GeneralSymbolConstraint "1" *--> "positionList *" Vec2i
+Generator  ..>  ColumnConstraint: «create»
+Generator  ..>  GeneralSymbolConstraint : «create»
+Generator  ..>  Grid: «create»
+Generator  ..>  LineConstraint: «create»
+Generator  ..>  NotEmptyConstraint: «create»
+Generator  ..>  Vec2i: «create»
+Grid "1" *--> "constraints *" AbstractConstraint
+Grid "1" *--> "innerGrid 1" InnerGrid
+Grid  ..>  InnerGrid: «create»
+Grid  ..>  Move2i: «create»
+Grid "1" *--> "moves *" Move2i
+Grid  ..>  ShallowCopyable~T~
+Grid  -->  Solvable
+Grid  ..>  Vec2i: «create»
+Grid "1" *--> "emptyCellsPossibilities *" Vec2i
+ImGUIFrame "1" *--> "originalGrid 1" Grid
+ImGUIFrame  ..>  ObservableGrid: «create»
+ImGUIFrame  ..>  Vec2i: «create»
+ImGUIFrame "1" *--> "selected_pos 1" Vec2i
+InnerGrid  ..>  Vec2i: «create»
+LineConstraint  ..>  AbstractConstraint
+Move2i "1" *--> "position 1" Vec2i
+MultiGrid "1" *--> "grids *" Grid
+MultiGrid  ..>  Move2i: «create»
+MultiGrid "1" *--> "moves *" Move2i
+MultiGrid  ..>  ShallowCopyable~T~
+MultiGrid  -->  Solvable
+MultiGrid  ..>  Vec2i: «create»
+MultiGrid "1" *--> "paddings *" Vec2i
+NotEmptyConstraint  ..>  AbstractConstraint
+ObservableGrid "1" *--> "grid 1" Grid
+ObservableGrid "1" *--> "listener 1" GridListener
+ObservableGrid  ..>  ShallowCopyable~T~
+ObservableGrid  -->  Solvable
+SudokuBoard "1" *--> "solvedGrid 1" Grid
+SudokuBoard  ..>  Grid: «create»
+SudokuBoard  ..>  Vec2i: «create»
+SudokuFrame  ..>  Grid : «create»
+SudokuFrame "1" *--> "grid 1" Grid
+SudokuFrame "1" *--> "board 1" SudokuBoard
+SudokuFrame  ..>  SudokuBoard: «create»
+SudokuFrame  ..>  SudokuOptions: «create»
+SudokuSolver  ..>  Pair~K, V~ : «create»
+Tui  ..>  Grid: «create»
+Tui  ..>  Vec2i: «create»
 
 ```
 
@@ -277,61 +458,61 @@ TODO
 
 ```mermaid
 stateDiagram
-queue_init: Ajouter grille à la queue
-boucle: La queue est vide ?
-if_solved: La grille est résolu ?
-partial: PARTIELLEMENT RESOLU
-suppress: On supprime un element de la queue
-SudokuSolver.doBacktracking: BACKTRACKING
+    queue_init: Ajouter grille à la queue
+    boucle: La queue est vide ?
+    if_solved: La grille est résolu ?
+    partial: PARTIELLEMENT RESOLU
+    suppress: On supprime un element de la queue
+    SudokuSolver.doBacktracking: BACKTRACKING
 SudokuSolver.solveDeduction: DEDUCTION
 
 state SudokuSolver.solve {
-    SudokuSolver.doBacktracking --> boucle
-    [*] --> solve
-    solve --> queue_init
-    queue_init --> boucle
+SudokuSolver.doBacktracking --> boucle
+[*] --> solve
+solve --> queue_init
+queue_init --> boucle
 
-    state boucle_test <<choice>>
-    boucle --> boucle_test
-    boucle_test --> suppress: Non
-    suppress --> if_solved
-    boucle_test --> INSOLVABLE: Oui, on ne peut pas résoudre
-    INSOLVABLE --> [*]
+state boucle_test <<choice>>
+boucle --> boucle_test
+boucle_test --> suppress: Non
+suppress --> if_solved
+boucle_test --> INSOLVABLE: Oui, on ne peut pas résoudre
+INSOLVABLE --> [*]
 
-    state is_solved_test <<choice>>
-    if_solved --> is_solved_test
-    is_solved_test --> if_deduced: Non
+state is_solved_test <<choice>>
+if_solved --> is_solved_test
+is_solved_test --> if_deduced: Non
 
-    is_solved_bis_test --> RESOLU:Oui
-    is_solved_test --> RESOLU: Oui
-    RESOLU --> [*]
+is_solved_bis_test --> RESOLU: Oui
+is_solved_test --> RESOLU: Oui
+RESOLU --> [*]
 
-    if_deduced: Doit on essayer de déduire avec les contraintes ?
-    state is_deduced_test <<choice>>
-    if_deduced --> is_deduced_test
-    is_backtracking_test --> SudokuSolver.doBacktracking: Oui
-    is_deduced_test --> SudokuSolver.doBacktracking:Non, alors on fait forcement du backtracking et on récupère les possibilités engendrée
-    is_deduced_test --> SudokuSolver.solveDeduction: Oui
+if_deduced: Doit on essayer de déduire avec les contraintes ?
+state is_deduced_test <<choice>>
+if_deduced --> is_deduced_test
+is_backtracking_test --> SudokuSolver.doBacktracking: Oui
+is_deduced_test --> SudokuSolver.doBacktracking: Non, alors on fait forcement du backtracking et on récupère les possibilités engendrée
+is_deduced_test --> SudokuSolver.solveDeduction: Oui
 
-    if_solved_bis : La grille est résolu ?
-    SudokuSolver.solveDeduction --> if_solved_bis
-    state is_solved_bis_test <<choice>>
-    if_solved_bis --> is_solved_bis_test
-    is_solved_bis_test --> if_unsolvable:Non
+if_solved_bis: La grille est résolu ?
+SudokuSolver.solveDeduction --> if_solved_bis
+state is_solved_bis_test <<choice>>
+if_solved_bis --> is_solved_bis_test
+is_solved_bis_test --> if_unsolvable: Non
 
-    if_unsolvable: La grille peut être résolu en l'état ?
-    state is_unsolvable_test <<choice>>
-    if_unsolvable --> is_unsolvable_test
-    is_unsolvable_test --> INSOLVABLE:Non
-    is_unsolvable_test --> if_backtracking: Oui
+if_unsolvable: La grille peut être résolu en l'état ?
+state is_unsolvable_test <<choice>>
+if_unsolvable --> is_unsolvable_test
+is_unsolvable_test --> INSOLVABLE: Non
+is_unsolvable_test --> if_backtracking: Oui
 
-    if_backtracking: Doit on essayer le backtracking ?
-    state is_backtracking_test <<choice>>
-    if_backtracking --> is_backtracking_test
-    is_backtracking_test --> partial: Non, on ne peut pas aller plus loin juste avec le déduction
+if_backtracking: Doit on essayer le backtracking ?
+state is_backtracking_test <<choice>>
+if_backtracking --> is_backtracking_test
+is_backtracking_test --> partial: Non, on ne peut pas aller plus loin juste avec le déduction
 
 
-    partial --> [*]
+partial --> [*]
 
 
 }

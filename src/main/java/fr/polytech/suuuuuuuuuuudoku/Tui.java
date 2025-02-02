@@ -460,12 +460,14 @@ public class Tui {
                         case 'd' -> disco = !disco;
                         case 's' -> {
                             line += max.getY() + 1;
-                            grid = solve(grid);
-                            if (!grid.isSolved()) {
+                            var solved = solve(grid);
+                            if (solved == null || !solved.isSolved()) {
                                 //display a message
                                 textGraphics.setBackgroundColor(TextColor.ANSI.RED);
                                 textGraphics.putString(0, line, "La grille n'a pas pu être résolue");
                                 textGraphics.setBackgroundColor(TextColor.ANSI.DEFAULT);
+                            } else {
+                                grid = solved;
                             }
                             line -= max.getY() + 1;
                             timeLinePos = -1;

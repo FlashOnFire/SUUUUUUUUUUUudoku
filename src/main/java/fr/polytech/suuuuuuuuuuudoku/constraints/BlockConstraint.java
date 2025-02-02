@@ -139,4 +139,16 @@ public class BlockConstraint implements AbstractConstraint {
     public Box2D getBlock() {
         return box;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        BlockConstraint that = (BlockConstraint) o;
+        return Objects.equals(symbols, that.symbols) && Objects.equals(box, that.box);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(symbols, box);
+    }
 }

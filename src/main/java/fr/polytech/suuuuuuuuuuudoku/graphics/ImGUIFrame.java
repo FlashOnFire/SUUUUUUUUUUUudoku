@@ -4,6 +4,7 @@ import fr.polytech.suuuuuuuuuuudoku.CsvUtils;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
+import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.grid.ObservableGrid;
 import imgui.ImGui;
@@ -141,15 +142,45 @@ public class ImGUIFrame extends Application {
         ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, 0, 0);
         for (int y = 0; y < gridSize.getY(); y++) {
             for (int x = 0; x < gridSize.getX(); x++) {
-                if (selected_pos != null && selected_pos.equals(x, y)) {
-                    ImGui.pushStyleColor(ImGuiCol.Button, ImGui.getColorU32(0.2f, 0.2f, 0.8f, 1.0f));
-                    ImGui.pushStyleColor(ImGuiCol.ButtonHovered, ImGui.getColorU32(0.3f, 0.3f, 0.8f, 1.0f));
+
+                var isSelected = selected_pos != null && selected_pos.equals(x, y);
+
+                int finalY = y;
+                int finalX = x;
+                var block = grid.getConstraints().stream()
+                        .filter(c -> c instanceof BlockConstraint)
+                        .filter(c -> c.isPosAffected(new Vec2i(finalX, finalY)))
+                        .findFirst();
+
+                block.ifPresent(c -> {
+                    int color = c.hashCode();
+
+
+                    int[] rgb;
+                    int[] rgbDarker;
+                    if (isSelected) {
+                        rgb = hslToRgb(color % 360, 0.45f, 0.3f);
+                        rgbDarker = hslToRgb(color % 360, 0.45f, 0.25f);
+
+                    } else {
+                        rgb = hslToRgb(color % 360, 0.45f, 0.45f);
+                        rgbDarker = hslToRgb(color % 360, 0.45f, 0.35f);
+                    }
+
+                    int[] rgbEvenDarker = hslToRgb(color % 360, 0.45f, 0.2f);
+
+                    ImGui.pushStyleColor(ImGuiCol.Button, rgb[0] / 255f, rgb[1] / 255f, rgb[2] / 255f, 1);
+                    ImGui.pushStyleColor(ImGuiCol.ButtonHovered, rgbDarker[0] / 255f, rgbDarker[1] / 255f, rgbDarker[2] / 255f, 1);
+
+                    ImGui.pushStyleColor(ImGuiCol.ButtonActive, rgbEvenDarker[0] / 255f, rgbEvenDarker[1] / 255f, rgbEvenDarker[2] / 255f, 1);
+
+                });
+
+                if (isSelected) {
                     ImGui.button(
                             (current_symbol == null ? " " : current_symbol) + "##" + y + ":" + x,
                             gridPixelSize
                     );
-                    ImGui.popStyleColor();
-                    ImGui.popStyleColor();
                 } else {
                     if (ImGui.button(
                             (grid.getSymbolAt(x, y) == null ? " " : grid.getSymbolAt(x, y).toString()) + "##" + y + ":" + x,
@@ -159,6 +190,11 @@ public class ImGUIFrame extends Application {
                         System.out.println("Selected: " + selected_pos);
                     }
                 }
+
+                if (block.isPresent()) {
+                    ImGui.popStyleColor(3);
+                }
+
                 ImGui.sameLine();
             }
             ImGui.newLine();
@@ -235,5 +271,52 @@ public class ImGUIFrame extends Application {
         } else {
             current_symbol += key;
         }
+    }
+
+    /**
+     * Converts HSL (Hue, Saturation, Lightness) color values to RGB (Red, Green, Blue) color values.
+     *
+     * @param h The hue value, in degrees (0-360).
+     * @param s The saturation value, as a percentage (0-1).
+     * @param l The lightness value, as a percentage (0-1).
+     * @return An array containing the RGB values, each ranging from 0 to 255.
+     */
+    private int[] hslToRgb(float h, float s, float l) {
+        float c = (1 - Math.abs(2 * l - 1)) * s;
+        float x = c * (1 - Math.abs((h / 60) % 2 - 1));
+        float m = l - c / 2;
+        float r = 0, g = 0, b = 0;
+
+        if (0 <= h && h < 60) {
+            r = c;
+            g = x;
+            b = 0;
+        } else if (60 <= h && h < 120) {
+            r = x;
+            g = c;
+            b = 0;
+        } else if (120 <= h && h < 180) {
+            r = 0;
+            g = c;
+            b = x;
+        } else if (180 <= h && h < 240) {
+            r = 0;
+            g = x;
+            b = c;
+        } else if (240 <= h && h < 300) {
+            r = x;
+            g = 0;
+            b = c;
+        } else if (300 <= h && h < 360) {
+            r = c;
+            g = 0;
+            b = x;
+        }
+
+        int[] rgb = new int[3];
+        rgb[0] = Math.round((r + m) * 255);
+        rgb[1] = Math.round((g + m) * 255);
+        rgb[2] = Math.round((b + m) * 255);
+        return rgb;
     }
 }

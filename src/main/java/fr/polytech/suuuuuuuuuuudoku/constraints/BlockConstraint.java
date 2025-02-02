@@ -43,12 +43,25 @@ public class BlockConstraint implements AbstractConstraint {
      */
     @Override
     public boolean isSatisfied(InnerGrid grid) {
-        // Extract the block from the grid
-        var values = extractBlock(grid);
+        HashSet<Integer> set = new HashSet<>();
 
-        // Check if the block contains all the symbols and has no duplicates
-        return symbols.containsAll(values)
-                && values.stream().noneMatch(v -> Collections.frequency(values, v) > 1);
+        for (int y = box.y(); y < box.dy(); y++) {
+            for (int x = box.x(); x < box.dx(); x++) {
+                // Ignore empty cells
+                if (grid.get()[y][x] != null) {
+                    // Check for duplicates
+                    if (set.contains(grid.get()[y][x])) {
+                        return false;
+                    }
+
+                    set.add(grid.get()[y][x]);
+                }
+            }
+        }
+
+        // Check if all values in the block are present in the symbols
+        // (not the other way around to allow empty cells to pass the constraint satisfaction)
+        return symbols.containsAll(set);
     }
 
     /**
@@ -71,12 +84,12 @@ public class BlockConstraint implements AbstractConstraint {
         }
 
         // Extract the block from the grid
-        List<Integer> values = extractBlock(grid);
+        Set<Integer> values = extractBlock(grid);
 
         // Return the symbols that are not present in the block
         var possibilities = symbols.stream()
-                                   .filter(c -> !values.contains(c))
-                                   .collect(Collectors.toSet());
+                .filter(c -> !values.contains(c))
+                .collect(Collectors.toSet());
 
         return Optional.of(possibilities);
     }
@@ -111,12 +124,14 @@ public class BlockConstraint implements AbstractConstraint {
      * @param grid the grid from which to extract the block
      * @return a set of characters within the block, excluding empty cells
      */
-    private List<Integer> extractBlock(InnerGrid grid) {
-        List<Integer> set = new ArrayList<>();
+    private Set<Integer> extractBlock(InnerGrid grid) {
+        Set<Integer> set = new HashSet<>();
+
         for (int i = box.y(); i < box.dy(); i++) {
             set.addAll(Arrays.asList(grid.get()[i]).subList(box.x(), box.dx()));
         }
-        set.removeIf(Objects::isNull);
+
+        set.remove(null);
 
         return set;
     }

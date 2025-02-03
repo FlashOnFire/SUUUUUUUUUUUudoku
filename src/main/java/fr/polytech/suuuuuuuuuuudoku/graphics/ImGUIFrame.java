@@ -60,7 +60,7 @@ public class ImGUIFrame extends Application {
         if (ImGui.button("MultiGrid")) {
             try {
                 solvable = CsvUtils.importMultiGrid(Path.of(
-                        "src/test/java/fr/polytech/suuuuuuuuuuudoku/resources/multigrid_1"));
+                        "src/test/resources/multigrid_1"));
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -71,7 +71,7 @@ public class ImGUIFrame extends Application {
         if (ImGui.button("MultiGrid2")) {
             try {
                 solvable = CsvUtils.importMultiGrid(Path.of(
-                        "src/test/java/fr/polytech/suuuuuuuuuuudoku/resources/multigrid_2"));
+                        "src/test/resources/multigrid_2"));
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -121,7 +121,7 @@ public class ImGUIFrame extends Application {
         if (ImGui.button("MaxiGrid")) {
             try {
                 solvable = CsvUtils.importGrid(Path.of(
-                        "src/test/java/fr/polytech/suuuuuuuuuuudoku/resources/100x100.csv"));
+                        "src/test/resources/100x100.csv"));
                 originalSolvable = ((Grid) solvable).shallowCopy();
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);

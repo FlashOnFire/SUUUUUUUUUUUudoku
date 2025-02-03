@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class GridTest {
-    static String RESSOURCES_PATH = "src/test/java/fr/polytech/suuuuuuuuuuudoku/resources/";
+    static String RESSOURCES_PATH = "src/test/resources/";
 
     @Test
     public void testImportExport() throws FileNotFoundException {

@@ -14,7 +14,7 @@ Ce SUUUUUUUUUUUudoku dispose des fonctionalité suivantes :
 
   Vous pouvez résoudre une grille de sudoku de taille avec des performance résonnable jusqu'a 100\*100
   Vous pouvez aussi résoudre des multi-doku (prés codé via des fichier dans le dossier
-  `src/test/java/fr/polytech/suuuuuuuuuuudoku/resources`)
+  `src/test/resources`)
 
 - Consulter l'historique des modifications
 

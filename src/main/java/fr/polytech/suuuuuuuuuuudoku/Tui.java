@@ -27,7 +27,7 @@ import static java.lang.System.exit;
  * The Tui class represents a text-based user interface for the Sudoku game.
  */
 public class Tui {
-    static String RESSOURCES_PATH = "src/test/java/fr/polytech/suuuuuuuuuuudoku/resources/";
+    static String RESSOURCES_PATH = "src/test/resources/";
     private final Terminal terminal;
     private final TextGraphics textGraphics;
     private Thread loaderThread;

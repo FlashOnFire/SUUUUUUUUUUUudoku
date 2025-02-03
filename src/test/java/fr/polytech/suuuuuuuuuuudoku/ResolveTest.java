@@ -16,7 +16,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ResolveTest {
-    static String RESSOURCES_PATH = "src/test/java/fr/polytech/suuuuuuuuuuudoku/resources/";
+    static String RESSOURCES_PATH = "src/test/resources/";
 
     @Test
     public void testSolveDeduce() throws FileNotFoundException {

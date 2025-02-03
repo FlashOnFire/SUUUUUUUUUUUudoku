@@ -25,6 +25,7 @@ public class ImGUIFrame extends Application {
     Vec2i selected_pos = null;
     String current_symbol = null;
     AtomicBoolean solving = new AtomicBoolean(false);
+    int[] selectedGeneratorGridSize = {9};
 
     public static void main(String[] args) {
         launch(new ImGUIFrame());
@@ -49,11 +50,27 @@ public class ImGUIFrame extends Application {
         }
 
         if (ImGui.button("Generate")) {
-            solvable = Generator.generateClassicSudoku(16);
+            solvable = Generator.generateClassicSudoku(selectedGeneratorGridSize[0]);
             originalSolvable = ((Grid) solvable).shallowCopy();
         }
 
         ImGui.sameLine();
+
+        ImGui.sameLine();
+        ImGui.setNextItemWidth(100);
+        if (ImGui.beginCombo("##gridSize", String.valueOf(selectedGeneratorGridSize[0]))) {
+            for (int size : new int[]{4, 9, 16, 25}) {
+                boolean isSelected = (selectedGeneratorGridSize[0] == size);
+                if (ImGui.selectable(String.valueOf(size), isSelected)) {
+                    selectedGeneratorGridSize[0] = size;
+                }
+                if (isSelected) {
+                    ImGui.setItemDefaultFocus();
+                }
+            }
+            ImGui.endCombo();
+        }
+
         if (ImGui.button("MultiGrid")) {
             try {
                 solvable = CsvUtils.importMultiGrid(Path.of(
@@ -129,6 +146,7 @@ public class ImGUIFrame extends Application {
             ImGui.endDisabled();
         }
 
+        ImGui.setNextItemWidth(100);
         ImGui.sliderFloat("Solve Pace", SudokuSolver.solvePace, 0.0f, 1.0f);
 
         ImGui.end();
@@ -159,7 +177,8 @@ public class ImGUIFrame extends Application {
             }
             if (ImGui.button("Undo")) {
                 solvable.undoLastMove(true);
-            };
+            }
+
             if (empty) {
                 ImGui.endDisabled();
             }

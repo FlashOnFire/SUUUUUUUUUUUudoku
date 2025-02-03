@@ -12,7 +12,10 @@ import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.graphics.Utils;
-import fr.polytech.suuuuuuuuuuudoku.grid.*;
+import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
+import fr.polytech.suuuuuuuuuuudoku.grid.Move2i;
+import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
+import fr.polytech.suuuuuuuuuuudoku.grid.Solvable;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
 import java.io.IOException;

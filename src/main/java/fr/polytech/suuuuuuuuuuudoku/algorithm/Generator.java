@@ -13,7 +13,6 @@ import java.util.stream.IntStream;
 
 
 public class Generator {
-
     /**
      * Generates a classic NxN grid
      *

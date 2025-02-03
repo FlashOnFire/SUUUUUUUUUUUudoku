@@ -17,12 +17,14 @@ public class GridTest {
 
     @Test
     public void testImportExport() throws FileNotFoundException {
-        var gridValue = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "100x100.csv"));
+
+        Path path = Path.of(RESSOURCES_PATH + "100x100_export.csv");
+        var gridValue = CsvUtils.importGrid(path);
         var symbol = SymbolSets.generateSymbols(gridValue.length);
         Grid grid = new Grid(gridValue, symbol);
-        CsvUtils.exportGrid(Path.of(RESSOURCES_PATH + "100x100_export.csv"), grid);
+        CsvUtils.exportGrid(path, grid);
 
-        var gridValue2 = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "100x100_export.csv"));
+        var gridValue2 = CsvUtils.importGrid(path);
         Grid grid2 = new Grid(gridValue2, symbol);
         for (int i = 0; i < grid.length(); i++) {
             for (int j = 0; j < grid.getInnerGrid().get()[0].length; j++) {

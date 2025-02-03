@@ -77,7 +77,7 @@ public class Tui {
      */
     void start() throws IOException, InterruptedException {
         welcomeMessage();
-        Solvable grid;
+        Solvable<?> grid;
         switch (selectMode(new String[]{"> Generer un sudoku", "  Entrer un sudoku", "  Ouvrir un fichier"})) {
             case 0 -> { // Generate
                 int size = selectSize();
@@ -173,7 +173,7 @@ public class Tui {
      * @return The solved Sudoku grid
      * @throws IOException if an I/O error occurs
      */
-    private Solvable solve(Solvable grid) throws IOException {
+    private Solvable<?> solve(Solvable<?> grid) throws IOException {
         String[] options = {"> [ ] Deducing", "  [ ] Backtracking "};
         for (int i = 0; i < options.length; i++) {
             textGraphics.putString(0, line + i,
@@ -318,8 +318,10 @@ public class Tui {
         int yPadding = padding.getY();
         line += yPadding;
 
-        for (int i = 0; i < gridSize; i++) {
-            for (int j = 0; j < gridSize; j++) {
+        for (int i = scrollY; i < scrollY + Math.min((terminal.getTerminalSize().getRows() - (line)), gridSize);
+             i++) {
+            for (int j = scrollX; j < scrollX + Math.min((terminal.getTerminalSize().getColumns() / (spacing + 1)),
+                    gridSize); j++) {
                 // Determine the block color
                 int finalI = i;
                 int finalJ = j;
@@ -363,8 +365,7 @@ public class Tui {
      * @param grid The Sudoku grid to solve.
      * @throws IOException If an I/O error occurs.
      */
-    private void play(Solvable grid) throws IOException {
-
+    private void play(Solvable<?> grid) throws IOException {
         Vec2i position = Vec2i.zero();
         Vec2i lastPosition = Vec2i.zero();
         KeyStroke keyStroke;
@@ -514,8 +515,6 @@ public class Tui {
                     }
                 }
             }
-
-
         } while (keyStroke.getKeyType() != KeyType.Escape);
 
         line += max.getY() + 1;

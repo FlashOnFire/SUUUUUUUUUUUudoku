@@ -2,6 +2,7 @@ package fr.polytech.suuuuuuuuuuudoku.grid;
 
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -61,5 +62,16 @@ public class ObservableGrid extends Solvable<ObservableGrid> {
     @Override
     public ObservableGrid shallowCopy() {
         return new ObservableGrid(grid.shallowCopy(), listener);
+    }
+
+    @Override
+    public List<Move2i> getMoves() {
+        return grid.getMoves();
+    }
+
+    @Override
+    public void undoLastMove(boolean updatePossibilities) {
+        grid.undoLastMove(updatePossibilities);
+        listener.onGridChange(this.getGrid().getInnerGrid());
     }
 }

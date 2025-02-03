@@ -307,4 +307,14 @@ public class Grid extends Solvable<Grid> {
     public List<Move2i> getMoves() {
         return moves;
     }
+
+    @Override
+    public void undoLastMove(boolean updatePossibilities) {
+        if (this.moves.isEmpty()) {
+            return;
+        }
+
+        var lastMove = this.moves.removeLast();
+        this.placeUnchecked(lastMove.position(), lastMove.previous_value(), updatePossibilities, false);
+    }
 }

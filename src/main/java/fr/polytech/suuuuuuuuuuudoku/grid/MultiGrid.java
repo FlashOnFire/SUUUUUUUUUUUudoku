@@ -151,6 +151,16 @@ public class MultiGrid extends Solvable<MultiGrid> {
         return moves;
     }
 
+    @Override
+    public void undoLastMove(boolean updatePossibilities) {
+        if (moves.isEmpty()) {
+            return;
+        }
+
+        Move2i lastMove = moves.removeLast();
+        placeUnchecked(lastMove.position(), lastMove.previous_value(), updatePossibilities, false);
+    }
+
     public Vec2i[] getPaddings() {
         return paddings;
     }

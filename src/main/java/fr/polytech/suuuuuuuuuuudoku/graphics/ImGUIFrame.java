@@ -13,10 +13,7 @@ import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.app.Application;
 import imgui.app.Configuration;
-import imgui.flag.ImGuiCol;
-import imgui.flag.ImGuiKey;
-import imgui.flag.ImGuiStyleVar;
-import imgui.flag.ImGuiWindowFlags;
+import imgui.flag.*;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
@@ -148,6 +145,51 @@ public class ImGUIFrame extends Application {
         ImGui.end();
 
         if (solvable != null) {
+            ImGui.setNextWindowSize(400, 800);
+            ImGui.begin("Move History");
+
+            var disabled = false;
+            if (solving.get()) {
+                ImGui.beginDisabled();
+                disabled = true;
+            }
+            var empty = solvable.getMoves().isEmpty();
+            if (empty) {
+                ImGui.beginDisabled();
+            }
+            if (ImGui.button("Undo")) {
+                solvable.undoLastMove(true);
+            };
+            if (empty) {
+                ImGui.endDisabled();
+            }
+
+            ImGui.beginTable("Move History Table", 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
+            ImGui.tableSetupColumn("Move");
+            ImGui.tableSetupColumn("Action");
+            ImGui.tableHeadersRow();
+
+            for (int i = 0; i < solvable.getMoves().size(); i++) {
+                var move = solvable.getMoves().get(i);
+                ImGui.tableNextRow();
+                ImGui.tableNextColumn();
+                ImGui.text(move.toString());
+                ImGui.tableNextColumn();
+                if (ImGui.button("Return here##" + move)) {
+                    for (int j = solvable.getMoves().size() - 1; j > i; j--) {
+                        solvable.undoLastMove(false);
+                    }
+                    solvable.computeAllEmptyCellsPossibilities();
+                }
+            }
+            ImGui.endTable();
+
+            if (disabled) {
+                ImGui.endDisabled();
+            }
+            ImGui.end();
+
+
             var size = ImGui.getIO().getDisplaySize();
             var gridSize = solvable.getSize();
             var minSize = Math.min(size.x, size.y);
@@ -393,7 +435,7 @@ public class ImGUIFrame extends Application {
             keyPress(8);
         } else if (ImGui.isKeyPressed(ImGuiKey.Keypad9)) {
             keyPress(9);
-        } else if (ImGui.isKeyPressed(ImGuiKey.Enter)) {
+        } else if (ImGui.isKeyPressed(ImGuiKey.Enter) || ImGui.isKeyPressed(ImGuiKey.KeyPadEnter)) {
             applyLastChanges();
             selected_pos = null;
         }
@@ -412,7 +454,7 @@ public class ImGUIFrame extends Application {
 
     private void applyLastChanges() {
         if (selected_pos != null) {
-            solvable.placeUnchecked(selected_pos, getCurrentSymbol(), true, false);
+            solvable.placeUnchecked(selected_pos, getCurrentSymbol(), true, true);
         }
     }
 

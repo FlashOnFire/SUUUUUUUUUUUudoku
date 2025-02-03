@@ -2,6 +2,7 @@ package fr.polytech.suuuuuuuuuuudoku.grid;
 
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,4 +36,11 @@ public abstract class Solvable<T> {
     public abstract Map<Vec2i, Set<Integer>> getEmptyCellsPossibilities();
 
     public abstract T shallowCopy();
+
+    public Set<Integer> getSymbols() {
+        return symbols;
+    }
+
+    public abstract List<Move2i> getMoves();
+    public abstract void undoLastMove(boolean updatePossibilities);
 }

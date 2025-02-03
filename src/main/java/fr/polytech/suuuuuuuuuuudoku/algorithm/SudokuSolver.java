@@ -11,7 +11,7 @@ import java.util.List;
  * The SudokuSolver class provides methods to solve a Sudoku puzzle.
  */
 public class SudokuSolver {
-    public static float[] solvePace = new float[]{1.0f};
+    public static final float[] solvePace = new float[]{1.0f};
 
     /**
      * Solves the given Sudoku grid.
@@ -21,8 +21,8 @@ public class SudokuSolver {
      * @return the solving state of the Sudoku grid
      */
     public static <T extends Solvable<T>> Pair<SolvingState, T> solve(T grid, boolean deducing,
-                                                                                        boolean backtracking,
-                                                                                        boolean store_moves) {
+                                                                      boolean backtracking,
+                                                                      boolean store_moves) {
         assert deducing || backtracking : "At least one of deducing or backtracking must be enabled";
 
         if (!grid.areConstraintsSatisfied(true)) {
@@ -39,7 +39,12 @@ public class SudokuSolver {
             }
 
             if (deducing) {
-                var state = solveDeduction(currentGrid, store_moves);
+                SolvingState state = null;
+                try {
+                    state = solveDeduction(currentGrid, store_moves);
+                } catch (InterruptedException e) {
+                    System.out.println("Deduction interrupted");
+                }
 
                 if (state == SolvingState.SOLVED) {
                     return new Pair<>(SolvingState.SOLVED, currentGrid);
@@ -66,8 +71,8 @@ public class SudokuSolver {
      * @return a list of all solutions to the Sudoku grid
      */
     public static <T extends Solvable<T>> List<T> findAllSolutions(T grid, boolean deducing,
-                                                                                     boolean backtracking,
-                                                                                     boolean store_moves) {
+                                                                   boolean backtracking,
+                                                                   boolean store_moves) throws InterruptedException {
         assert deducing || backtracking : "At least one of deducing or backtracking must be enabled";
 
         ArrayDeque<T> currentList = new ArrayDeque<>();
@@ -105,8 +110,8 @@ public class SudokuSolver {
      * @return true if the Sudoku grid has more than one solution, false otherwise
      */
     public static <T extends Solvable<T>> boolean hasMoreThanOneSolution(T grid,
-                                                                                           boolean deducing,
-                                                                                           boolean backtracking) {
+                                                                         boolean deducing,
+                                                                         boolean backtracking) throws InterruptedException {
         assert deducing || backtracking : "At least one of deducing or backtracking must be enabled";
 
         ArrayDeque<T> currentList = new ArrayDeque<>();
@@ -173,18 +178,14 @@ public class SudokuSolver {
      * @param grid the Sudoku grid to solve
      * @return the solving state of the Sudoku grid
      */
-    private static <T extends Solvable<T>> SolvingState solveDeduction(T grid, boolean store_moves) {
+    private static <T extends Solvable<T>> SolvingState solveDeduction(T grid, boolean store_moves) throws InterruptedException {
         // System.out.println("Deduction");
 
         boolean finished = false;
 
         while (!finished) {
             if (solvePace[0] != 1.0f) {
-                try {
-                    Thread.sleep((long) (10 + (1 - solvePace[0]) * (300 - 10)));
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                Thread.sleep((long) (10 + (1 - solvePace[0]) * (300 - 10)));
             }
             finished = true;
 

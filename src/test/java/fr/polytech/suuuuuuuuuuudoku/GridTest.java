@@ -11,15 +11,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class GridTest {
-    static String RESSOURCES_PATH = "src/test/resources/";
+    static final String RESSOURCES_PATH = "src/test/resources/";
 
     @Test
     public void testImportExport() throws FileNotFoundException {
 
         var grid = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "100x100.csv"));
-        CsvUtils.exportGrid(Path.of(RESSOURCES_PATH + "100x100_export.csv"), grid);
+        Path path = Path.of(RESSOURCES_PATH + "100x100_export.csv");
+        CsvUtils.exportGrid(path, grid);
 
-        var grid2 = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "100x100_export.csv"));
+        var grid2 = CsvUtils.importGrid(path);
         for (int i = 0; i < grid.length(); i++) {
             for (int j = 0; j < grid.getInnerGrid().get()[0].length; j++) {
                 assertEquals(grid.getInnerGrid().get()[i][j], grid2.getInnerGrid().get()[i][j]);

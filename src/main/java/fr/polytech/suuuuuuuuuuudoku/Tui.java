@@ -11,6 +11,7 @@ import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
+import fr.polytech.suuuuuuuuuuudoku.graphics.Utils;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.grid.Move2i;
 import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
@@ -27,7 +28,7 @@ import static java.lang.System.exit;
  * The Tui class represents a text-based user interface for the Sudoku game.
  */
 public class Tui {
-    static String RESSOURCES_PATH = "src/test/resources/";
+    static final String RESSOURCES_PATH = "src/test/resources/";
     private final Terminal terminal;
     private final TextGraphics textGraphics;
     private Thread loaderThread;
@@ -339,7 +340,7 @@ public class Tui {
                                            float lightness = 0.25f; // Lightness value between 0 and 1
 
                                            // Convert HSL to RGB
-                                           int[] rgb = hslToRgb(hue, saturation, lightness);
+                                           int[] rgb = Utils.hslToRgb(hue, saturation, lightness);
                                            return new TextColor.RGB(rgb[0], rgb[1], rgb[2]);
                                        });
 
@@ -365,7 +366,7 @@ public class Tui {
      * @param grid The Sudoku grid to solve.
      * @throws IOException If an I/O error occurs.
      */
-    private void play(Solvable<?> grid) throws IOException {
+    private void play(Solvable<?> grid) throws IOException, InterruptedException {
         Vec2i position = Vec2i.zero();
         Vec2i lastPosition = Vec2i.zero();
         KeyStroke keyStroke;
@@ -380,11 +381,10 @@ public class Tui {
 
         if (grid instanceof MultiGrid) {
             spacing = String.valueOf(((MultiGrid) grid).getGrids()[0].getSymbols().size()).length();
-            max = ((MultiGrid) grid).getSize();
         } else {
-            spacing = String.valueOf(((Grid) grid).getSymbols().size()).length();
-            max = ((Grid) grid).getSize();
+            spacing = String.valueOf(grid.getSymbols().size()).length();
         }
+        max = grid.getSize();
 
         if (terminal.getTerminalSize().getRows() / (spacing + 1) < grid.getSize().getX()) {
             enableScrollX = true;
@@ -400,7 +400,7 @@ public class Tui {
 
             if (grid instanceof MultiGrid) {
                 displayMultiGrid((MultiGrid) grid);
-                if (!((MultiGrid) grid).isInGrid(lastPosition)) {
+                if (((MultiGrid) grid).isNotInGrid(lastPosition)) {
                     // Clear the last position
                     textGraphics.setBackgroundColor(TextColor.ANSI.DEFAULT);
                     textGraphics.putString(lastPosition.getX() * (spacing + 1), lastPosition.getY() + line,
@@ -422,8 +422,7 @@ public class Tui {
             textGraphics.putString(0, line - 1, displayValue + " ".repeat(padding));
 
             line -= 5;
-            List<Move2i> moveList = grid instanceof MultiGrid ? ((MultiGrid) grid).getMoves() :
-                    ((Grid) grid).getMoves();
+            List<Move2i> moveList = grid.getMoves();
             if (!moveList.isEmpty()) {
                 showTimeLine(moveList.size(), timeLinePos);
             }
@@ -646,53 +645,6 @@ public class Tui {
             padding += String.valueOf(possibleSizes[i]).length() + 1;
         }
         terminal.flush();
-    }
-
-    /**
-     * Converts HSL (Hue, Saturation, Lightness) color values to RGB (Red, Green, Blue) color values.
-     *
-     * @param h The hue value, in degrees (0-360).
-     * @param s The saturation value, as a percentage (0-1).
-     * @param l The lightness value, as a percentage (0-1).
-     * @return An array containing the RGB values, each ranging from 0 to 255.
-     */
-    private int[] hslToRgb(float h, float s, float l) {
-        float c = (1 - Math.abs(2 * l - 1)) * s;
-        float x = c * (1 - Math.abs((h / 60) % 2 - 1));
-        float m = l - c / 2;
-        float r = 0, g = 0, b = 0;
-
-        if (0 <= h && h < 60) {
-            r = c;
-            g = x;
-            b = 0;
-        } else if (60 <= h && h < 120) {
-            r = x;
-            g = c;
-            b = 0;
-        } else if (120 <= h && h < 180) {
-            r = 0;
-            g = c;
-            b = x;
-        } else if (180 <= h && h < 240) {
-            r = 0;
-            g = x;
-            b = c;
-        } else if (240 <= h && h < 300) {
-            r = x;
-            g = 0;
-            b = c;
-        } else if (300 <= h && h < 360) {
-            r = c;
-            g = 0;
-            b = x;
-        }
-
-        int[] rgb = new int[3];
-        rgb[0] = Math.round((r + m) * 255);
-        rgb[1] = Math.round((g + m) * 255);
-        rgb[2] = Math.round((b + m) * 255);
-        return rgb;
     }
 }
 

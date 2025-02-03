@@ -46,6 +46,10 @@ public class MultiGrid extends Solvable<MultiGrid> {
         return size;
     }
 
+    public boolean isNotInGrid(Vec2i pos) {
+        return !isInGrid(pos);
+    }
+
     public boolean isInGrid(Vec2i pos) {
         // Check if the position is in one of the grids
         for (int i = 0; i < paddings.length; i++) {

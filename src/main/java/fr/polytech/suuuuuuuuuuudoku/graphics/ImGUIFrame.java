@@ -20,12 +20,12 @@ import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ImGUIFrame extends Application {
+    final AtomicBoolean solving = new AtomicBoolean(false);
+    final int[] selectedGeneratorGridSize = {9};
     Solvable<?> originalSolvable;
     Solvable<?> solvable;
     Vec2i selected_pos = null;
     String current_symbol = null;
-    AtomicBoolean solving = new AtomicBoolean(false);
-    int[] selectedGeneratorGridSize = {9};
 
     public static void main(String[] args) {
         launch(new ImGUIFrame());
@@ -50,7 +50,11 @@ public class ImGUIFrame extends Application {
         }
 
         if (ImGui.button("Generate")) {
-            solvable = Generator.generateClassicSudoku(selectedGeneratorGridSize[0]);
+            try {
+                solvable = Generator.generateClassicSudoku(selectedGeneratorGridSize[0]);
+            } catch (InterruptedException e) {
+                System.out.println("Generation interrupted");
+            }
             originalSolvable = ((Grid) solvable).shallowCopy();
         }
 
@@ -112,7 +116,8 @@ public class ImGUIFrame extends Application {
                 new Thread(() -> {
                     solving.set(true);
                     solvable = SudokuSolver.solve((MultiGrid) solvable, true, true, true).getSecond();
-                    //grid = SudokuSolver.solve(new ObservableGrid((MultiGrid) grid, innerGrid -> ((MultiGrid) grid).setInnerGrid(innerGrid)), true, true, true).getSecond().getGrid();
+                    //grid = SudokuSolver.solve(new ObservableGrid((MultiGrid) grid, innerGrid -> ((MultiGrid) grid)
+                    // .setInnerGrid(innerGrid)), true, true, true).getSecond().getGrid();
                     solving.set(false);
                 }).start();
             }
@@ -158,7 +163,8 @@ public class ImGUIFrame extends Application {
                 "Infos",
                 ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoTitleBar
         );
-        ImGui.text("Size: " + ((solvable != null) ? (solvable.getSize().getX() + "x" + solvable.getSize().getY()) : "No grid loaded"));
+        ImGui.text("Size: " + ((solvable != null) ? (solvable.getSize().getX() + "x" + solvable.getSize().getY()) :
+                "No grid loaded"));
         ImGui.text("Solve pace :" + SudokuSolver.solvePace[0]);
         ImGui.end();
 
@@ -258,9 +264,9 @@ public class ImGUIFrame extends Application {
                 int finalY = y;
                 int finalX = x;
                 var block = grid.getConstraints().stream()
-                        .filter(c -> c instanceof BlockConstraint)
-                        .filter(c -> c.isPosAffected(new Vec2i(finalX, finalY)))
-                        .findFirst();
+                                .filter(c -> c instanceof BlockConstraint)
+                                .filter(c -> c.isPosAffected(new Vec2i(finalX, finalY)))
+                                .findFirst();
 
                 block.ifPresent(c -> {
                     int color = c.hashCode();
@@ -269,15 +275,15 @@ public class ImGUIFrame extends Application {
                     int[] rgb;
                     int[] rgbDarker;
                     if (isSelected) {
-                        rgb = hslToRgb(color % 360, 0.45f, 0.3f);
-                        rgbDarker = hslToRgb(color % 360, 0.45f, 0.25f);
+                        rgb = Utils.hslToRgb(color % 360, 0.45f, 0.3f);
+                        rgbDarker = Utils.hslToRgb(color % 360, 0.45f, 0.25f);
 
                     } else {
-                        rgb = hslToRgb(color % 360, 0.45f, 0.45f);
-                        rgbDarker = hslToRgb(color % 360, 0.45f, 0.35f);
+                        rgb = Utils.hslToRgb(color % 360, 0.45f, 0.45f);
+                        rgbDarker = Utils.hslToRgb(color % 360, 0.45f, 0.35f);
                     }
 
-                    int[] rgbEvenDarker = hslToRgb(color % 360, 0.45f, 0.2f);
+                    int[] rgbEvenDarker = Utils.hslToRgb(color % 360, 0.45f, 0.2f);
 
                     ImGui.pushStyleColor(ImGuiCol.Button, rgb[0] / 255f, rgb[1] / 255f, rgb[2] / 255f, 1);
                     ImGui.pushStyleColor(
@@ -331,7 +337,7 @@ public class ImGUIFrame extends Application {
         ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, 0, 0);
         for (int y = 0; y < gridSize.getY(); y++) {
             for (int x = 0; x < gridSize.getX(); x++) {
-                if (!mg.isInGrid(new Vec2i(x, y))) {
+                if (mg.isNotInGrid(new Vec2i(x, y))) {
                     ImGui.invisibleButton("##" + y + ":" + x, gridPixelSize.x, gridPixelSize.y);
                     ImGui.sameLine();
                     continue;
@@ -346,10 +352,10 @@ public class ImGUIFrame extends Application {
                 int withoutPaddingY = y - padding.getY();
 
                 var block = pair.getSecond().getConstraints().stream()
-                        .filter(c -> c instanceof BlockConstraint)
-                        .filter(c -> c.isPosAffected(new Vec2i(withoutPaddingX, withoutPaddingY)))
-                        .map(c -> (BlockConstraint) c)
-                        .findFirst();
+                                .filter(c -> c instanceof BlockConstraint)
+                                .filter(c -> c.isPosAffected(new Vec2i(withoutPaddingX, withoutPaddingY)))
+                                .map(c -> (BlockConstraint) c)
+                                .findFirst();
 
                 block.ifPresent(c -> {
                     int color = c.getBlock().offset(padding.getX(), padding.getY()).hashCode() % 360;
@@ -357,15 +363,15 @@ public class ImGUIFrame extends Application {
                     int[] rgb;
                     int[] rgbDarker;
                     if (isSelected) {
-                        rgb = hslToRgb(color, 0.45f, 0.3f);
-                        rgbDarker = hslToRgb(color, 0.45f, 0.25f);
+                        rgb = Utils.hslToRgb(color, 0.45f, 0.3f);
+                        rgbDarker = Utils.hslToRgb(color, 0.45f, 0.25f);
 
                     } else {
-                        rgb = hslToRgb(color, 0.45f, 0.45f);
-                        rgbDarker = hslToRgb(color, 0.45f, 0.35f);
+                        rgb = Utils.hslToRgb(color, 0.45f, 0.45f);
+                        rgbDarker = Utils.hslToRgb(color, 0.45f, 0.35f);
                     }
 
-                    int[] rgbEvenDarker = hslToRgb(color, 0.45f, 0.2f);
+                    int[] rgbEvenDarker = Utils.hslToRgb(color, 0.45f, 0.2f);
 
                     ImGui.pushStyleColor(ImGuiCol.Button, rgb[0] / 255f, rgb[1] / 255f, rgb[2] / 255f, 1);
                     ImGui.pushStyleColor(
@@ -489,50 +495,4 @@ public class ImGUIFrame extends Application {
         }
     }
 
-    /**
-     * Converts HSL (Hue, Saturation, Lightness) color values to RGB (Red, Green, Blue) color values.
-     *
-     * @param h The hue value, in degrees (0-360).
-     * @param s The saturation value, as a percentage (0-1).
-     * @param l The lightness value, as a percentage (0-1).
-     * @return An array containing the RGB values, each ranging from 0 to 255.
-     */
-    private int[] hslToRgb(float h, float s, float l) {
-        float c = (1 - Math.abs(2 * l - 1)) * s;
-        float x = c * (1 - Math.abs((h / 60) % 2 - 1));
-        float m = l - c / 2;
-        float r = 0, g = 0, b = 0;
-
-        if (0 <= h && h < 60) {
-            r = c;
-            g = x;
-            b = 0;
-        } else if (60 <= h && h < 120) {
-            r = x;
-            g = c;
-            b = 0;
-        } else if (120 <= h && h < 180) {
-            r = 0;
-            g = c;
-            b = x;
-        } else if (180 <= h && h < 240) {
-            r = 0;
-            g = x;
-            b = c;
-        } else if (240 <= h && h < 300) {
-            r = x;
-            g = 0;
-            b = c;
-        } else if (300 <= h && h < 360) {
-            r = c;
-            g = 0;
-            b = x;
-        }
-
-        int[] rgb = new int[3];
-        rgb[0] = Math.round((r + m) * 255);
-        rgb[1] = Math.round((g + m) * 255);
-        rgb[2] = Math.round((b + m) * 255);
-        return rgb;
-    }
 }

@@ -13,7 +13,7 @@ public class Generator {
      * @param n: The size of the grid
      * @return A playable grid
      */
-    public static Grid generateClassicSudoku(int n) {
+    public static Grid generateClassicSudoku(int n) throws InterruptedException {
         //assert n is perfect square
         int sqrt = (int) Math.sqrt(n);
         assert sqrt * sqrt == n;
@@ -28,7 +28,7 @@ public class Generator {
      * @param blockColumns: The number of block columns
      * @return A playable grid
      */
-    public static Grid generateSudokuWithBlockConstraints(int blockRows, int blockColumns) {
+    public static Grid generateSudokuWithBlockConstraints(int blockRows, int blockColumns) throws InterruptedException {
         var solvedGrid = createSolvedSudoku(blockRows, blockColumns);
         return removeRandomCells(solvedGrid, blockRows * blockColumns);
     }
@@ -39,7 +39,7 @@ public class Generator {
      * @param lengthInnerGrid: The length of the inner grid
      * @return A playable grid
      */
-    public static Grid generateSudokuWithRandomBlockConstraint(int lengthInnerGrid) {
+    public static Grid generateSudokuWithRandomBlockConstraint(int lengthInnerGrid) throws InterruptedException {
         var symbols = SymbolSets.generateSymbols(lengthInnerGrid);
         Vec2i dividers = findDividers(lengthInnerGrid);
         Grid solvedGrid = createSolvedSudoku(dividers.getX(), dividers.getY());
@@ -58,11 +58,11 @@ public class Generator {
      * @param lengthInnerGrid: The length of the inner grid
      * @return A playable grid
      */
-    private static Grid removeRandomCells(Grid solvedGrid, int lengthInnerGrid) {
+    private static Grid removeRandomCells(Grid solvedGrid, int lengthInnerGrid) throws InterruptedException {
         Vec2i lastMovePos;
         Integer lastMoveSymbol;
         Set<Vec2i> emptyCells = solvedGrid.getEmptyCellsPossibilities().keySet();
-        Random random = new Random();
+        new Random();
         do {
             Vec2i randomPos;
             do {

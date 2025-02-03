@@ -16,7 +16,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ResolveTest {
-    static String RESSOURCES_PATH = "src/test/resources/";
+    static final String RESSOURCES_PATH = "src/test/resources/";
 
     @Test
     public void testSolveDeduce() throws FileNotFoundException {
@@ -61,7 +61,7 @@ public class ResolveTest {
     }
 
     @Test
-    public void testMultiSolve() throws FileNotFoundException {
+    public void testMultiSolve() throws FileNotFoundException, InterruptedException {
         var grid = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "multisolutions.csv"));
 
         assertFalse(grid.areConstraintsSatisfied(false));

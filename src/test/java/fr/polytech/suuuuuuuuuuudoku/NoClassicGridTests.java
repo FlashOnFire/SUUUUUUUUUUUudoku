@@ -3,12 +3,10 @@ package fr.polytech.suuuuuuuuuuudoku;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Box2D;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.constraints.*;
-import fr.polytech.suuuuuuuuuuudoku.graphics.SudokuFrame;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 import org.junit.jupiter.api.Test;
 
-import javax.swing.*;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;

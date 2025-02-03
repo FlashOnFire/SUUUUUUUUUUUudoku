@@ -14,12 +14,12 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 
 public class SudokuBoard extends JPanel {
+    final Grid previousGrid;
+    final JTable table;
     Boolean alreadySolved = false;
     Grid solvedGrid;
     Grid grid;
-    Grid previousGrid;
     boolean[][] trace;
-    JTable table;
 
     SudokuBoard(Grid grid) {
         final Integer[][][] value = {grid.getInnerGrid().get()};
@@ -53,22 +53,23 @@ public class SudokuBoard extends JPanel {
             System.arraycopy(value[0][i], 0, data[i], 0, value[0][i].length);
             table.getColumnModel().getColumn(i).setCellRenderer(new DefaultTableCellRenderer() {
                 @Override
-                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                                                               boolean hasFocus, int row, int column) {
                     Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                     setHorizontalAlignment(SwingConstants.CENTER);
                     grid.getConstraints().stream()
-                            .filter(BlockConstraint.class::isInstance)
-                            .map(BlockConstraint.class::cast)
-                            .filter(blockConstraint -> row >= blockConstraint.getBlock().x() && row < blockConstraint.getBlock().dx() && column >= blockConstraint.getBlock().y() && column < blockConstraint.getBlock().dy())
-                            .findFirst()
-                            .ifPresent(blockConstraint -> c.setBackground(new Color((grid.getConstraints().indexOf(blockConstraint) * 1234567) % 0x888888 + 0x777777)));
+                        .filter(BlockConstraint.class::isInstance)
+                        .map(BlockConstraint.class::cast)
+                        .filter(blockConstraint -> row >= blockConstraint.getBlock().x() && row < blockConstraint.getBlock().dx() && column >= blockConstraint.getBlock().y() && column < blockConstraint.getBlock().dy())
+                        .findFirst()
+                        .ifPresent(blockConstraint -> c.setBackground(new Color((grid.getConstraints().indexOf(blockConstraint) * 1234567) % 0x888888 + 0x777777)));
 
                     grid.getConstraints().stream()
-                            .filter(GeneralSymbolConstraint.class::isInstance)
-                            .map(GeneralSymbolConstraint.class::cast)
-                            .filter(generalSymbolConstraint -> Arrays.stream(generalSymbolConstraint.getPositionList()).anyMatch(pos -> pos.getX() == column && pos.getY() == row))
-                            .findFirst()
-                            .ifPresent(blockConstraint -> c.setBackground(new Color((grid.getConstraints().indexOf(blockConstraint) * 1234567) % 0x888888 + 0x777777)));
+                        .filter(GeneralSymbolConstraint.class::isInstance)
+                        .map(GeneralSymbolConstraint.class::cast)
+                        .filter(generalSymbolConstraint -> Arrays.stream(generalSymbolConstraint.getPositionList()).anyMatch(pos -> pos.getX() == column && pos.getY() == row))
+                        .findFirst()
+                        .ifPresent(blockConstraint -> c.setBackground(new Color((grid.getConstraints().indexOf(blockConstraint) * 1234567) % 0x888888 + 0x777777)));
 
                     if (trace[row][column]) {
                         c.setForeground(new Color(50, 50, 200));

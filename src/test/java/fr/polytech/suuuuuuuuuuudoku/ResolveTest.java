@@ -20,8 +20,11 @@ public class ResolveTest {
 
     @Test
     public void testSolveDeduce() throws FileNotFoundException {
-        var grid = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "deduce.csv"));
-        var res = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "deduceSolved.csv"));
+        var gridValue = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "deduce.csv"));
+        var resGrid = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "deduceSolved.csv"));
+        var symbol = SymbolSets.generateSymbols(gridValue.length);
+        Grid grid = new Grid(gridValue, symbol);
+        Grid res = new Grid(resGrid, symbol);
 
         assertFalse(grid.areConstraintsSatisfied(false));
 
@@ -38,8 +41,11 @@ public class ResolveTest {
 
     @Test
     public void testSolveWithBackTrack() throws FileNotFoundException {
-        var grid = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "backtrack.csv"));
-        var res = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "backtrackSolved.csv"));
+        var gridValue = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "backtrack.csv"));
+        var resGrid = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "backtrackSolved.csv"));
+        var symbol = SymbolSets.generateSymbols(gridValue.length);
+        Grid grid = new Grid(gridValue, symbol);
+        Grid res = new Grid(resGrid, symbol);
 
         assertFalse(grid.areConstraintsSatisfied(false));
         var solve = SudokuSolver.solve(grid, false, true, false);
@@ -50,8 +56,12 @@ public class ResolveTest {
 
     @Test
     public void testSolveWithBackTrackAndDeduce() throws FileNotFoundException {
-        var grid = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "backtrackAndDeduce.csv"));
-        var res = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "backtrackAndDeduceSolved.csv"));
+        var gridValue = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "backtrackAndDeduce.csv"));
+        var resGrid = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "backtrackAndDeduceSolved.csv"));
+        var symbol = SymbolSets.generateSymbols(gridValue.length);
+        Grid grid = new Grid(gridValue, symbol);
+        Grid res = new Grid(resGrid, symbol);
+
 
         assertFalse(grid.areConstraintsSatisfied(false));
         var solve = SudokuSolver.solve(grid, true, true, false);
@@ -62,7 +72,9 @@ public class ResolveTest {
 
     @Test
     public void testMultiSolve() throws FileNotFoundException, InterruptedException {
-        var grid = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "multisolutions.csv"));
+        var gridValue = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "multisolutions.csv"));
+        var symbol = SymbolSets.generateSymbols(gridValue.length);
+        Grid grid = new Grid(gridValue, symbol);
 
         assertFalse(grid.areConstraintsSatisfied(false));
 
@@ -105,8 +117,11 @@ public class ResolveTest {
 
     @Test
     public void testSolveBig() throws FileNotFoundException {
-        var grid = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "100x100.csv"));
-        var res = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "100x100Solved.csv"));
+        var gridValue = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "100x100.csv"));
+        var resGrid = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "100x100Solved.csv"));
+        var symbol = SymbolSets.generateSymbols(gridValue.length);
+        Grid grid = new Grid(gridValue, symbol);
+        Grid res = new Grid(resGrid, symbol);
 
         assertFalse(grid.areConstraintsSatisfied(false));
 

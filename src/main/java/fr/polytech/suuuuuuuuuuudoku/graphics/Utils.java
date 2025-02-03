@@ -50,7 +50,7 @@ public class Utils {
         return rgb;
     }
 
-    public <O, M> M[][] applyMapping(O[][] original, M[][] mapped, HashMap<O, M> mapping) {
+    public static <O, M> M[][] applyMapping(O[][] original, M[][] mapped, HashMap<O, M> mapping) {
         assert original.length == mapped.length;
         if (original.length == 0) return mapped;
         assert original[0].length == mapped[0].length;

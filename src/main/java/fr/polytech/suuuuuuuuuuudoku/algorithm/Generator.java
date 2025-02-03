@@ -1,12 +1,19 @@
 package fr.polytech.suuuuuuuuuuudoku.algorithm;
 
+import fr.polytech.suuuuuuuuuuudoku.CsvUtils;
 import fr.polytech.suuuuuuuuuuudoku.constraints.*;
+import fr.polytech.suuuuuuuuuuudoku.graphics.Utils;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
+import java.io.FileNotFoundException;
+import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.IntStream;
+
 
 public class Generator {
+
     /**
      * Generates a classic NxN grid
      *
@@ -29,7 +36,7 @@ public class Generator {
      * @return A playable grid
      */
     public static Grid generateSudokuWithBlockConstraints(int blockRows, int blockColumns) throws InterruptedException {
-        var solvedGrid = createSolvedSudoku(blockRows, blockColumns);
+        var solvedGrid = fastSolvedGridCreation(blockRows, blockColumns);
         return removeRandomCells(solvedGrid, blockRows * blockColumns);
     }
 
@@ -42,7 +49,7 @@ public class Generator {
     public static Grid generateSudokuWithRandomBlockConstraint(int lengthInnerGrid) throws InterruptedException {
         var symbols = SymbolSets.generateSymbols(lengthInnerGrid);
         Vec2i dividers = findDividers(lengthInnerGrid);
-        Grid solvedGrid = createSolvedSudoku(dividers.getX(), dividers.getY());
+        Grid solvedGrid = fastSolvedGridCreation(dividers.getX(), dividers.getY());
         var generalSymbolConstraints = createRandomConstraints(solvedGrid);
 
         // We update the new constraints
@@ -123,8 +130,7 @@ public class Generator {
                 listInConstraint.add(pos);
                 positionList.get(i).remove(pos);
             }
-            constraints.add(new GeneralSymbolConstraint(SymbolSets.generateSymbols(length),
-                    listInConstraint.toArray(Vec2i[]::new)));
+            constraints.add(new GeneralSymbolConstraint(SymbolSets.generateSymbols(length), listInConstraint.toArray(Vec2i[]::new)));
         }
         constraints.add(new LineConstraint(grid.getSymbols()));
         constraints.add(new ColumnConstraint(grid.getSymbols()));
@@ -166,5 +172,101 @@ public class Generator {
             solvedGrid = pair.getSecond();
         } while (state != SolvingState.SOLVED);
         return solvedGrid;
+    }
+
+    /**
+     * Try to generate a solved grid faster using previous generated grid. We shuffled row and column, keeping block constraints at the same time.
+     *
+     * @param blockRows    : the number of rows in a block constraint
+     * @param blockColumns : the number of columns in a block constraint
+     * @return a solved grid of size blockRows*blockColumns x blockRows*blockColumns
+     */
+    public static Grid fastSolvedGridCreation(int blockRows, int blockColumns) {
+        Path path = Path.of("src/main/java/fr/polytech/suuuuuuuuuuudoku/ressources/" + blockColumns * blockRows + "x" + blockColumns * blockRows + "(constraint" + blockRows + "x" + blockColumns + ").csv");
+        try {
+            // Import the grid of length blockRows*blockColumns if it exists
+            Integer[][] gridValue = CsvUtils.importGrid(path);
+            var symbols = SymbolSets.generateSymbols(blockRows * blockColumns);
+            var listOfIndexRows = new ArrayList<>(IntStream.rangeClosed(0, blockRows - 1).boxed().toList());
+            var listOfIndexColumns = new ArrayList<>(IntStream.rangeClosed(0, blockColumns - 1).boxed().toList());
+
+            // Create a temporary grid
+            var tempGrid = new Integer[blockRows * blockColumns][blockRows * blockColumns];
+            for (int i = 0; i < blockRows; i++) {
+                Arrays.fill(tempGrid[i], null);
+            }
+
+            // Shuffle block in rows
+            Collections.shuffle(listOfIndexRows);
+            for (int i = 0; i < blockRows; i++) {
+                for (int j = 0; j < blockColumns; j++) {
+                    tempGrid[blockColumns * i + j] = gridValue[blockColumns * listOfIndexRows.get(i) + j].clone();
+                }
+            }
+
+            var grid = new Grid(tempGrid, symbols, blockRows, blockColumns);
+            assert grid.isSolved();
+
+            // shuffle block in columns
+            Collections.shuffle(listOfIndexColumns);
+            for (int i = 0; i < blockRows; i++) {
+                for (int j = 0; j < blockColumns; j++) {
+                    for (int k = 0; k < blockColumns * blockRows; k++) {
+                        gridValue[k][blockRows * j + i] = tempGrid[k][blockRows * listOfIndexColumns.get(j) + i];
+                    }
+                }
+            }
+
+            grid = new Grid(gridValue, symbols, blockRows, blockColumns);
+            assert grid.isSolved();
+
+            // Shuffle rows
+            for (int i = 0; i < blockRows; i++) {
+                Collections.shuffle(listOfIndexColumns);
+                for (int j = 0; j < blockColumns; j++) {
+                    tempGrid[blockColumns * i + j] = gridValue[blockColumns * i + listOfIndexColumns.get(j)].clone();
+                }
+            }
+
+            grid = new Grid(tempGrid, symbols, blockRows, blockColumns);
+            assert grid.isSolved();
+
+            // Shuffle columns
+            for (int i = 0; i < blockColumns; i++) {
+                Collections.shuffle(listOfIndexRows);
+                for (int j = 0; j < blockRows; j++) {
+                    for (int k = 0; k < blockColumns * blockRows; k++) {
+                        gridValue[k][blockRows * i + j] = tempGrid[k][blockRows * i + listOfIndexRows.get(j)];
+                    }
+                }
+            }
+
+            grid = new Grid(gridValue, symbols, blockRows, blockColumns);
+            assert grid.isSolved();
+
+            // Shuffle symbols
+            var symbolsList = new ArrayList<>(symbols);
+            Collections.shuffle(symbolsList);
+            Utils.applyMapping(gridValue, gridValue, symbolsList.stream().collect(HashMap::new, (m, v) -> m.put(v, symbolsList.get(v - 1)), HashMap::putAll));
+
+            // Check if the grid is solved to assure the grid is correct
+            grid = new Grid(gridValue, symbols, blockRows, blockColumns);
+            assert grid.isSolved();
+            return grid;
+        } catch (FileNotFoundException e) {
+            var grid = createSolvedSudoku(blockRows, blockColumns);
+            CsvUtils.exportGrid(path, grid);
+            return grid;
+        }
+    }
+
+    static public void printGrid(Integer[][] grid) {
+        for (Integer[] integers : grid) {
+            for (int j = 0; j < grid.length; j++) {
+                System.out.print(integers[j] + " ");
+            }
+            System.out.println();
+        }
+        System.out.println();
     }
 }

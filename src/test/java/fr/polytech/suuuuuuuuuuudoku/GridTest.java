@@ -1,6 +1,8 @@
 package fr.polytech.suuuuuuuuuuudoku;
 
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
+import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
+import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -15,12 +17,13 @@ public class GridTest {
 
     @Test
     public void testImportExport() throws FileNotFoundException {
+        var gridValue = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "100x100.csv"));
+        var symbol = SymbolSets.generateSymbols(gridValue.length);
+        Grid grid = new Grid(gridValue, symbol);
+        CsvUtils.exportGrid(Path.of(RESSOURCES_PATH + "100x100_export.csv"), grid);
 
-        var grid = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "100x100.csv"));
-        Path path = Path.of(RESSOURCES_PATH + "100x100_export.csv");
-        CsvUtils.exportGrid(path, grid);
-
-        var grid2 = CsvUtils.importGrid(path);
+        var gridValue2 = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "100x100_export.csv"));
+        Grid grid2 = new Grid(gridValue2, symbol);
         for (int i = 0; i < grid.length(); i++) {
             for (int j = 0; j < grid.getInnerGrid().get()[0].length; j++) {
                 assertEquals(grid.getInnerGrid().get()[i][j], grid2.getInnerGrid().get()[i][j]);

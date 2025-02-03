@@ -20,16 +20,13 @@ public class CsvUtils {
      * @param file the CSV file representing the grid
      * @return the created Grid
      */
-    static public Grid importGrid(Path file) throws FileNotFoundException {
-        Integer[][] grid = new BufferedReader(new FileReader(file.toFile()))
+    static public Integer[][] importGrid(Path file) throws FileNotFoundException {
+        return new BufferedReader(new FileReader(file.toFile()))
                 .lines()
                 .map(line -> Arrays.stream(line.split(",(?<!\\r)")).map(cell -> cell.equals(".") ? null :
-                                           Integer.parseInt(cell))
-                                   .toArray(Integer[]::new))
+                                Integer.parseInt(cell))
+                        .toArray(Integer[]::new))
                 .toArray(Integer[][]::new);
-
-        var symbols = SymbolSets.generateSymbols(grid.length);
-        return new Grid(grid, symbols);
     }
 
     /**
@@ -49,7 +46,9 @@ public class CsvUtils {
         // load the grids
         ArrayList<Grid> grids = Arrays.stream(files).filter(file -> !file.getName().equals("padding.csv")).map(file -> {
             try {
-                return importGrid(file.toPath());
+                var gridValue = importGrid(file.toPath());
+                var symbols = SymbolSets.generateSymbols(gridValue.length);
+                return new Grid(gridValue, symbols);
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -68,8 +67,8 @@ public class CsvUtils {
         assert paddings.size() == grids.size();
         // merge the grids
         var mergedGrids = grids.stream()
-                               .map(grid -> new Pair<>(paddings.removeFirst(), grid))
-                               .collect(Collectors.toList());
+                .map(grid -> new Pair<>(paddings.removeFirst(), grid))
+                .collect(Collectors.toList());
         return new MultiGrid(mergedGrids);
     }
 
@@ -81,10 +80,10 @@ public class CsvUtils {
      */
     static public void exportGrid(Path path, Grid grid) {
         var csvData = Arrays.stream(grid.getInnerGrid().get())
-                            .map(line -> Arrays.stream(line)
-                                               .map(cell -> cell == null ? "." : cell.toString())
-                                               .collect(Collectors.joining(",")))
-                            .collect(Collectors.joining("\n"));
+                .map(line -> Arrays.stream(line)
+                        .map(cell -> cell == null ? "." : cell.toString())
+                        .collect(Collectors.joining(",")))
+                .collect(Collectors.joining("\n"));
 
         try (var writer = new BufferedWriter(new FileWriter(path.toFile()))) {
             writer.write(csvData);

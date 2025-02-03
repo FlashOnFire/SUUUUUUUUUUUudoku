@@ -12,10 +12,7 @@ import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.graphics.Utils;
-import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
-import fr.polytech.suuuuuuuuuuudoku.grid.Move2i;
-import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
-import fr.polytech.suuuuuuuuuuudoku.grid.Solvable;
+import fr.polytech.suuuuuuuuuuudoku.grid.*;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
 import java.io.IOException;
@@ -104,7 +101,9 @@ public class Tui {
                 if (files[selected].isDirectory()) {
                     grid = CsvUtils.importMultiGrid(files[selected].toPath());
                 } else {
-                    grid = CsvUtils.importGrid(files[selected].toPath());
+                    Integer[][] t = CsvUtils.importGrid(files[selected].toPath());
+                    var symbols = SymbolSets.generateSymbols(t.length);
+                    grid = new Grid(t, symbols);
                 }
             }
             default -> throw new IllegalStateException("Unexpected value: " + selectMode(new String[]{"> Generer un " +
@@ -310,9 +309,9 @@ public class Tui {
         int gridSize = grid.getInnerGrid().length();
         int spacing = String.valueOf(gridSize).length();
         List<BlockConstraint> blocks = grid.getConstraints().stream()
-                                           .filter(BlockConstraint.class::isInstance)
-                                           .map(BlockConstraint.class::cast)
-                                           .toList();
+                .filter(BlockConstraint.class::isInstance)
+                .map(BlockConstraint.class::cast)
+                .toList();
 
         // Calculate the padding which is the padding + the padding between each character + the number of blocks
         int xPadding = padding.getX() * (spacing + 1);
@@ -327,22 +326,22 @@ public class Tui {
                 int finalI = i;
                 int finalJ = j;
                 var blockColor = blocks.stream()
-                                       .filter(blockConstraint ->
-                                               finalI >= blockConstraint.getBlock().x()
-                                                       && finalI < blockConstraint.getBlock().dx()
-                                                       && finalJ >= blockConstraint.getBlock().y()
-                                                       && finalJ < blockConstraint.getBlock().dy())
-                                       .findFirst()
-                                       .map(blockConstraint -> {
-                                           int blockIndex = blocks.indexOf(blockConstraint) + usedColors;
-                                           float hue = (blockIndex * 50) % 360; // Hue value between 0 and 360
-                                           float saturation = 1.0f; // Saturation value between 0 and 1
-                                           float lightness = 0.25f; // Lightness value between 0 and 1
+                        .filter(blockConstraint ->
+                                finalI >= blockConstraint.getBlock().x()
+                                        && finalI < blockConstraint.getBlock().dx()
+                                        && finalJ >= blockConstraint.getBlock().y()
+                                        && finalJ < blockConstraint.getBlock().dy())
+                        .findFirst()
+                        .map(blockConstraint -> {
+                            int blockIndex = blocks.indexOf(blockConstraint) + usedColors;
+                            float hue = (blockIndex * 50) % 360; // Hue value between 0 and 360
+                            float saturation = 1.0f; // Saturation value between 0 and 1
+                            float lightness = 0.25f; // Lightness value between 0 and 1
 
-                                           // Convert HSL to RGB
-                                           int[] rgb = Utils.hslToRgb(hue, saturation, lightness);
-                                           return new TextColor.RGB(rgb[0], rgb[1], rgb[2]);
-                                       });
+                            // Convert HSL to RGB
+                            int[] rgb = Utils.hslToRgb(hue, saturation, lightness);
+                            return new TextColor.RGB(rgb[0], rgb[1], rgb[2]);
+                        });
 
                 blockColor.ifPresent(textGraphics::setBackgroundColor);
 
@@ -366,7 +365,7 @@ public class Tui {
      * @param grid The Sudoku grid to solve.
      * @throws IOException If an I/O error occurs.
      */
-    private void play(Solvable<?> grid) throws IOException, InterruptedException {
+    private void play(Solvable<?> grid) throws IOException {
         Vec2i position = Vec2i.zero();
         Vec2i lastPosition = Vec2i.zero();
         KeyStroke keyStroke;

@@ -8,6 +8,7 @@ import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
 import fr.polytech.suuuuuuuuuuudoku.grid.ObservableGrid;
+import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 import fr.polytech.suuuuuuuuuuudoku.grid.Solvable;
 import imgui.ImGui;
 import imgui.ImVec2;
@@ -18,6 +19,7 @@ import imgui.flag.*;
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 
 public class ImGUIFrame extends Application {
     final AtomicBoolean solving = new AtomicBoolean(false);
@@ -139,8 +141,10 @@ public class ImGUIFrame extends Application {
         ImGui.sameLine();
         if (ImGui.button("MaxiGrid")) {
             try {
-                solvable = CsvUtils.importGrid(Path.of(
+                var innergrid = CsvUtils.importGrid(Path.of(
                         "src/test/resources/100x100.csv"));
+                var symbolSet = SymbolSets.generateSymbols(innergrid.length);
+                solvable = new Grid(innergrid, symbolSet);
                 originalSolvable = ((Grid) solvable).shallowCopy();
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
@@ -264,9 +268,9 @@ public class ImGUIFrame extends Application {
                 int finalY = y;
                 int finalX = x;
                 var block = grid.getConstraints().stream()
-                                .filter(c -> c instanceof BlockConstraint)
-                                .filter(c -> c.isPosAffected(new Vec2i(finalX, finalY)))
-                                .findFirst();
+                        .filter(c -> c instanceof BlockConstraint)
+                        .filter(c -> c.isPosAffected(new Vec2i(finalX, finalY)))
+                        .findFirst();
 
                 block.ifPresent(c -> {
                     int color = c.hashCode();
@@ -352,10 +356,10 @@ public class ImGUIFrame extends Application {
                 int withoutPaddingY = y - padding.getY();
 
                 var block = pair.getSecond().getConstraints().stream()
-                                .filter(c -> c instanceof BlockConstraint)
-                                .filter(c -> c.isPosAffected(new Vec2i(withoutPaddingX, withoutPaddingY)))
-                                .map(c -> (BlockConstraint) c)
-                                .findFirst();
+                        .filter(c -> c instanceof BlockConstraint)
+                        .filter(c -> c.isPosAffected(new Vec2i(withoutPaddingX, withoutPaddingY)))
+                        .map(c -> (BlockConstraint) c)
+                        .findFirst();
 
                 block.ifPresent(c -> {
                     int color = c.getBlock().offset(padding.getX(), padding.getY()).hashCode() % 360;

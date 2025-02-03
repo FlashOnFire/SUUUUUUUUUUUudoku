@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class GeneratorTests {
 
     @Test
-    public void testBasicGenerator() {
+    public void testBasicGenerator() throws InterruptedException {
         long startTime1 = System.currentTimeMillis();
         Generator.generateClassicSudoku(4);
         long endTime1 = System.currentTimeMillis();
@@ -32,7 +32,11 @@ public class GeneratorTests {
         long endTime4 = System.currentTimeMillis();
         System.out.println("Generation time for 25x25 grid: " + (endTime4 - startTime4) + "ms");
         assertTrue((endTime4 - startTime4) < 30000, "Generation time for 25x25 grid exceeded limit");
+
+        long startTime5 = System.currentTimeMillis();
+        Generator.generateSudokuWithBlockConstraints(3, 4);
+        long endTime5 = System.currentTimeMillis();
+        System.out.println("Generation time for 25x25 grid: " + (endTime4 - startTime4) + "ms");
+        assertTrue((endTime5 - startTime5) < 20000, "Generation time for 25x25 grid exceeded limit");
     }
-
-
 }

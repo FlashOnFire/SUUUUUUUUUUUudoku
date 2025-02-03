@@ -33,6 +33,8 @@ public class Tui {
     private Thread loaderThread;
     private int line = 0;
     private int usedColors = 0;
+    private int scrollX = 0;
+    private int scrollY = 0;
 
     /**
      * Constructs a new Tui instance and initializes the terminal.
@@ -54,6 +56,17 @@ public class Tui {
     public static void main(String[] args) throws IOException, InterruptedException {
         Tui tui = new Tui();
         tui.start();
+    }
+
+    /**
+     * Cleans the terminal screen.
+     *
+     * @throws IOException if an I/O error occurs
+     */
+    private void cleanTerminal() throws IOException {
+        line = 0;
+        terminal.clearScreen();
+        terminal.flush();
     }
 
     /**
@@ -97,7 +110,9 @@ public class Tui {
                     "sudoku",
                     "  Entrer un sudoku", "  Ouvrir un fichier"}));
         }
+        cleanTerminal();
         showHelper();
+        line += 4;
         play(grid);
         gameOver();
     }
@@ -278,7 +293,7 @@ public class Tui {
      *
      * @param grid The MultiGrid object containing multiple Sudoku grids.
      */
-    private void displayMultiGrid(MultiGrid grid) {
+    private void displayMultiGrid(MultiGrid grid) throws IOException {
         for (int i = 0; i < grid.getGrids().length; i++) {
             displayGrid(grid.getGrids()[i], grid.getPaddings()[i]);
         }
@@ -290,12 +305,9 @@ public class Tui {
      * @param grid    The Sudoku grid to display.
      * @param padding The padding to apply around the grid.
      */
-    private void displayGrid(Grid grid, Vec2i padding) {
-        var oldLine = line;
-
-        // Afficher la grille
+    private void displayGrid(Grid grid, Vec2i padding) throws IOException {
         int gridSize = grid.getInnerGrid().length();
-        int spacing = String.valueOf(gridSize).length(); // Calculate the spacing between each character
+        int spacing = String.valueOf(gridSize).length();
         List<BlockConstraint> blocks = grid.getConstraints().stream()
                                            .filter(BlockConstraint.class::isInstance)
                                            .map(BlockConstraint.class::cast)
@@ -332,7 +344,7 @@ public class Tui {
                 blockColor.ifPresent(textGraphics::setBackgroundColor);
 
                 // display the symbol at the right place
-                textGraphics.putString(finalJ * (spacing + 1) + xPadding, line,
+                textGraphics.putString((j - scrollX) * (spacing + 1) + xPadding, line + (i - scrollY),
                         // Theirs no value just display the spacing
                         grid.getSymbolAt(finalJ, finalI) == null ? " ".repeat(spacing + 1) :
                                 // Display the value with the right spacing (taking care of the end of the line)
@@ -340,9 +352,8 @@ public class Tui {
                                         finalI).toString().length() + 1));
                 textGraphics.setBackgroundColor(TextColor.ANSI.DEFAULT);
             }
-            line++;
         }
-        line = oldLine;
+        line -= yPadding;
         usedColors += blocks.size();
     }
 
@@ -362,6 +373,9 @@ public class Tui {
         Vec2i max;
         int spacing;
         int timeLinePos = 0;
+        boolean enableScrollX = false;
+        boolean enableScrollY = false;
+
 
         if (grid instanceof MultiGrid) {
             spacing = String.valueOf(((MultiGrid) grid).getGrids()[0].getSymbols().size()).length();
@@ -369,6 +383,13 @@ public class Tui {
         } else {
             spacing = String.valueOf(((Grid) grid).getSymbols().size()).length();
             max = ((Grid) grid).getSize();
+        }
+
+        if (terminal.getTerminalSize().getRows() / (spacing + 1) < grid.getSize().getX()) {
+            enableScrollX = true;
+        }
+        if (terminal.getTerminalSize().getColumns() / (spacing + 1) < grid.getSize().getY()) {
+            enableScrollY = true;
         }
 
         do {
@@ -384,55 +405,72 @@ public class Tui {
                     textGraphics.putString(lastPosition.getX() * (spacing + 1), lastPosition.getY() + line,
                             " ".repeat(spacing));
                 }
-                textGraphics.setBackgroundColor(TextColor.ANSI.BLACK_BRIGHT);
-                textGraphics.putString(position.getX() * (spacing + 1), position.getY() + line,
-                        ((MultiGrid) grid).getSymbolAt(new Vec2i(position.getX(),
-                                position.getY())) == null ? " ".repeat(spacing) :
-                                ((MultiGrid) grid).getSymbolAt(new Vec2i(position.getX(),
-                                        position.getY())).toString());
             } else {
                 displayGrid((Grid) grid, Vec2i.zero());
-                textGraphics.setBackgroundColor(TextColor.ANSI.BLACK_BRIGHT);
-                textGraphics.putString(position.getX() * (spacing + 1), position.getY() + line,
-                        ((Grid) grid).getSymbolAt(position.getX(),
-                                position.getY()) == null ? " ".repeat(spacing) :
-                                ((Grid) grid).getSymbolAt(position.getX(), position.getY()).toString());
             }
+            textGraphics.setBackgroundColor(TextColor.ANSI.BLACK_BRIGHT);
+            textGraphics.putString((position.getX() - scrollX) * (spacing + 1), position.getY() + line - scrollY,
+                    grid.getSymbolAt(new Vec2i(position.getX(),
+                            position.getY())) == null ? " ".repeat(spacing) :
+                            grid.getSymbolAt(new Vec2i(position.getX(),
+                                    position.getY())).toString());
 
-            // Afficher la valeur entrée sur la grille
             textGraphics.setBackgroundColor(TextColor.ANSI.DEFAULT);
             String displayValue = "Valeur entrée: " + (enteredValue != null ? enteredValue : "");
             int padding = terminal.getTerminalSize().getColumns() - 15 - displayValue.length();
             textGraphics.putString(0, line - 1, displayValue + " ".repeat(padding));
 
-            // display move navigator
-            line += max.getY() + 1;
-            List<Move2i> moveList;
-            if (grid instanceof MultiGrid) {
-                moveList = ((MultiGrid) grid).getMoves();
-            } else {
-                moveList = ((Grid) grid).getMoves();
-            }
+            line -= 5;
+            List<Move2i> moveList = grid instanceof MultiGrid ? ((MultiGrid) grid).getMoves() :
+                    ((Grid) grid).getMoves();
             if (!moveList.isEmpty()) {
                 showTimeLine(moveList.size(), timeLinePos);
             }
-            line -= max.getY() + 1;
+            line += 5;
             terminal.flush();
 
             lastPosition = new Vec2i(position.getX(), position.getY());
             keyStroke = terminal.readInput();
 
-            if (keyStroke.getKeyType() == KeyType.ArrowDown && position.getY() < max.getY() - 1) {
-                position = position.add(new Vec2i(0, 1));
-            } else if (keyStroke.getKeyType() == KeyType.ArrowUp && position.getY() > 0) {
-                position = position.add(new Vec2i(0, -1));
-            } else if (keyStroke.getKeyType() == KeyType.ArrowLeft && position.getX() > 0) {
-                position = position.add(new Vec2i(-1, 0));
-            } else if (keyStroke.getKeyType() == KeyType.ArrowRight && position.getX() < max.getX() - 1) {
-                position = position.add(new Vec2i(1, 0));
+            if (keyStroke.getKeyType() == KeyType.ArrowDown) {
+                if (position.getY() < max.getY() - 1) {
+
+                    if (enableScrollY &&
+                            position.getY() >= (terminal.getTerminalSize().getRows() - line) / 2
+                            && scrollY < max.getY() - (terminal.getTerminalSize().getRows() - line)) {
+                        scrollY++;
+                    }
+                    position = position.add(new Vec2i(0, 1));
+                }
+            } else if (keyStroke.getKeyType() == KeyType.ArrowUp) {
+                if (position.getY() > 0) {
+                    if (enableScrollY
+                            && scrollY > 0
+                            && (position.getY() / scrollY) <= terminal.getTerminalSize().getRows() / (spacing) / 2) {
+                        scrollY--;
+                    }
+                    position = position.add(new Vec2i(0, -1));
+                }
+            } else if (keyStroke.getKeyType() == KeyType.ArrowLeft) {
+                if (position.getX() > 0) {
+                    if (enableScrollX
+                            && scrollX > 0
+                            && (position.getX() / scrollX) <= terminal.getTerminalSize().getColumns() / (spacing + 1) / 2) {
+                        scrollX--;
+                    }
+                    position = position.add(new Vec2i(-1, 0));
+                }
+            } else if (keyStroke.getKeyType() == KeyType.ArrowRight) {
+                if (position.getX() < max.getX() - 1) {
+                    if (enableScrollX
+                            && position.getX() >= terminal.getTerminalSize().getColumns() / (spacing + 1) / 2
+                            && scrollX < max.getX() - terminal.getTerminalSize().getColumns() / (spacing + 1)) {
+                        scrollX++;
+                    }
+                    position = position.add(new Vec2i(1, 0));
+                }
             } else if (keyStroke.getKeyType() == KeyType.Enter && enteredValue != null) {
-                grid.placeUnchecked(new Vec2i(position), Integer.parseInt(enteredValue),
-                        true, true);
+                grid.placeUnchecked(new Vec2i(position), Integer.parseInt(enteredValue), true, true);
                 timeLinePos = -1;
                 enteredValue = null;
             } else if (keyStroke.getKeyType() == KeyType.Delete) {
@@ -460,19 +498,17 @@ public class Tui {
                     switch (keyStroke.getCharacter()) {
                         case 'd' -> disco = !disco;
                         case 's' -> {
-                            line += max.getY() + 1;
+                            line -= 3;
                             var solved = solve(grid);
                             if (solved == null || !solved.isSolved()) {
-                                //display a message
                                 textGraphics.setBackgroundColor(TextColor.ANSI.RED);
                                 textGraphics.putString(0, line, "La grille n'a pas pu être résolue");
                                 textGraphics.setBackgroundColor(TextColor.ANSI.DEFAULT);
                             } else {
                                 grid = solved;
                             }
-                            line -= max.getY() + 1;
+                            line += 3;
                             timeLinePos = -1;
-
                         }
                         case 'q' -> exit(0);
                     }
@@ -587,7 +623,7 @@ public class Tui {
 
             displaySizes(selectedSize, possibleSizes);
         } while (keyStroke.getKeyType() != KeyType.Enter);
-        line += 4;
+        line += 3;
         return possibleSizes[selectedSize];
     }
 

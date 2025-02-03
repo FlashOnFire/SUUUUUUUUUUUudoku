@@ -1,13 +1,12 @@
 package fr.polytech.suuuuuuuuuuudoku.grid;
 
-import fr.polytech.suuuuuuuuuuudoku.algorithm.ShallowCopyable;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-public class ObservableGrid extends Solvable implements ShallowCopyable<ObservableGrid> {
+public class ObservableGrid extends Solvable<ObservableGrid> {
     private final GridListener listener;
     private Grid grid;
 
@@ -18,6 +17,11 @@ public class ObservableGrid extends Solvable implements ShallowCopyable<Observab
 
         this.grid = grid;
         this.listener = listener;
+    }
+
+    @Override
+    public Vec2i getSize() {
+        return grid.getSize();
     }
 
     public Grid getGrid() {
@@ -31,6 +35,11 @@ public class ObservableGrid extends Solvable implements ShallowCopyable<Observab
     @Override
     public boolean areConstraintsSatisfied(boolean skip_not_empty) {
         return grid.areConstraintsSatisfied(skip_not_empty);
+    }
+
+    @Override
+    public Integer getSymbolAt(Vec2i pos) {
+        return grid.getSymbolAt(pos);
     }
 
     @Override

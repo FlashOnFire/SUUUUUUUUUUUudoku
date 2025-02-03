@@ -14,6 +14,10 @@ public class Box2D {
         return new Box2D(x, y, dx - x, dy - y);
     }
 
+    public Box2D absolute() {
+        return new Box2D(x, y, dx - x, dy - y);
+    }
+
     public boolean contains(Vec2i vec2i) {
         return contains(vec2i.getX(), vec2i.getY());
     }
@@ -57,6 +61,10 @@ public class Box2D {
 
     public int height() {
         return dy - y;
+    }
+
+    public Box2D offset(int offsetX, int offsetY) {
+        return new Box2D(x + offsetX, y + offsetY, dx + offsetX, dy + offsetY);
     }
 
     public Box2D substract(Box2D other) {

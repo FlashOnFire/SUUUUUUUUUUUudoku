@@ -20,7 +20,7 @@ public class SudokuSolver {
      * @param backtracking whether to use backtracking if deduction fails
      * @return the solving state of the Sudoku grid
      */
-    public static <T extends Solvable & ShallowCopyable<T>> Pair<SolvingState, T> solve(T grid, boolean deducing,
+    public static <T extends Solvable<T>> Pair<SolvingState, T> solve(T grid, boolean deducing,
                                                                                         boolean backtracking,
                                                                                         boolean store_moves) {
         assert deducing || backtracking : "At least one of deducing or backtracking must be enabled";
@@ -65,7 +65,7 @@ public class SudokuSolver {
      * @param store_moves:  whether to store the moves
      * @return a list of all solutions to the Sudoku grid
      */
-    public static <T extends Solvable & ShallowCopyable<T>> List<T> findAllSolutions(T grid, boolean deducing,
+    public static <T extends Solvable<T>> List<T> findAllSolutions(T grid, boolean deducing,
                                                                                      boolean backtracking,
                                                                                      boolean store_moves) {
         assert deducing || backtracking : "At least one of deducing or backtracking must be enabled";
@@ -104,7 +104,7 @@ public class SudokuSolver {
      * @param backtracking: whether to use backtracking
      * @return true if the Sudoku grid has more than one solution, false otherwise
      */
-    public static <T extends Solvable & ShallowCopyable<T>> boolean hasMoreThanOneSolution(T grid,
+    public static <T extends Solvable<T>> boolean hasMoreThanOneSolution(T grid,
                                                                                            boolean deducing,
                                                                                            boolean backtracking) {
         assert deducing || backtracking : "At least one of deducing or backtracking must be enabled";
@@ -144,7 +144,7 @@ public class SudokuSolver {
      * @param grid the Sudoku grid to solve
      * @return the solving state of the Sudoku grid
      */
-    private static <T extends Solvable & ShallowCopyable<T>> List<T> doBacktracking(T grid, boolean store_moves) {
+    private static <T extends Solvable<T>> List<T> doBacktracking(T grid, boolean store_moves) {
         // System.out.println("Backtracking");
 
         assert !grid.getEmptyCellsPossibilities().isEmpty() : "No empty cells";
@@ -173,7 +173,7 @@ public class SudokuSolver {
      * @param grid the Sudoku grid to solve
      * @return the solving state of the Sudoku grid
      */
-    private static <T extends Solvable> SolvingState solveDeduction(T grid, boolean store_moves) {
+    private static <T extends Solvable<T>> SolvingState solveDeduction(T grid, boolean store_moves) {
         // System.out.println("Deduction");
 
         boolean finished = false;

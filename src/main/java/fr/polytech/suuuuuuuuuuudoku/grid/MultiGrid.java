@@ -1,12 +1,11 @@
 package fr.polytech.suuuuuuuuuuudoku.grid;
 
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Pair;
-import fr.polytech.suuuuuuuuuuudoku.algorithm.ShallowCopyable;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 
 import java.util.*;
 
-public class MultiGrid extends Solvable implements ShallowCopyable<MultiGrid> {
+public class MultiGrid extends Solvable<MultiGrid> {
     private final Grid[] grids;
     private final Vec2i[] paddings;
     private final List<Move2i> moves = new ArrayList<>();
@@ -122,9 +121,22 @@ public class MultiGrid extends Solvable implements ShallowCopyable<MultiGrid> {
     public Integer getSymbolAt(Vec2i pos) {
         for (int i = 0; i < paddings.length; i++) {
             Vec2i padding = paddings[i];
-            if (pos.getX() >= padding.getX() && pos.getX() < padding.getX() + grids[i].length()
-                    && pos.getY() >= padding.getY() && pos.getY() < padding.getY() + grids[i].length()) {
+            Vec2i size = grids[i].getSize();
+            if (pos.getX() >= padding.getX() && pos.getX() < padding.getX() + size.getX()
+                    && pos.getY() >= padding.getY() && pos.getY() < padding.getY() + size.getY()) {
                 return grids[i].getSymbolAt(pos.substract(padding));
+            }
+        }
+        return null;
+    }
+
+    public Pair<Integer, Grid> getGridFor(int x, int y) {
+        for (int i = 0; i < paddings.length; i++) {
+            Vec2i padding = paddings[i];
+            Vec2i size = grids[i].getSize();
+            if (x >= padding.getX() && x < padding.getX() + size.getX()
+                    && y >= padding.getY() && y < padding.getY() + size.getY()) {
+                return new Pair<>(i, grids[i]);
             }
         }
         return null;

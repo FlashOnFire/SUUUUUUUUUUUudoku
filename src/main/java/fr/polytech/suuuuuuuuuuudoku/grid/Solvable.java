@@ -5,12 +5,14 @@ import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class Solvable {
+public abstract class Solvable<T> {
     final Set<Integer> symbols;
 
     protected Solvable(Set<Integer> symbols) {
         this.symbols = symbols;
     }
+
+    public abstract Vec2i getSize();
 
     /**
      * Checks if all constraints are satisfied.
@@ -19,6 +21,8 @@ public abstract class Solvable {
      * @return true if all constraints are satisfied, false otherwise
      */
     public abstract boolean areConstraintsSatisfied(boolean skip_not_empty);
+
+    public abstract Integer getSymbolAt(Vec2i pos);
 
     public boolean isSolved() {
         return this.areConstraintsSatisfied(false);
@@ -29,4 +33,6 @@ public abstract class Solvable {
     public abstract void placeUnchecked(Vec2i pos, Integer value, boolean updatePossibilities, boolean store_move);
 
     public abstract Map<Vec2i, Set<Integer>> getEmptyCellsPossibilities();
+
+    public abstract T shallowCopy();
 }

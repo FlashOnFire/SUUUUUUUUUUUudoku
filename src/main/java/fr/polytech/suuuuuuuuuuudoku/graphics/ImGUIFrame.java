@@ -6,7 +6,9 @@ import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
+import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
 import fr.polytech.suuuuuuuuuuudoku.grid.ObservableGrid;
+import fr.polytech.suuuuuuuuuuudoku.grid.Solvable;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.app.Application;
@@ -21,8 +23,8 @@ import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ImGUIFrame extends Application {
-    Grid originalGrid;
-    Grid grid;
+    Solvable<?> originalSolvable;
+    Solvable<?> solvable;
     Vec2i selected_pos = null;
     String current_symbol = null;
     AtomicBoolean solving = new AtomicBoolean(false);
@@ -50,37 +52,77 @@ public class ImGUIFrame extends Application {
         }
 
         if (ImGui.button("Generate")) {
-            grid = Generator.generateClassicSudoku(16);
-            originalGrid = grid.shallowCopy();
+            solvable = Generator.generateClassicSudoku(16);
+            originalSolvable = ((Grid) solvable).shallowCopy();
         }
 
-        if (grid == null) {
+        ImGui.sameLine();
+        if (ImGui.button("MultiGrid")) {
+            try {
+                solvable = CsvUtils.importMultiGrid(Path.of(
+                        "src/test/java/fr/polytech/suuuuuuuuuuudoku/resources/multigrid_1"));
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            originalSolvable = ((MultiGrid) solvable).shallowCopy();
+        }
+
+        ImGui.sameLine();
+        if (ImGui.button("MultiGrid2")) {
+            try {
+                solvable = CsvUtils.importMultiGrid(Path.of(
+                        "src/test/java/fr/polytech/suuuuuuuuuuudoku/resources/multigrid_2"));
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            originalSolvable = ((MultiGrid) solvable).shallowCopy();
+        }
+
+        if (solvable == null) {
             ImGui.beginDisabled();
         }
         ImGui.sameLine();
         if (ImGui.button("Solve")) {
-            selected_pos = null;
-            new Thread(() -> {
-                solving.set(true);
-                grid = SudokuSolver.solve(new ObservableGrid(grid, innerGrid -> grid.setInnerGrid(innerGrid)), true, true, true).getSecond().getGrid();
-                solving.set(false);
-            }).start();
+            if (solvable instanceof Grid) {
+                new Thread(() -> {
+                    solving.set(true);
+                    solvable = SudokuSolver.solve(
+                            new ObservableGrid(
+                                    (Grid) solvable,
+                                    innerGrid -> ((Grid) solvable).setInnerGrid(innerGrid)
+                            ), true, true, true
+                    ).getSecond().getGrid();
+                    solving.set(false);
+                }).start();
+            } else if (solvable instanceof MultiGrid) {
+                new Thread(() -> {
+                    solving.set(true);
+                    solvable = SudokuSolver.solve((MultiGrid) solvable, true, true, true).getSecond();
+                    //grid = SudokuSolver.solve(new ObservableGrid((MultiGrid) grid, innerGrid -> ((MultiGrid) grid).setInnerGrid(innerGrid)), true, true, true).getSecond().getGrid();
+                    solving.set(false);
+                }).start();
+            }
         }
 
         ImGui.sameLine();
         if (ImGui.button("Reset")) {
-            grid = originalGrid.shallowCopy();
+            if (originalSolvable instanceof Grid) {
+                solvable = ((Grid) originalSolvable).shallowCopy();
+            } else if (originalSolvable instanceof MultiGrid) {
+                solvable = ((MultiGrid) originalSolvable).shallowCopy();
+            }
         }
 
-        if (grid == null) {
+        if (solvable == null) {
             ImGui.endDisabled();
         }
 
         ImGui.sameLine();
         if (ImGui.button("MaxiGrid")) {
             try {
-                grid = CsvUtils.importGrid(Path.of("src/test/java/fr/polytech/suuuuuuuuuuudoku/resources/100x100.csv"));
-                originalGrid = grid.shallowCopy();
+                solvable = CsvUtils.importGrid(Path.of(
+                        "src/test/java/fr/polytech/suuuuuuuuuuudoku/resources/100x100.csv"));
+                originalSolvable = ((Grid) solvable).shallowCopy();
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -97,14 +139,17 @@ public class ImGUIFrame extends Application {
         //little overlay window to show infos
         ImGui.setNextWindowPos(10, 10);
         ImGui.setNextWindowSize(200, 50);
-        ImGui.begin("Infos", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoTitleBar);
-        ImGui.text("Size: " + ((grid != null) ? (grid.getSize().getX() + "x" + grid.getSize().getY()) : "No grid loaded"));
+        ImGui.begin(
+                "Infos",
+                ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoTitleBar
+        );
+        ImGui.text("Size: " + ((solvable != null) ? (solvable.getSize().getX() + "x" + solvable.getSize().getY()) : "No grid loaded"));
         ImGui.text("Solve pace :" + SudokuSolver.solvePace[0]);
         ImGui.end();
 
-        if (grid != null) {
+        if (solvable != null) {
             var size = ImGui.getIO().getDisplaySize();
-            var gridSize = grid.getSize();
+            var gridSize = solvable.getSize();
             var minSize = Math.min(size.x, size.y);
 
             var gridPixelSize = new ImVec2(minSize / gridSize.getX(), minSize / gridSize.getY());
@@ -125,7 +170,11 @@ public class ImGUIFrame extends Application {
                     ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoTitleBar
             );
 
-            drawGrid(gridSize, gridPixelSize);
+            if (solvable instanceof Grid) {
+                drawGrid((Grid) solvable, gridSize, gridPixelSize);
+            } else if (solvable instanceof MultiGrid) {
+                drawMultiGrid((MultiGrid) solvable, gridSize, gridPixelSize);
+            }
 
             ImGui.popStyleColor();
             ImGui.popStyleVar();
@@ -138,7 +187,7 @@ public class ImGUIFrame extends Application {
         //ImGui.showDemoWindow();
     }
 
-    private void drawGrid(Vec2i gridSize, ImVec2 gridPixelSize) {
+    private void drawGrid(Grid grid, Vec2i gridSize, ImVec2 gridPixelSize) {
         ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, 0, 0);
         for (int y = 0; y < gridSize.getY(); y++) {
             for (int x = 0; x < gridSize.getX(); x++) {
@@ -170,9 +219,21 @@ public class ImGUIFrame extends Application {
                     int[] rgbEvenDarker = hslToRgb(color % 360, 0.45f, 0.2f);
 
                     ImGui.pushStyleColor(ImGuiCol.Button, rgb[0] / 255f, rgb[1] / 255f, rgb[2] / 255f, 1);
-                    ImGui.pushStyleColor(ImGuiCol.ButtonHovered, rgbDarker[0] / 255f, rgbDarker[1] / 255f, rgbDarker[2] / 255f, 1);
+                    ImGui.pushStyleColor(
+                            ImGuiCol.ButtonHovered,
+                            rgbDarker[0] / 255f,
+                            rgbDarker[1] / 255f,
+                            rgbDarker[2] / 255f,
+                            1
+                    );
 
-                    ImGui.pushStyleColor(ImGuiCol.ButtonActive, rgbEvenDarker[0] / 255f, rgbEvenDarker[1] / 255f, rgbEvenDarker[2] / 255f, 1);
+                    ImGui.pushStyleColor(
+                            ImGuiCol.ButtonActive,
+                            rgbEvenDarker[0] / 255f,
+                            rgbEvenDarker[1] / 255f,
+                            rgbEvenDarker[2] / 255f,
+                            1
+                    );
 
                 });
 
@@ -183,7 +244,98 @@ public class ImGUIFrame extends Application {
                     );
                 } else {
                     if (ImGui.button(
-                            (grid.getSymbolAt(x, y) == null ? " " : grid.getSymbolAt(x, y).toString()) + "##" + y + ":" + x,
+                            (grid.getSymbolAt(x, y) == null ? " " : grid.getSymbolAt(
+                                    x,
+                                    y
+                            ).toString()) + "##" + y + ":" + x,
+                            gridPixelSize
+                    ) && !solving.get()) {
+                        setSelection(x, y);
+                        System.out.println("Selected: " + selected_pos);
+                    }
+                }
+
+                if (block.isPresent()) {
+                    ImGui.popStyleColor(3);
+                }
+
+                ImGui.sameLine();
+            }
+            ImGui.newLine();
+        }
+        ImGui.popStyleVar();
+    }
+
+    private void drawMultiGrid(MultiGrid mg, Vec2i gridSize, ImVec2 gridPixelSize) {
+        ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, 0, 0);
+        for (int y = 0; y < gridSize.getY(); y++) {
+            for (int x = 0; x < gridSize.getX(); x++) {
+                if (!mg.isInGrid(new Vec2i(x, y))) {
+                    ImGui.invisibleButton("##" + y + ":" + x, gridPixelSize.x, gridPixelSize.y);
+                    ImGui.sameLine();
+                    continue;
+                }
+
+                var isSelected = selected_pos != null && selected_pos.equals(x, y);
+
+                var pair = mg.getGridFor(x, y);
+
+                var padding = mg.getPaddings()[pair.getFirst()];
+                int withoutPaddingX = x - padding.getX();
+                int withoutPaddingY = y - padding.getY();
+
+                var block = pair.getSecond().getConstraints().stream()
+                        .filter(c -> c instanceof BlockConstraint)
+                        .filter(c -> c.isPosAffected(new Vec2i(withoutPaddingX, withoutPaddingY)))
+                        .map(c -> (BlockConstraint) c)
+                        .findFirst();
+
+                block.ifPresent(c -> {
+                    int color = c.getBlock().offset(padding.getX(), padding.getY()).hashCode() % 360;
+
+                    int[] rgb;
+                    int[] rgbDarker;
+                    if (isSelected) {
+                        rgb = hslToRgb(color, 0.45f, 0.3f);
+                        rgbDarker = hslToRgb(color, 0.45f, 0.25f);
+
+                    } else {
+                        rgb = hslToRgb(color, 0.45f, 0.45f);
+                        rgbDarker = hslToRgb(color, 0.45f, 0.35f);
+                    }
+
+                    int[] rgbEvenDarker = hslToRgb(color, 0.45f, 0.2f);
+
+                    ImGui.pushStyleColor(ImGuiCol.Button, rgb[0] / 255f, rgb[1] / 255f, rgb[2] / 255f, 1);
+                    ImGui.pushStyleColor(
+                            ImGuiCol.ButtonHovered,
+                            rgbDarker[0] / 255f,
+                            rgbDarker[1] / 255f,
+                            rgbDarker[2] / 255f,
+                            1
+                    );
+
+                    ImGui.pushStyleColor(
+                            ImGuiCol.ButtonActive,
+                            rgbEvenDarker[0] / 255f,
+                            rgbEvenDarker[1] / 255f,
+                            rgbEvenDarker[2] / 255f,
+                            1
+                    );
+
+                });
+
+                if (isSelected) {
+                    ImGui.button(
+                            (current_symbol == null ? " " : current_symbol) + "##" + y + ":" + x,
+                            gridPixelSize
+                    );
+                } else {
+                    if (ImGui.button(
+                            (mg.getSymbolAt(new Vec2i(x, y)) == null ? " " : mg.getSymbolAt(new Vec2i(
+                                    x,
+                                    y
+                            )).toString()) + "##" + y + ":" + x,
                             gridPixelSize
                     ) && !solving.get()) {
                         setSelection(x, y);
@@ -248,16 +400,19 @@ public class ImGUIFrame extends Application {
     }
 
     private void setSelection(int x, int y) {
-        if (x >= 0 && x < grid.getSize().getX() && y >= 0 && y < grid.getSize().getY()) {
+        if (x >= 0 && x < solvable.getSize().getX() && y >= 0 && y < solvable.getSize().getY()) {
             applyLastChanges();
             selected_pos = new Vec2i(x, y);
-            current_symbol = grid.getSymbolAt(x, y) == null ? null : grid.getSymbolAt(x, y).toString();
+            current_symbol = solvable.getSymbolAt(new Vec2i(x, y)) == null ? null : solvable.getSymbolAt(new Vec2i(
+                    x,
+                    y
+            )).toString();
         }
     }
 
     private void applyLastChanges() {
         if (selected_pos != null) {
-            grid.placeUnchecked(selected_pos, getCurrentSymbol(), true, false);
+            solvable.placeUnchecked(selected_pos, getCurrentSymbol(), true, false);
         }
     }
 

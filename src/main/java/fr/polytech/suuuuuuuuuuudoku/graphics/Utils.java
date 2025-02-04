@@ -50,9 +50,19 @@ public class Utils {
         return rgb;
     }
 
-    public static <O, M> M[][] applyMapping(O[][] original, M[][] mapped, HashMap<O, M> mapping) {
+
+    /**
+     * Applies a mapping from the original 2D array to the mapped 2D array using the provided mapping.
+     *
+     * @param original The original 2D array.
+     * @param mapped   The 2D array to store the mapped values.
+     * @param mapping  The HashMap containing the mapping from original values to mapped values.
+     * @param <O>      The type of the original values.
+     * @param <M>      The type of the mapped values.
+     */
+    public static <O, M> void applyMapping(O[][] original, M[][] mapped, HashMap<O, M> mapping) {
         assert original.length == mapped.length;
-        if (original.length == 0) return mapped;
+        if (original.length == 0) return;
         assert original[0].length == mapped[0].length;
 
         for (int i = 0; i < original.length; i++) {
@@ -61,7 +71,6 @@ public class Utils {
             }
         }
 
-        return mapped;
     }
 
 }

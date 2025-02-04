@@ -65,22 +65,35 @@ public class Generator {
      * @return A playable grid
      */
     private static Grid removeRandomCells(Grid solvedGrid, int lengthInnerGrid) throws InterruptedException {
-        Vec2i lastMovePos;
-        Integer lastMoveSymbol;
-        Set<Vec2i> emptyCells = solvedGrid.getEmptyCellsPossibilities().keySet();
-        new Random();
+        int nToRemove = (int) Math.sqrt(lengthInnerGrid);
+        boolean canSolve = true;
+        Set<Vec2i> emptyCells = new HashSet<>();
         do {
-            Vec2i randomPos;
-            do {
-                randomPos = Vec2i.random(lengthInnerGrid, lengthInnerGrid);
-            } while (emptyCells.contains(randomPos));
+            // if we can't solve, undo n/2 moves and try again
+            if (!canSolve) {
+                nToRemove = nToRemove / 2;
+                for (int i = 0; i < nToRemove; i++) {
+                    solvedGrid.undoLastMove(true);
+                }
+            }
 
-            lastMovePos = randomPos;
-            lastMoveSymbol = solvedGrid.getSymbolAt(randomPos);
-            solvedGrid.placeUnchecked(randomPos, null, true, false);
-        } while (!SudokuSolver.hasMoreThanOneSolution(solvedGrid, true, true));
+            for (int i = 0; i < nToRemove; i++) {
+                Vec2i randomPos;
+                do {
+                    randomPos = Vec2i.random(lengthInnerGrid, lengthInnerGrid);
+                } while (emptyCells.contains(randomPos));
 
-        solvedGrid.placeUnchecked(lastMovePos, lastMoveSymbol, true, false);
+                solvedGrid.placeUnchecked(randomPos, null, true, true);
+                emptyCells.add(randomPos);
+            }
+            canSolve = SudokuSolver.solve(solvedGrid, true, false, false).getFirst() == SolvingState.SOLVED;
+        } while (canSolve || nToRemove > 1);
+
+        //undo the moves until there's only one solution
+        do {
+            solvedGrid.undoLastMove(true);
+        } while (SudokuSolver.hasMoreThanOneSolution(solvedGrid, true, true));
+
         return solvedGrid;
     }
 

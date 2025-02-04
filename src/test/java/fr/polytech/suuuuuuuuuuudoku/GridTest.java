@@ -19,7 +19,7 @@ public class GridTest {
     public void testImportExport() throws FileNotFoundException {
 
         Path path = Path.of(RESSOURCES_PATH + "100x100_export.csv");
-        var gridValue = CsvUtils.importGrid(path);
+        var gridValue = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "100x100.csv"));
         var symbol = SymbolSets.generateSymbols(gridValue.length);
         Grid grid = new Grid(gridValue, symbol);
         CsvUtils.exportGrid(path, grid);

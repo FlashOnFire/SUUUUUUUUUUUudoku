@@ -6,7 +6,6 @@ import fr.polytech.suuuuuuuuuuudoku.graphics.Utils;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
-import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -197,7 +196,12 @@ public class Generator {
             var symbols = SymbolSets.generateSymbols(blockRows * blockColumns);
             var listOfIndexRows = new ArrayList<>(IntStream.rangeClosed(0, blockRows - 1).boxed().toList());
             var listOfIndexColumns = new ArrayList<>(IntStream.rangeClosed(0, blockColumns - 1).boxed().toList());
+            var grid = new Grid(gridValue, symbols, blockRows, blockColumns);
 
+            // The original grid is not solved, we need to regenerate it
+            if (!grid.isSolved()) {
+                throw new Exception("The stored grid is not solved, we need to regenerate it");
+            }
             // Shuffle block in rows
             Collections.shuffle(listOfIndexRows);
             for (int i = 0; i < blockRows / 2; i++) {
@@ -207,9 +211,6 @@ public class Generator {
                     gridValue[blockColumns * listOfIndexRows.get(i) + j] = tmpValue;
                 }
             }
-
-            var grid = new Grid(gridValue, symbols, blockRows, blockColumns);
-            assert grid.isSolved();
 
             // shuffle block in columns
             Collections.shuffle(listOfIndexColumns);
@@ -223,8 +224,6 @@ public class Generator {
                 }
             }
 
-            assert grid.isSolved();
-
             // Shuffle rows
             for (int i = 0; i < blockRows; i++) {
                 Collections.shuffle(listOfIndexColumns);
@@ -234,8 +233,6 @@ public class Generator {
                     gridValue[blockColumns * i + listOfIndexColumns.get(j)] = tempValue;
                 }
             }
-
-            assert grid.isSolved();
 
             // Shuffle columns
             for (int i = 0; i < blockColumns; i++) {
@@ -249,8 +246,6 @@ public class Generator {
                 }
             }
 
-            assert grid.isSolved();
-
             // Shuffle symbols
             var symbolsList = new ArrayList<>(symbols);
             Collections.shuffle(symbolsList);
@@ -258,9 +253,10 @@ public class Generator {
                     symbolsList.get(v - 1)), HashMap::putAll));
 
             // Check if the grid is solved to assure the grid is correct
+            grid = new Grid(gridValue, symbols, blockRows, blockColumns);
             assert grid.isSolved();
             return grid;
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             var grid = createSolvedSudoku(blockRows, blockColumns);
             CsvUtils.exportGrid(path, grid);
             return grid;

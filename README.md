@@ -39,7 +39,7 @@ Ce SUUUUUUUUUUUudoku dispose des fonctionalité suivantes :
 
 #### Utilisateur nix
 
-La methode privilégiée pour lancer le programme est d'utiliser nix, cas celui-ci vous assure d'avoir un environement
+La methode privilégiée pour lancer le programme est d'utiliser nix, car celui-ci vous assure d'avoir un environement
 identique au autre utilisateur de nix.
 
 Si vous disposez de nix, vous pouvez lancer la compilation avec la commande suivante :

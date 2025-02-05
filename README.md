@@ -478,25 +478,48 @@ Tui ..> Grid: «create»
 Tui ..> MultiGrid: «create»
 ```
 
+### Système général :
+
+```
+TODO : diagramme de communication entre les différentes classes au démarrage
+ex : Main -> Tui -> Grid
+                 -> MultiGrid
+                 -> Solver
+                 -> Generateur
+          -> ImGUIFrame
+A voir un peu plus en détail
+```
+
+### Grille de sudoku et multi grille (Solvable) :
+
+```
+TODO : diagrammes d'états qui montre les différentes agencement que l'on peut avoir
+```
+
+### UI :
+
+```
+TODO : diagramme d'état transition de l'interface graphique (optionel)
+```
 
 ### Générateur :
 
 #### Explication de la méthode de génération de grille simple optimisé :
 
 ```
-TODO
+TODO : diagramme d'activité et/ou de séquence. 
 ```
 
 #### Explication de la méthode de génération de multi grille :
 
 ```
-TODO
+TODO : diagramme d'activité et/ou de séquence
 ```
 
 #### Méthode de génération des contraintes pour un sudoku avec des contraintes de blocs de NxM :
 
 ```
-TODO
+TODO: diagramme d'activité et/ou de séquence
 ```
 
 ### Solveur :

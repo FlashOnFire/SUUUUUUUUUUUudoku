@@ -45,6 +45,26 @@ public class MultiGrid extends Solvable<MultiGrid> {
         this.paddings = Arrays.stream(other.paddings).map(Vec2i::new).toArray(Vec2i[]::new);
     }
 
+    public static Vec2i[] getRandomPadding() {
+        var allPaddings = new Vec2i[][]{
+                new Vec2i[]{
+                        new Vec2i(0, 0),
+                        new Vec2i(12, 0),
+                        new Vec2i(6, 6),
+                        new Vec2i(0, 12),
+                        new Vec2i(12, 12)
+                },
+                new Vec2i[]{
+                        new Vec2i(6, 0),
+                        new Vec2i(0, 6),
+                        new Vec2i(6, 6),
+                        new Vec2i(12, 6),
+                        new Vec2i(6, 12)
+                }
+        };
+        return allPaddings[(int) (Math.random() * allPaddings.length)];
+    }
+
     public Vec2i getSize() {
         return size;
     }
@@ -124,7 +144,6 @@ public class MultiGrid extends Solvable<MultiGrid> {
         }
     }
 
-
     public Integer getSymbolAt(Vec2i pos) {
         for (int i = 0; i < paddings.length; i++) {
             Vec2i padding = paddings[i];
@@ -162,7 +181,6 @@ public class MultiGrid extends Solvable<MultiGrid> {
     public void cleanMoves() {
         moves.clear();
     }
-
 
     @Override
     public void undoLastMove(boolean updatePossibilities) {

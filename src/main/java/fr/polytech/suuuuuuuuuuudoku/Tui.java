@@ -8,6 +8,7 @@ import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
+import fr.polytech.suuuuuuuuuuudoku.algorithm.Pair;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
@@ -20,7 +21,10 @@ import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.lang.System.exit;
 
@@ -31,6 +35,31 @@ public class Tui {
     static final String RESSOURCES_PATH = "src/test/resources/";
     private final Terminal terminal;
     private final TextGraphics textGraphics;
+    private final HashMap<Integer, Integer> mapGridSize = new HashMap<Integer, Integer>() {{
+        put(0, 4);
+        put(1, 9);
+        put(2, 16);
+        put(3, 25);
+        put(4, 36);
+        put(5, 49);
+        put(6, 64);
+        put(7, 81);
+        put(8, 100);
+        put(9, -1);
+    }};
+    private final String[] sizes = {"4", "9", "16", "25", "36", "49", "64", "81", "100", "multigrid"};
+    private final String[] generationDurations = {
+            "(mediane 4ms)",
+            "(mediane 17ms)",
+            "(mediane 44ms)",
+            "(mediane 308ms)",
+            "(mediane 1s 136ms)",
+            "(mediane 3s 981ms)",
+            "(mediane 10s 989ms)",
+            "(mediane 22s 872ms)",
+            "(mediane 30s 237ms)",
+            "(mediane 94ms)"
+    };
     private Thread loaderThread;
     private int line = 0;
     private int usedColors = 0;
@@ -79,16 +108,33 @@ public class Tui {
     void start() throws IOException, InterruptedException {
         welcomeMessage();
         Solvable<?> grid;
-        switch (selectMode(new String[]{"> Generer un sudoku", "  Entrer un sudoku", "  Ouvrir un fichier"})) {
+
+        switch (selectMode(new String[]{"Generer un sudoku", "Entrer un sudoku", "Ouvrir un fichier"})) {
             case 0 -> { // Generate
-                int size = selectSize();
+                String[] options = IntStream.range(0, sizes.length)
+                                            .mapToObj(i -> sizes[i] + " " + generationDurations[i])
+                                            .toArray(String[]::new);
+                int size = mapGridSize.get(selectMode(options));
                 startLoader();
-                grid = Generator.generateClassicSudoku(size);
+                if (size == -1) {
+                    grid = Generator.generateMultigridSudoku(9, 5);
+                } else {
+                    grid = Generator.generateClassicSudoku(size);
+                }
                 stopLoader();
             }
             case 1 -> { // Enter
-                int size = selectSize();
-                grid = new Grid(new Integer[size][size], SymbolSets.generateSymbols(size));
+                int size = mapGridSize.get(selectMode(sizes));
+                if (size == -1) {
+                    Grid[] grids = new Grid[5];
+                    for (int i = 0; i < 5; i++) {
+                        grids[i] = new Grid(new Integer[9][9], SymbolSets.generateSymbols(9));
+                    }
+                    var paddings = MultiGrid.getRandomPadding();
+                    grid = new MultiGrid(IntStream.range(0, 5).mapToObj(i -> new Pair<>(paddings[i], grids[i])).collect(Collectors.toList()));
+                } else {
+                    grid = new Grid(new Integer[size][size], SymbolSets.generateSymbols(size));
+                }
             }
             case 2 -> { // Open a file
                 // List all the files in the resources folder
@@ -312,9 +358,9 @@ public class Tui {
         int gridSize = grid.getInnerGrid().length();
         int spacing = String.valueOf(gridSize).length();
         List<BlockConstraint> blocks = grid.getConstraints().stream()
-                .filter(BlockConstraint.class::isInstance)
-                .map(BlockConstraint.class::cast)
-                .toList();
+                                           .filter(BlockConstraint.class::isInstance)
+                                           .map(BlockConstraint.class::cast)
+                                           .toList();
 
         // Calculate the padding which is the padding + the padding between each character + the number of blocks
         int xPadding = padding.getX() * (spacing + 1);
@@ -329,22 +375,22 @@ public class Tui {
                 int finalI = i;
                 int finalJ = j;
                 var blockColor = blocks.stream()
-                        .filter(blockConstraint ->
-                                finalI >= blockConstraint.getBlock().x()
-                                        && finalI < blockConstraint.getBlock().dx()
-                                        && finalJ >= blockConstraint.getBlock().y()
-                                        && finalJ < blockConstraint.getBlock().dy())
-                        .findFirst()
-                        .map(blockConstraint -> {
-                            int blockIndex = blocks.indexOf(blockConstraint) + usedColors;
-                            float hue = (blockIndex * 50) % 360; // Hue value between 0 and 360
-                            float saturation = 1.0f; // Saturation value between 0 and 1
-                            float lightness = 0.25f; // Lightness value between 0 and 1
+                                       .filter(blockConstraint ->
+                                               finalI >= blockConstraint.getBlock().x()
+                                                       && finalI < blockConstraint.getBlock().dx()
+                                                       && finalJ >= blockConstraint.getBlock().y()
+                                                       && finalJ < blockConstraint.getBlock().dy())
+                                       .findFirst()
+                                       .map(blockConstraint -> {
+                                           int blockIndex = blocks.indexOf(blockConstraint) + usedColors;
+                                           float hue = (blockIndex * 50) % 360; // Hue value between 0 and 360
+                                           float saturation = 1.0f; // Saturation value between 0 and 1
+                                           float lightness = 0.25f; // Lightness value between 0 and 1
 
-                            // Convert HSL to RGB
-                            int[] rgb = Utils.hslToRgb(hue, saturation, lightness);
-                            return new TextColor.RGB(rgb[0], rgb[1], rgb[2]);
-                        });
+                                           // Convert HSL to RGB
+                                           int[] rgb = Utils.hslToRgb(hue, saturation, lightness);
+                                           return new TextColor.RGB(rgb[0], rgb[1], rgb[2]);
+                                       });
 
                 blockColor.ifPresent(textGraphics::setBackgroundColor);
 
@@ -568,6 +614,12 @@ public class Tui {
      * @throws IOException if an I/O error occurs
      */
     private int selectMode(String[] options) throws IOException {
+        //add double space to the first option
+        for (int i = 0; i < options.length; i++) {
+            options[i] = "  " + options[i];
+        }
+        options[0] = "> " + options[0].substring(2);
+
         for (int i = 0; i < options.length; i++) {
             textGraphics.putString(0, line + i, options[i]);
         }
@@ -587,66 +639,6 @@ public class Tui {
         } while (keyStroke.getKeyType() != KeyType.Enter);
         line += options.length + 1;
         return selectedOption;
-    }
-
-    /**
-     * Prompts the user to select the size of the Sudoku grid.
-     *
-     * @return The size of the Sudoku grid selected by the user.
-     * @throws IOException if an I/O error occurs.
-     */
-    private int selectSize() throws IOException {
-        int selectedSize = 0;
-        int[] possibleSizes = {4, 9, 16};
-        textGraphics.putString(0, line, "Entrez la taille du sudoku");
-
-        // Display a selector for the possible sizes
-        displaySizes(selectedSize, possibleSizes);
-
-        // Wait for user input
-        KeyStroke keyStroke;
-        do {
-            keyStroke = terminal.readInput();
-            if (keyStroke.getKeyType() == KeyType.ArrowLeft) {
-                if (selectedSize == 0) {
-                    selectedSize = possibleSizes.length - 1;
-                } else {
-                    selectedSize--;
-                }
-            } else if (keyStroke.getKeyType() == KeyType.ArrowRight) {
-                if (selectedSize == possibleSizes.length - 1) {
-                    selectedSize = 0;
-                } else {
-                    selectedSize++;
-                }
-            }
-
-            displaySizes(selectedSize, possibleSizes);
-        } while (keyStroke.getKeyType() != KeyType.Enter);
-        line += 3;
-        return possibleSizes[selectedSize];
-    }
-
-    /**
-     * Displays the possible sizes for the Sudoku grid and highlights the selected size.
-     *
-     * @param selectedSize  The index of the currently selected size.
-     * @param possibleSizes An array of possible sizes for the Sudoku grid.
-     * @throws IOException If an I/O error occurs.
-     */
-    private void displaySizes(int selectedSize, int[] possibleSizes) throws IOException {
-        int padding = 0;
-        for (int i = 0; i < possibleSizes.length; i++) {
-            if (i == selectedSize) {
-                textGraphics.setBackgroundColor(TextColor.ANSI.YELLOW);
-                textGraphics.putString(padding, line + 1, String.valueOf(possibleSizes[i]));
-                textGraphics.setBackgroundColor(TextColor.ANSI.DEFAULT);
-            } else {
-                textGraphics.putString(padding, line + 1, String.valueOf(possibleSizes[i]));
-            }
-            padding += String.valueOf(possibleSizes[i]).length() + 1;
-        }
-        terminal.flush();
     }
 }
 

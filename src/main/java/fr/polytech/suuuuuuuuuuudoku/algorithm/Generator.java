@@ -39,26 +39,7 @@ public class Generator {
     public static MultiGrid generateMultigridSudoku(int n, int m) throws InterruptedException {
         List<Pair<Vec2i, Grid>> grids = new ArrayList<>();
         var blockSize = (int) Math.sqrt(n);
-        var maxDiag = (int) Math.sqrt(Math.pow(n, 2) + Math.pow(n, 2)) * m;
-
-        var allPaddings = new Vec2i[][]{
-                new Vec2i[]{
-                        new Vec2i(0, 0),
-                        new Vec2i(12, 0),
-                        new Vec2i(6, 6),
-                        new Vec2i(0, 12),
-                        new Vec2i(12, 12)
-                },
-                new Vec2i[]{
-                        new Vec2i(6, 0),
-                        new Vec2i(0, 6),
-                        new Vec2i(6, 6),
-                        new Vec2i(12, 6),
-                        new Vec2i(6, 12)
-                }
-        };
-
-        var paddings = allPaddings[(int) (Math.random() * allPaddings.length)];
+        var paddings = MultiGrid.getRandomPadding();
         var symbols = SymbolSets.generateSymbols(n);
 
         var centeredGrid = fastSolvedGridCreation(blockSize, blockSize);

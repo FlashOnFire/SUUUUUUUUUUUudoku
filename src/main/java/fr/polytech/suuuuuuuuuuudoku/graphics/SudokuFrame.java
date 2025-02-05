@@ -1,5 +1,6 @@
 package fr.polytech.suuuuuuuuuuudoku.graphics;
 
+import fr.polytech.suuuuuuuuuuudoku.algorithm.Difficulty;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
@@ -62,7 +63,7 @@ public class SudokuFrame extends JFrame {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        var grid = Generator.generateClassicSudoku(16);
+        var grid = Generator.generateClassicSudoku(16, Difficulty.EXPERT);
 
         SwingUtilities.invokeLater(() ->
         {
@@ -81,7 +82,8 @@ public class SudokuFrame extends JFrame {
 
     private final Runnable generate = () -> {
         try {
-            this.grid = new Grid(Generator.generateClassicSudoku(lengthClassicSudoku * lengthClassicSudoku));
+            this.grid = new Grid(Generator.generateClassicSudoku(lengthClassicSudoku * lengthClassicSudoku,
+                    Difficulty.EXPERT));
         } catch (InterruptedException e) {
             System.out.println("Interrupted");
         }
@@ -103,7 +105,7 @@ public class SudokuFrame extends JFrame {
     private final Runnable generateRandom = () -> {
         var length = (int) (Math.random() * 6) + 4;
         try {
-            this.grid = new Grid(Generator.generateSudokuWithRandomBlockConstraint(length));
+            this.grid = new Grid(Generator.generateSudokuWithRandomBlockConstraint(length, Difficulty.EXPERT));
         } catch (InterruptedException e) {
             System.out.println("Interrupted");
         }
@@ -124,7 +126,7 @@ public class SudokuFrame extends JFrame {
         var n = (int) (Math.random() * 3) + 2;
         var m = (int) (Math.random() * 3) + 2;
         try {
-            this.grid = new Grid(Generator.generateSudokuWithBlockConstraints(n, m));
+            this.grid = new Grid(Generator.generateSudokuWithBlockConstraints(n, m, Difficulty.EXPERT));
         } catch (InterruptedException e) {
             System.out.println("Interrupted");
         }

@@ -7,10 +7,7 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Pair;
-import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
+import fr.polytech.suuuuuuuuuuudoku.algorithm.*;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.graphics.Utils;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
@@ -47,18 +44,13 @@ public class Tui {
         put(8, 100);
         put(9, -1);
     }};
-    private final String[] sizes = {"4", "9", "16", "25", "36", "49", "64", "81", "100", "multigrid"};
+    private final String[] sizes = {"4", "9", "16", "25", "multigrid"};
     private final String[] generationDurations = {
             "(mediane 4ms)",
-            "(mediane 17ms)",
-            "(mediane 44ms)",
-            "(mediane 308ms)",
-            "(mediane 1s 136ms)",
-            "(mediane 3s 981ms)",
-            "(mediane 10s 989ms)",
-            "(mediane 22s 872ms)",
-            "(mediane 30s 237ms)",
-            "(mediane 94ms)"
+            "(mediane 39ms)",
+            "(mediane 587ms)",
+            "(mediane 6s 435ms)",
+            "(mediane 1s 572ms)"
     };
     private Thread loaderThread;
     private int line = 0;
@@ -115,11 +107,14 @@ public class Tui {
                                             .mapToObj(i -> sizes[i] + " " + generationDurations[i])
                                             .toArray(String[]::new);
                 int size = mapGridSize.get(selectMode(options));
+
+                Difficulty difficulty = Difficulty.fromInt(selectMode(Difficulty.getValues()));
+
                 startLoader();
                 if (size == -1) {
-                    grid = Generator.generateMultigridSudoku(9, 5);
+                    grid = Generator.generateMultigridSudoku(9, 5, difficulty);
                 } else {
-                    grid = Generator.generateClassicSudoku(size);
+                    grid = Generator.generateClassicSudoku(size, difficulty);
                 }
                 stopLoader();
             }

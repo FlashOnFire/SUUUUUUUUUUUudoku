@@ -1,5 +1,6 @@
 package fr.polytech.suuuuuuuuuuudoku;
 
+import fr.polytech.suuuuuuuuuuudoku.algorithm.Difficulty;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +18,8 @@ public class GeneratorTests {
             long[] durations = new long[N];
             for (int i = 0; i < N; i++) {
                 long startTime = System.currentTimeMillis();
-                Generator.generateClassicSudoku(gridSize);
+               Generator.generateClassicSudoku(gridSize, Difficulty.EXPERT);
+                // Generator.generateMultigridSudoku(9, 5, Difficulty.EXPERT);
                 long endTime = System.currentTimeMillis();
                 durations[i] = endTime - startTime;
             }

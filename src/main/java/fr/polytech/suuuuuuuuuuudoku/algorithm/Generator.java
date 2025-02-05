@@ -13,7 +13,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-
 public class Generator {
     /**
      * Generates a classic NxN grid
@@ -21,12 +20,12 @@ public class Generator {
      * @param n: The size of the grid
      * @return A playable grid
      */
-    public static Grid generateClassicSudoku(int n) throws InterruptedException {
+    public static Grid generateClassicSudoku(int n, Difficulty difficulty) throws InterruptedException {
         //assert n is perfect square
         int sqrt = (int) Math.sqrt(n);
         assert sqrt * sqrt == n;
 
-        return generateSudokuWithBlockConstraints((int) Math.sqrt(n), (int) Math.sqrt(n));
+        return generateSudokuWithBlockConstraints((int) Math.sqrt(n), (int) Math.sqrt(n), difficulty);
     }
 
     /**
@@ -36,7 +35,7 @@ public class Generator {
      * @param m: The number of sub grids
      * @return A playable multigrid
      */
-    public static MultiGrid generateMultigridSudoku(int n, int m) throws InterruptedException {
+    public static MultiGrid generateMultigridSudoku(int n, int m, Difficulty difficulty) throws InterruptedException {
         List<Pair<Vec2i, Grid>> grids = new ArrayList<>();
         var blockSize = (int) Math.sqrt(n);
         var paddings = MultiGrid.getRandomPadding();
@@ -60,7 +59,7 @@ public class Generator {
 
         var multigrid = new MultiGrid(grids);
         multigrid = SudokuSolver.solve(multigrid, true, true, false).getSecond();
-        removeRandomCells(multigrid, Math.max(multigrid.getSize().getX(), multigrid.getSize().getY()));
+        removeRandomCells(multigrid, Math.max(multigrid.getSize().getX(), multigrid.getSize().getY()), difficulty);
         multigrid.cleanMoves();
         return multigrid;
     }
@@ -72,9 +71,9 @@ public class Generator {
      * @param blockColumns: The number of block columns
      * @return A playable grid
      */
-    public static Grid generateSudokuWithBlockConstraints(int blockRows, int blockColumns) throws InterruptedException {
+    public static Grid generateSudokuWithBlockConstraints(int blockRows, int blockColumns, Difficulty difficulty) throws InterruptedException {
         var solvedGrid = fastSolvedGridCreation(blockRows, blockColumns);
-        removeRandomCells(solvedGrid, blockRows * blockColumns);
+        removeRandomCells(solvedGrid, blockRows * blockColumns, difficulty);
         solvedGrid.cleanMoves();
         return solvedGrid;
     }
@@ -85,7 +84,7 @@ public class Generator {
      * @param lengthInnerGrid: The length of the inner grid
      * @return A playable grid
      */
-    public static Grid generateSudokuWithRandomBlockConstraint(int lengthInnerGrid) throws InterruptedException {
+    public static Grid generateSudokuWithRandomBlockConstraint(int lengthInnerGrid, Difficulty difficulty) throws InterruptedException {
         var symbols = SymbolSets.generateSymbols(lengthInnerGrid);
         Vec2i dividers = findDividers(lengthInnerGrid);
         Grid solvedGrid = fastSolvedGridCreation(dividers.getX(), dividers.getY());
@@ -94,7 +93,7 @@ public class Generator {
         // We update the new constraints
         solvedGrid = new Grid(solvedGrid.getInnerGrid().get(), generalSymbolConstraints, symbols);
         assert solvedGrid.isSolved();
-        removeRandomCells(solvedGrid, lengthInnerGrid);
+        removeRandomCells(solvedGrid, lengthInnerGrid, difficulty);
         solvedGrid.cleanMoves();
         return solvedGrid;
     }
@@ -104,35 +103,39 @@ public class Generator {
      *
      * @param solvedGrid:      The solved grid
      * @param lengthInnerGrid: The length of the inner grid
-     * @return A playable grid
      */
-    private static <T extends Solvable<T>> T removeRandomCells(T solvedGrid, int lengthInnerGrid) throws InterruptedException {
-//        int nToRemove = (int) Math.sqrt(lengthInnerGrid);
-        int nToRemove = lengthInnerGrid / 2;
-        boolean canSolve = true;
-        Set<Vec2i> emptyCells = new HashSet<>();
+    private static <T extends Solvable<T>> void removeRandomCells(T solvedGrid, int lengthInnerGrid,
+                                                                  Difficulty difficulty) throws InterruptedException {
+        List<Vec2i> toTestRemove = new ArrayList<>();
+        int difficultyValue = difficulty.getValue();
+        for (int i = 0; i < lengthInnerGrid; i++) {
+            for (int j = 0; j < lengthInnerGrid; j++) {
+                toTestRemove.add(new Vec2i(i, j));
+            }
+        }
+        Collections.shuffle(toTestRemove);
+        //keep only lengthInnerGrid * lengthInnerGrid / difficultyValue cells
+        toTestRemove = toTestRemove.subList(0,
+                lengthInnerGrid * lengthInnerGrid / (Difficulty.getValues().length - difficultyValue));
+
         do {
-            // if we can't solve, undo n/2 moves and try again
-            if (!canSolve) {
-                nToRemove = nToRemove / 2;
-                for (int i = 0; i < nToRemove; i++) {
-                    solvedGrid.undoLastMove(true);
+            Vec2i pos = null;
+            do {
+                if (toTestRemove.isEmpty()) {
+                    break;
                 }
+                pos = toTestRemove.removeFirst();
+            } while ((solvedGrid instanceof MultiGrid) && !((MultiGrid) solvedGrid).isInGrid(pos));
+            if (pos == null) {
+                break;
             }
+            solvedGrid.placeUnchecked(pos, null, false, true);
 
-            for (int i = 0; i < nToRemove; i++) {
-                Vec2i randomPos;
-                do {
-                    randomPos = Vec2i.random(lengthInnerGrid, lengthInnerGrid);
-                } while (emptyCells.contains(randomPos)
-                        && (!(solvedGrid instanceof MultiGrid) || ((MultiGrid) solvedGrid).isInGrid(randomPos)));
-
-                solvedGrid.placeUnchecked(randomPos, null, false, true);
-                emptyCells.add(randomPos);
-            }
             solvedGrid.computeAllEmptyCellsPossibilities();
-            canSolve = SudokuSolver.solve(solvedGrid, true, false, false).getFirst() == SolvingState.SOLVED;
-        } while (canSolve || nToRemove > 1);
+            if (SudokuSolver.solve(solvedGrid, true, false, false).getFirst() != SolvingState.SOLVED) {
+                solvedGrid.undoLastMove(true);
+            }
+        } while (!toTestRemove.isEmpty());
 
         //undo the moves until there's only one solution
         do {
@@ -140,7 +143,6 @@ public class Generator {
         } while (SudokuSolver.hasMoreThanOneSolution(solvedGrid, true, true));
 
         solvedGrid.cleanMoves();
-        return solvedGrid;
     }
 
     /**

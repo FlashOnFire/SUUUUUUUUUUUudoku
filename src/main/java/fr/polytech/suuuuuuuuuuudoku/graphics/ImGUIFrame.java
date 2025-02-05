@@ -53,12 +53,15 @@ public class ImGUIFrame extends Application {
         }
 
         if (ImGui.button("Generate")) {
+            var oldPace = SudokuSolver.solvePace[0];
+            SudokuSolver.solvePace[0] = 1.0f;
             try {
                 solvable = Generator.generateClassicSudoku(selectedGeneratorGridSize[0], Difficulty.EXPERT);
             } catch (InterruptedException e) {
                 System.out.println("Generation interrupted");
             }
             originalSolvable = ((Grid) solvable).shallowCopy();
+            SudokuSolver.solvePace[0] = oldPace;
         }
 
         ImGui.sameLine();

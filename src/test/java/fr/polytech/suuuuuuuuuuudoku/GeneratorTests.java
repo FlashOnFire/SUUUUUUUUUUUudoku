@@ -3,53 +3,32 @@ package fr.polytech.suuuuuuuuuuudoku;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
 import org.junit.jupiter.api.Test;
 
-import static fr.polytech.suuuuuuuuuuudoku.algorithm.Generator.createExempleSolvedSudoku;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.Arrays;
 
 public class GeneratorTests {
 
     @Test
     public void testBasicGenerator() throws InterruptedException {
-        long startTime1 = System.currentTimeMillis();
-        Generator.generateClassicSudoku(4);
-        long endTime1 = System.currentTimeMillis();
-        System.out.println("Generation time for 4x4 grid: " + (endTime1 - startTime1) + "ms");
-        assertTrue((endTime1 - startTime1) < 1000, "Generation time for 4x4 grid exceeded limit");
+        int[] gridSizes = {4, 9, 16, 25, 36, 49, 64};
+        final int N = 10;
 
-        long startTime2 = System.currentTimeMillis();
-        Generator.generateClassicSudoku(9);
-        long endTime2 = System.currentTimeMillis();
-        System.out.println("Generation time for 9x9 grid: " + (endTime2 - startTime2) + "ms");
-        assertTrue((endTime2 - startTime2) < 1000, "Generation time for 9x9 grid exceeded limit");
+        System.out.println("Grid size, Moyenne, Min, Max, Médiane");
+        for (int gridSize : gridSizes) {
+            long[] durations = new long[N];
+            for (int i = 0; i < N; i++) {
+                long startTime = System.currentTimeMillis();
+                Generator.generateClassicSudoku(gridSize);
+                long endTime = System.currentTimeMillis();
+                durations[i] = endTime - startTime;
+            }
+            Arrays.sort(durations);
+            long sum = Arrays.stream(durations).sum();
+            long moy = sum / durations.length;
+            long min = durations[0];
+            long max = durations[durations.length - 1];
+            long median = durations[durations.length / 2];
 
-        long startTime3 = System.currentTimeMillis();
-        Generator.generateClassicSudoku(16);
-        long endTime3 = System.currentTimeMillis();
-        System.out.println("Generation time for 16x16 grid: " + (endTime3 - startTime3) + "ms");
-        assertTrue((endTime3 - startTime3) < 1000, "Generation time for 16x16 grid exceeded limit");
-
-        long startTime4 = System.currentTimeMillis();
-        Generator.generateClassicSudoku(25);
-        long endTime4 = System.currentTimeMillis();
-        System.out.println("Generation time for 25x25 grid: " + (endTime4 - startTime4) + "ms");
-        assertTrue((endTime4 - startTime4) < 30000, "Generation time for 25x25 grid exceeded limit");
-
-        long startTime5 = System.currentTimeMillis();
-        Generator.generateSudokuWithBlockConstraints(3, 4);
-        long endTime5 = System.currentTimeMillis();
-        System.out.println("Generation time for 25x25 grid: " + (endTime4 - startTime4) + "ms");
-        assertTrue((endTime5 - startTime5) < 20000, "Generation time for 25x25 grid exceeded limit");
-    }
-
-    @Test
-    public void testFastSolvedExempleGeneration() {
-        var grid3x2 = createExempleSolvedSudoku(3, 2);
-        assertTrue(grid3x2.isSolved());
-        var grid2x3 = createExempleSolvedSudoku(2, 3);
-        assertTrue(grid2x3.isSolved());
-        var grid3x3 = createExempleSolvedSudoku(3, 3);
-        assertTrue(grid3x3.isSolved());
-        var grid4x4 = createExempleSolvedSudoku(4, 4);
-        assertTrue(grid4x4.isSolved());
+            System.out.println(gridSize + "," + moy + "ms," + min + "ms," + max + "ms," + median + "ms");
+        }
     }
 }

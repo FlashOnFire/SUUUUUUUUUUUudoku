@@ -16,6 +16,7 @@ import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
 import fr.polytech.suuuuuuuuuuudoku.grid.Solvable;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -139,8 +140,7 @@ public class Tui {
                     terminal.flush();
                     return;
                 }
-                String[] options = Arrays.stream(files).map(file -> "  " + file.getName()).toArray(String[]::new);
-                options[0] = "> " + options[0].substring(2);
+                String[] options = Arrays.stream(files).map(File::getName).toArray(String[]::new);
                 int selected = selectMode(options);
                 if (files[selected].isDirectory()) {
                     grid = CsvUtils.importMultiGrid(files[selected].toPath());

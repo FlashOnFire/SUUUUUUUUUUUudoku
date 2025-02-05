@@ -55,11 +55,9 @@ public class ImGUIFrame extends Application {
         if (ImGui.button("Generate")) {
             var oldPace = SudokuSolver.solvePace[0];
             SudokuSolver.solvePace[0] = 1.0f;
-            try {
-                solvable = Generator.generateClassicSudoku(selectedGeneratorGridSize[0], Difficulty.EXPERT);
-            } catch (InterruptedException e) {
-                System.out.println("Generation interrupted");
-            }
+
+            solvable = Generator.generateClassicSudoku(selectedGeneratorGridSize[0], Difficulty.EXPERT);
+
             originalSolvable = ((Grid) solvable).shallowCopy();
             SudokuSolver.solvePace[0] = oldPace;
         }
@@ -272,9 +270,9 @@ public class ImGUIFrame extends Application {
                 int finalY = y;
                 int finalX = x;
                 var block = grid.getConstraints().stream()
-                                .filter(c -> c instanceof BlockConstraint)
-                                .filter(c -> c.isPosAffected(new Vec2i(finalX, finalY)))
-                                .findFirst();
+                        .filter(c -> c instanceof BlockConstraint)
+                        .filter(c -> c.isPosAffected(new Vec2i(finalX, finalY)))
+                        .findFirst();
 
                 block.ifPresent(c -> {
                     int color = c.hashCode();
@@ -360,10 +358,10 @@ public class ImGUIFrame extends Application {
                 int withoutPaddingY = y - padding.getY();
 
                 var block = pair.getSecond().getConstraints().stream()
-                                .filter(c -> c instanceof BlockConstraint)
-                                .filter(c -> c.isPosAffected(new Vec2i(withoutPaddingX, withoutPaddingY)))
-                                .map(c -> (BlockConstraint) c)
-                                .findFirst();
+                        .filter(c -> c instanceof BlockConstraint)
+                        .filter(c -> c.isPosAffected(new Vec2i(withoutPaddingX, withoutPaddingY)))
+                        .map(c -> (BlockConstraint) c)
+                        .findFirst();
 
                 block.ifPresent(c -> {
                     int color = c.getBlock().offset(padding.getX(), padding.getY()).hashCode() % 360;

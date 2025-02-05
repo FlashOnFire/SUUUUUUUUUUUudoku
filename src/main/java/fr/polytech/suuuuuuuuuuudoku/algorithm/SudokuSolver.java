@@ -39,13 +39,7 @@ public class SudokuSolver {
             }
 
             if (deducing) {
-                SolvingState state = null;
-                try {
-                    state = solveDeduction(currentGrid, store_moves);
-                } catch (InterruptedException e) {
-                    System.out.println("Deduction interrupted");
-                }
-
+                SolvingState state = solveDeduction(currentGrid, store_moves);
                 if (state == SolvingState.SOLVED) {
                     return new Pair<>(SolvingState.SOLVED, currentGrid);
                 } else if (state == SolvingState.UNSOLVABLE) {
@@ -74,7 +68,7 @@ public class SudokuSolver {
      */
     public static <T extends Solvable<T>> List<T> findAllSolutions(T grid, boolean deducing,
                                                                    boolean backtracking,
-                                                                   boolean store_moves) throws InterruptedException {
+                                                                   boolean store_moves) {
         assert deducing || backtracking : "At least one of deducing or backtracking must be enabled";
 
         ArrayDeque<T> currentList = new ArrayDeque<>();
@@ -113,7 +107,7 @@ public class SudokuSolver {
      */
     public static <T extends Solvable<T>> boolean hasMoreThanOneSolution(T grid,
                                                                          boolean deducing,
-                                                                         boolean backtracking) throws InterruptedException {
+                                                                         boolean backtracking) {
         assert deducing || backtracking : "At least one of deducing or backtracking must be enabled";
 
         ArrayDeque<T> currentList = new ArrayDeque<>();
@@ -157,8 +151,8 @@ public class SudokuSolver {
         assert !grid.getEmptyCellsPossibilities().isEmpty() : "No empty cells";
 
         var cell = grid.getEmptyCellsPossibilities().entrySet().stream()
-                       .min(Comparator.comparingInt(e -> e.getValue().size()))
-                       .orElseThrow();
+                .min(Comparator.comparingInt(e -> e.getValue().size()))
+                .orElseThrow();
 
         if (cell.getValue().isEmpty()) {
             return List.of();
@@ -177,14 +171,18 @@ public class SudokuSolver {
      * @param grid the Sudoku grid to solve
      * @return the solving state of the Sudoku grid
      */
-    private static <T extends Solvable<T>> SolvingState solveDeduction(T grid, boolean store_moves) throws InterruptedException {
+    private static <T extends Solvable<T>> SolvingState solveDeduction(T grid, boolean store_moves) {
         // System.out.println("Deduction");
 
         boolean finished = false;
 
         while (!finished) {
             if (solvePace[0] != 1.0f) {
-                Thread.sleep((long) (10 + (1 - solvePace[0]) * (300 - 10)));
+                try {
+                    Thread.sleep((long) (10 + (1 - solvePace[0]) * (300 - 10)));
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
             finished = true;
 

@@ -20,7 +20,7 @@ public class Generator {
      * @param n: The size of the grid
      * @return A playable grid
      */
-    public static Grid generateClassicSudoku(int n, Difficulty difficulty) throws InterruptedException {
+    public static Grid generateClassicSudoku(int n, Difficulty difficulty) {
         //assert n is perfect square
         int sqrt = (int) Math.sqrt(n);
         assert sqrt * sqrt == n;
@@ -35,7 +35,7 @@ public class Generator {
      * @param m: The number of sub grids
      * @return A playable multigrid
      */
-    public static MultiGrid generateMultigridSudoku(int n, int m, Difficulty difficulty) throws InterruptedException {
+    public static MultiGrid generateMultigridSudoku(int n, int m, Difficulty difficulty) {
         List<Pair<Vec2i, Grid>> grids = new ArrayList<>();
         var blockSize = (int) Math.sqrt(n);
         var paddings = MultiGrid.getRandomPadding();
@@ -71,7 +71,7 @@ public class Generator {
      * @param blockColumns: The number of block columns
      * @return A playable grid
      */
-    public static Grid generateSudokuWithBlockConstraints(int blockRows, int blockColumns, Difficulty difficulty) throws InterruptedException {
+    public static Grid generateSudokuWithBlockConstraints(int blockRows, int blockColumns, Difficulty difficulty) {
         var solvedGrid = fastSolvedGridCreation(blockRows, blockColumns);
         removeRandomCells(solvedGrid, blockRows * blockColumns, difficulty);
         solvedGrid.cleanMoves();
@@ -84,7 +84,7 @@ public class Generator {
      * @param lengthInnerGrid: The length of the inner grid
      * @return A playable grid
      */
-    public static Grid generateSudokuWithRandomBlockConstraint(int lengthInnerGrid, Difficulty difficulty) throws InterruptedException {
+    public static Grid generateSudokuWithRandomBlockConstraint(int lengthInnerGrid, Difficulty difficulty) {
         var symbols = SymbolSets.generateSymbols(lengthInnerGrid);
         Vec2i dividers = findDividers(lengthInnerGrid);
         Grid solvedGrid = fastSolvedGridCreation(dividers.getX(), dividers.getY());
@@ -105,7 +105,7 @@ public class Generator {
      * @param lengthInnerGrid: The length of the inner grid
      */
     private static <T extends Solvable<T>> void removeRandomCells(T solvedGrid, int lengthInnerGrid,
-                                                                  Difficulty difficulty) throws InterruptedException {
+                                                                  Difficulty difficulty) {
         List<Vec2i> toTestRemove = new ArrayList<>();
         int difficultyValue = difficulty.getValue();
         for (int i = 0; i < lengthInnerGrid; i++) {

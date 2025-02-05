@@ -43,11 +43,11 @@ public class Generator {
 
         var allPaddings = new Vec2i[][]{
                 new Vec2i[]{
-                new Vec2i(0, 0),
-                new Vec2i(12, 0),
-                new Vec2i(6, 6),
-                new Vec2i(0, 12),
-                new Vec2i(12, 12)
+                        new Vec2i(0, 0),
+                        new Vec2i(12, 0),
+                        new Vec2i(6, 6),
+                        new Vec2i(0, 12),
+                        new Vec2i(12, 12)
                 },
                 new Vec2i[]{
                         new Vec2i(6, 0),
@@ -74,7 +74,7 @@ public class Generator {
             }
             grids.add(new Pair<>(paddings[i],
                     new Grid(Arrays.stream(innerGrid).map(Integer[]::clone).toArray(Integer[][]::new),
-                        new HashSet<>(symbols))));
+                            new HashSet<>(symbols))));
         }
 
         var multigrid = new MultiGrid(grids);
@@ -93,7 +93,9 @@ public class Generator {
      */
     public static Grid generateSudokuWithBlockConstraints(int blockRows, int blockColumns) throws InterruptedException {
         var solvedGrid = fastSolvedGridCreation(blockRows, blockColumns);
-        return removeRandomCells(solvedGrid, blockRows * blockColumns);
+        removeRandomCells(solvedGrid, blockRows * blockColumns);
+        solvedGrid.cleanMoves();
+        return solvedGrid;
     }
 
     /**
@@ -111,7 +113,9 @@ public class Generator {
         // We update the new constraints
         solvedGrid = new Grid(solvedGrid.getInnerGrid().get(), generalSymbolConstraints, symbols);
         assert solvedGrid.isSolved();
-        return removeRandomCells(solvedGrid, lengthInnerGrid);
+        removeRandomCells(solvedGrid, lengthInnerGrid);
+        solvedGrid.cleanMoves();
+        return solvedGrid;
     }
 
     /**
@@ -139,11 +143,13 @@ public class Generator {
                 Vec2i randomPos;
                 do {
                     randomPos = Vec2i.random(lengthInnerGrid, lengthInnerGrid);
-                } while (emptyCells.contains(randomPos));
+                } while (emptyCells.contains(randomPos)
+                        && (!(solvedGrid instanceof MultiGrid) || ((MultiGrid) solvedGrid).isInGrid(randomPos)));
 
-                solvedGrid.placeUnchecked(randomPos, null, true, true);
+                solvedGrid.placeUnchecked(randomPos, null, false, true);
                 emptyCells.add(randomPos);
             }
+            solvedGrid.computeAllEmptyCellsPossibilities();
             canSolve = SudokuSolver.solve(solvedGrid, true, false, false).getFirst() == SolvingState.SOLVED;
         } while (canSolve || nToRemove > 1);
 
@@ -152,6 +158,7 @@ public class Generator {
             solvedGrid.undoLastMove(true);
         } while (SudokuSolver.hasMoreThanOneSolution(solvedGrid, true, true));
 
+        solvedGrid.cleanMoves();
         return solvedGrid;
     }
 

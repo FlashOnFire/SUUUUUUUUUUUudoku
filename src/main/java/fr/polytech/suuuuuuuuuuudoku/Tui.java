@@ -30,7 +30,6 @@ import static java.lang.System.exit;
  * The Tui class represents a text-based user interface for the Sudoku game.
  */
 public class Tui {
-    static final String RESOURCES_PATH = "src/test/resources/";
     private final Terminal terminal;
     private final TextGraphics textGraphics;
     private final HashMap<Integer, Integer> mapGridSize = new HashMap<>() {{
@@ -129,12 +128,14 @@ public class Tui {
             }
             case 2 -> { // Open a file
                 // List all the files in the resources folder
-                var files = new java.io.File(RESOURCES_PATH).listFiles();
-                if (files == null) {
+                var resourceUrl = ClassLoader.getSystemResource("exemples");
+                if (resourceUrl == null) {
                     textGraphics.putString(0, line, "Aucun fichier trouvé");
                     terminal.flush();
                     return;
                 }
+                var files = new java.io.File(resourceUrl.getFile()).listFiles();
+                assert files != null;
                 String[] options = Arrays.stream(files).map(File::getName).toArray(String[]::new);
                 int selected = selectMode(options);
                 if (files[selected].isDirectory()) {

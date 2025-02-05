@@ -37,11 +37,18 @@ tasks.register("buildAllJars") {
     dependsOn("tuiJar", "guiSwingJar", "guiImGUIJar")
 }
 
+tasks.named<JavaExec>("run") {
+    classpath += files("src/test/resources")
+}
+
 tasks.jar {
     manifest {
         attributes["Main-Class"] = application.mainClass
     }
+    from(sourceSets.main.get().output)
     from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    from("src/main/resources")
+    from("src/test/resources")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
@@ -52,6 +59,8 @@ tasks.register<Jar>("tuiJar") {
     }
     from(sourceSets.main.get().output)
     from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    from("src/main/resources")
+    from("src/test/resources")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
@@ -62,6 +71,8 @@ tasks.register<Jar>("guiSwingJar") {
     }
     from(sourceSets.main.get().output)
     from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    from("src/main/resources")
+    from("src/test/resources")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
@@ -72,5 +83,7 @@ tasks.register<Jar>("guiImGUIJar") {
     }
     from(sourceSets.main.get().output)
     from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    from("src/main/resources")
+    from("src/test/resources")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

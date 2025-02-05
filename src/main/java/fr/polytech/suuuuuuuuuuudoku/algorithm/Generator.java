@@ -240,8 +240,9 @@ public class Generator {
      * @return a solved grid of size blockRows*blockColumns x blockRows*blockColumns
      */
     public static Grid fastSolvedGridCreation(int blockRows, int blockColumns) {
+
         Path path =
-                Path.of("src/main/java/fr/polytech/suuuuuuuuuuudoku/ressources/" + blockColumns * blockRows + "x" + blockColumns * blockRows + "(constraint" + blockRows + "x" + blockColumns + ").csv");
+                Path.of(ClassLoader.getSystemResource("presolved/" + blockColumns * blockRows + "x" + blockColumns * blockRows + "(constraint" + blockRows + "x" + blockColumns + ").csv").getFile());
         try {
             // Import the grid of length blockRows*blockColumns if it exists
             Integer[][] gridValue = CsvUtils.importGrid(path);

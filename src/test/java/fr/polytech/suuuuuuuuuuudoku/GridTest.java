@@ -13,13 +13,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class GridTest {
-    static final String RESSOURCES_PATH = "src/test/resources/";
 
     @Test
     public void testImportExport() throws FileNotFoundException {
 
-        Path path = Path.of(RESSOURCES_PATH + "100x100_export.csv");
-        var gridValue = CsvUtils.importGrid(Path.of(RESSOURCES_PATH + "100x100.csv"));
+        Path path = Path.of("100x100_export.csv");
+        var gridValue = CsvUtils.importGrid(Path.of(ClassLoader.getSystemResource("exemples/100x100.csv").getFile()));
         var symbol = SymbolSets.generateSymbols(gridValue.length);
         Grid grid = new Grid(gridValue, symbol);
         CsvUtils.exportGrid(path, grid);
@@ -33,13 +32,13 @@ public class GridTest {
         }
 
         //delete the exported file
-        assertTrue(new File(RESSOURCES_PATH + "100x100_export.csv").delete());
+        assertTrue(new File("100x100_export.csv").delete());
     }
 
 
     @Test
     public void testMultigrid() throws FileNotFoundException {
-        var grid = CsvUtils.importMultiGrid(Path.of(RESSOURCES_PATH + "multigrid_1"));
+        var grid = CsvUtils.importMultiGrid(Path.of(ClassLoader.getSystemResource("exemples/multigrid_1").getFile()));
 
         assertEquals(5, grid.getGrids().length);
         assertEquals(1, grid.getSymbolAt(new Vec2i(10, 10)));

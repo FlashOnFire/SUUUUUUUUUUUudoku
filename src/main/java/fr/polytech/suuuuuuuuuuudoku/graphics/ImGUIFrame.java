@@ -82,7 +82,7 @@ public class ImGUIFrame extends Application {
         if (ImGui.button("MultiGrid")) {
             try {
                 solvable = CsvUtils.importMultiGrid(Path.of(
-                        "src/test/resources/multigrid_1"));
+                        ClassLoader.getSystemResource("exemples/multigrid_1").getFile()));
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -93,7 +93,7 @@ public class ImGUIFrame extends Application {
         if (ImGui.button("MultiGrid2")) {
             try {
                 solvable = CsvUtils.importMultiGrid(Path.of(
-                        "src/test/resources/multigrid_2"));
+                        ClassLoader.getSystemResource("exemples/multigrid_2").getFile()));
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -143,8 +143,8 @@ public class ImGUIFrame extends Application {
         ImGui.sameLine();
         if (ImGui.button("MaxiGrid")) {
             try {
-                var innergrid = CsvUtils.importGrid(Path.of(
-                        "src/test/resources/100x100.csv"));
+                var innergrid =
+                        CsvUtils.importGrid(Path.of(ClassLoader.getSystemResource("exemples/100x100.csv").getFile()));
                 var symbolSet = SymbolSets.generateSymbols(innergrid.length);
                 solvable = new Grid(innergrid, symbolSet);
                 originalSolvable = ((Grid) solvable).shallowCopy();

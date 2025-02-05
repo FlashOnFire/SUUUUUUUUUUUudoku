@@ -112,100 +112,127 @@ classDiagram
     direction BT
     class AbstractConstraint {
         <<Interface>>
-        + getClassicConstraints(int, Set~Integer~) List~AbstractConstraint~
-        + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
-        + getRectConstraints(int, int, Set~Integer~) List~AbstractConstraint~
-        + isAffectedBy(Vec2i, Vec2i) boolean
-        + isPosAffected(Vec2i) boolean
         + isSatisfied(InnerGrid) boolean
+        + isAffectedBy(Vec2i, Vec2i) boolean
+        + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
+        + isPosAffected(Vec2i) boolean
+        + getClassicConstraints(int, Set~Integer~) List~AbstractConstraint~
+        + getRectConstraints(int, int, Set~Integer~) List~AbstractConstraint~
     }
     class BlockConstraint {
         + BlockConstraint(Set~Integer~, Box2D)
-        - extractBlock(InnerGrid) List~Integer~
-        + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
         + isAffectedBy(Vec2i, Vec2i) boolean
-        + isInBlock(Vec2i) boolean
-        + isPosAffected(Vec2i) boolean
         + isSatisfied(InnerGrid) boolean
+        - extractBlock(InnerGrid) Set~Integer~
+        + isInBlock(Vec2i) boolean
+        + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
+        + equals(Object) boolean
+        + hashCode() int
+        + isPosAffected(Vec2i) boolean
         Box2D block
     }
     class Box2D {
+        + Box2D(Vec2i, Vec2i)
         + Box2D(int, int, int, int)
-        + absolute(int, int, int, int) Box2D
-        + contains(int, int) boolean
-        + contains(Vec2i) boolean
+        + absolute() Box2D
+        + x() int
         + dx() int
+        + overlap(Box2D) Box2D
+        + height() int
+        + contains(Vec2i) boolean
+        + absolute(int, int, int, int) Box2D
         + dy() int
+        + width() int
+        + offset(int, int) Box2D
         + equals(Object) boolean
         + hashCode() int
-        + height() int
-        + overlap(Box2D) Box2D
+        + contains(int, int) boolean
         + substract(Box2D) Box2D
-        + width() int
-        + x() int
         + y() int
     }
     class ColumnConstraint {
         + ColumnConstraint(Set~Integer~)
-        + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
-        + isAffectedBy(Vec2i, Vec2i) boolean
-        + isPosAffected(Vec2i) boolean
         + isSatisfied(InnerGrid) boolean
+        + isAffectedBy(Vec2i, Vec2i) boolean
+        + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
+        + isPosAffected(Vec2i) boolean
     }
     class CsvUtils {
         + CsvUtils()
         + exportGrid(Path, Grid) void
-        + exportMultiGrid(Path, MultiGrid) void
-        + importGrid(Path) Grid
         + importMultiGrid(Path) MultiGrid
+        + importGrid(Path) Integer[][]
+        + exportMultiGrid(Path, MultiGrid) void
+    }
+    class DiagonalConstraint {
+        + DiagonalConstraint(Set~Integer~)
+        + isAffectedBy(Vec2i, Vec2i) boolean
+        + isSatisfied(InnerGrid) boolean
+        + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
+        + isPosAffected(Vec2i) boolean
+    }
+    class Difficulty {
+        <<enumeration>>
+        + Difficulty()
+        + fromInt(int) Difficulty
+        + values() Difficulty[]
+        + valueOf(String) Difficulty
+        String[] values
+        int value
     }
     class GeneralSymbolConstraint {
         + GeneralSymbolConstraint(Set~Integer~, Vec2i[])
         - Vec2i[] positionList
-        - extractValues(InnerGrid) Set~Integer~
-        + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
-        + isAffectedBy(Vec2i, Vec2i) boolean
-        - isInPositionList(Vec2i) boolean
-        + isPosAffected(Vec2i) boolean
         + isSatisfied(InnerGrid) boolean
+        - extractValues(InnerGrid) Set~Integer~
+        + isPosAffected(Vec2i) boolean
+        - isInPositionList(Vec2i) boolean
+        + isAffectedBy(Vec2i, Vec2i) boolean
+        + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
         Vec2i[] positionList
     }
     class Generator {
         + Generator()
+        - removeRandomCells(T, int, Difficulty) void
+        + fastSolvedGridCreation(int, int) Grid
         ~ createRandomConstraints(Grid) List~AbstractConstraint~
-        - createSolvedSudoku(int, int) Grid
+        + createExempleSolvedSudoku(int, int) Grid
+        + generateSudokuWithBlockConstraints(int, int, Difficulty) Grid
+        + generateClassicSudoku(int, Difficulty) Grid
+        + printGrid(Integer[][]) void
+        + generateSudokuWithRandomBlockConstraint(int, Difficulty) Grid
+        + generateMultigridSudoku(int, int, Difficulty) MultiGrid
         - findDividers(int) Vec2i
-        + generateClassicSudoku(int) Grid
-        + generateSudokuWithBlockConstraints(int, int) Grid
-        + generateSudokuWithRandomBlockConstraint(int) Grid
-        - removeRandomCells(Grid, int) Grid
+        - createSolvedSudoku(int, int) Grid
     }
     class Grid {
         + Grid(Integer[][], Set~Integer~)
         + Grid(Grid)
         + Grid(Integer[][], Set~Integer~, int, int)
         + Grid(Integer[][], List~AbstractConstraint~, Set~Integer~)
+        - ArrayList~Move2i~ moves
+        - InnerGrid innerGrid
         ~ List~AbstractConstraint~ constraints
         - HashMap~Vec2i, Set~ Integer~~ emptyCellsPossibilities
-        - InnerGrid innerGrid
-        - ArrayList~Move2i~ moves
-        + applyNakedPairs() boolean
-        + areConstraintsSatisfied(boolean) boolean
         + computeAllEmptyCellsPossibilities() void
-        + computeChangedEmptyCellsPossibilities(Vec2i, boolean) void
-        + display() void
+        + placeUnchecked(Vec2i, Integer, boolean, boolean) void
+        + areConstraintsSatisfied(boolean) boolean
         + getSymbolAt(Vec2i) Integer
+        + tryPlace(Vec2i, Integer, boolean, boolean) boolean
+        + display() void
         + getSymbolAt(int, int) Integer
         + length() int
-        + placeUnchecked(Vec2i, Integer, boolean, boolean) void
+        + undoLastMove(boolean) void
         + shallowCopy() Grid
-        + tryPlace(Vec2i, Integer, boolean, boolean) boolean
+        + computeChangedEmptyCellsPossibilities(Vec2i, boolean) void
+        + cleanMoves() void
+        + applyNakedPairs() boolean
+        InnerGrid innerGrid
+        Vec2i size
+        List~Move2i~ moves
+        Set~Integer~ symbols
         List~AbstractConstraint~ constraints
         HashMap~Vec2i, Set~ Integer~~ emptyCellsPossibilities
-        InnerGrid innerGrid
-        List~Move2i~ moves
-        Vec2i size
-        Set~Integer~ symbols
     }
     class GridListener {
         <<Interface>>
@@ -213,35 +240,36 @@ classDiagram
     }
     class ImGUIFrame {
         + ImGUIFrame()
-        - applyLastChanges() void
+        - drawGrid(Grid, Vec2i, ImVec2) void
         # configure(Configuration) void
-        - drawGrid(Vec2i, ImVec2) void
-        - handleInput() void
         - keyPress(int) void
+        - setSelection(int, int) void
         + main(String[]) void
         # preRun() void
+        - drawMultiGrid(MultiGrid, Vec2i, ImVec2) void
+        - applyLastChanges() void
+        - handleInput() void
         + process() void
-        - setSelection(int, int) void
         Integer? currentSymbol
     }
     class InnerGrid {
         + InnerGrid(Integer[][])
         + InnerGrid(InnerGrid)
-        + at(Vec2i) Integer
-        + computeEmptyCells() HashSet~Vec2i~
-        + display() void
-        + equals(Object) boolean
-        + get() Integer[][]
-        + hashCode() int
-        + length() int
         + set(Vec2i, Integer) void
+        + get() Integer[][]
+        + display() void
+        + length() int
+        + computeEmptyCells() HashSet~Vec2i~
+        + at(Vec2i) Integer
+        + hashCode() int
+        + equals(Object) boolean
     }
     class LineConstraint {
         + LineConstraint(Set~Integer~)
-        + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
-        + isAffectedBy(Vec2i, Vec2i) boolean
         + isPosAffected(Vec2i) boolean
         + isSatisfied(InnerGrid) boolean
+        + isAffectedBy(Vec2i, Vec2i) boolean
+        + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
     }
     class Main {
         + Main()
@@ -250,46 +278,59 @@ classDiagram
     class Move2i {
         + Move2i(Vec2i, Integer, Integer)
         + position() Vec2i
+        + toString() String
         + previous_value() Integer
         + value() Integer
     }
     class MultiGrid {
         + MultiGrid(List~Pair~ Vec2i, Grid~~)
         + MultiGrid(MultiGrid)
-        - HashMap~Vec2i, Set~ Integer~~ emptyCellsPossibilities
         - Grid[] grids
-        - List~Move2i~ moves
         - Vec2i[] paddings
         - Vec2i size
-        + areConstraintsSatisfied(boolean) boolean
+        - List~Move2i~ moves
+        - HashMap~Vec2i, Set~ Integer~~ emptyCellsPossibilities
+        + getGridFor(int, int) Pair~Integer, Grid~
+        + fillOverlappingCells() void
         + computeAllEmptyCellsPossibilities() void
-        + gatherEmptyCellsPossibilities() void
-        + getSymbolAt(Vec2i) Integer
-        + isInGrid(Vec2i) boolean
+        + areConstraintsSatisfied(boolean) boolean
         + placeUnchecked(Vec2i, Integer, boolean, boolean) void
+        + cleanMoves() void
+        + isNotInGrid(Vec2i) boolean
+        + undoLastMove(boolean) void
         + shallowCopy() MultiGrid
+        + gatherEmptyCellsPossibilities() void
+        + isInGrid(Vec2i) boolean
+        + getSymbolAt(Vec2i) Integer
+        + display() void
+        Vec2i[] randomPadding
         Map~Vec2i, Set~ Integer~~ emptyCellsPossibilities
-        Grid[] grids
+        Vec2i size
         List~Move2i~ moves
         Vec2i[] paddings
-        Vec2i size
+        Grid[] grids
     }
     class NotEmptyConstraint {
         + NotEmptyConstraint()
-        + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
         + isAffectedBy(Vec2i, Vec2i) boolean
         + isPosAffected(Vec2i) boolean
+        + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
         + isSatisfied(InnerGrid) boolean
     }
     class ObservableGrid {
         + ObservableGrid(Grid, GridListener)
         - Grid grid
-        + areConstraintsSatisfied(boolean) boolean
         + computeAllEmptyCellsPossibilities() void
         + placeUnchecked(Vec2i, Integer, boolean, boolean) void
+        + undoLastMove(boolean) void
+        + cleanMoves() void
+        + areConstraintsSatisfied(boolean) boolean
         + shallowCopy() ObservableGrid
+        + getSymbolAt(Vec2i) Integer
         Map~Vec2i, Set~ Integer~~ emptyCellsPossibilities
         Grid grid
+        Vec2i size
+        List~Move2i~ moves
     }
     class Pair~K, V~ {
 + Pair(K, V)
@@ -298,23 +339,27 @@ classDiagram
 K first
 V second
 }
-class ShallowCopyable~T~ {
-<<Interface>>
-+ shallowCopy() T
- }
-class Solvable {
+class Solvable~T~ {
 # Solvable(Set~Integer~)
+~ Set~Integer~ symbols
++ cleanMoves() void
 + areConstraintsSatisfied(boolean) boolean
++ getSymbolAt(Vec2i) Integer
++ shallowCopy() T
++ undoLastMove(boolean) void
 + computeAllEmptyCellsPossibilities() void
 + placeUnchecked(Vec2i, Integer, boolean, boolean) void
-Map~Vec2i, Set~ Integer~~ emptyCellsPossibilities
 boolean solved
+Map~Vec2i, Set~ Integer~~ emptyCellsPossibilities
+Vec2i size
+List~Move2i~ moves
+Set~Integer~ symbols
 }
 class SolvingState {
 <<enumeration>>
 + SolvingState()
-+ valueOf(String) SolvingState
 + values() SolvingState[]
++ valueOf(String) SolvingState
 }
 class SudokuBoard {
 ~ SudokuBoard(Grid)
@@ -332,11 +377,11 @@ class SudokuOptions {
 }
 class SudokuSolver {
 + SudokuSolver()
-- doBacktracking(T, boolean) List~T~
 + findAllSolutions(T, boolean, boolean, boolean) List~T~
 + hasMoreThanOneSolution(T, boolean, boolean) boolean
-+ solve(T, boolean, boolean, boolean) Pair~SolvingState, T~
 - solveDeduction(T, boolean) SolvingState
++ solve(T, boolean, boolean, boolean) Pair~SolvingState, T~
+- doBacktracking(T, boolean) List~T~
 }
 class SymbolSets {
 + SymbolSets()
@@ -344,42 +389,41 @@ class SymbolSets {
 }
 class Tui {
 + Tui()
+- welcomeMessage() void
 - displayGrid(Grid, Vec2i) void
-- displayMultiGrid(MultiGrid) void
-- displayOptions(String[], int) void
-- displaySizes(int, int[]) void
-- gameOver() void
-- hslToRgb(float, float, float) int[]
-+ main(String[]) void
-- play(Solvable) void
-- selectMode(String[]) int
-- selectSize() int
-- showHelper() void
+- play(Solvable~?~) void
 - showTimeLine(int, int) void
-- solve(Solvable) Solvable
++ main(String[]) void
+- stopLoader() void
+- selectMode(String[]) int
 ~ start() void
 - startLoader() void
-- stopLoader() void
-- welcomeMessage() void
+- gameOver() void
+- cleanTerminal() void
+- solve(Solvable~?~) Solvable~?~
+- displayMultiGrid(MultiGrid) void
+- showHelper() void
+- displayOptions(String[], int) void
 }
 class Utils {
 + Utils()
-+ applyMapping(O[][], M[][], HashMap~O, M~) M[][]
++ hslToRgb(float, float, float) int[]
++ applyMapping(O[][], M[][], HashMap~O, M~) void
 }
 class Vec2i {
 + Vec2i(Vec2i)
 + Vec2i(int, int)
 - int x
 - int y
-+ absolute() Vec2i
-+ add(Vec2i) Vec2i
-+ equals(int, int) boolean
-+ equals(Object) boolean
-+ hashCode() int
-+ random(int, int) Vec2i
-+ substract(Vec2i) Vec2i
-+ toString() String
 + zero() Vec2i
++ equals(int, int) boolean
++ random(int, int) Vec2i
++ equals(Object) boolean
++ substract(Vec2i) Vec2i
++ absolute() Vec2i
++ toString() String
++ hashCode() int
++ add(Vec2i) Vec2i
 int x
 int y
 }
@@ -396,54 +440,58 @@ CsvUtils  ..>  Grid: «create»
 CsvUtils  ..>  MultiGrid : «create»
 CsvUtils  ..>  Pair~K, V~: «create»
 CsvUtils  ..>  Vec2i: «create»
+DiagonalConstraint  ..>  AbstractConstraint
 GeneralSymbolConstraint  ..>  AbstractConstraint
 GeneralSymbolConstraint "1" *--> "positionList *" Vec2i
 Generator  ..>  ColumnConstraint: «create»
-Generator  ..>  GeneralSymbolConstraint : «create»
+Generator  ..>  GeneralSymbolConstraint: «create»
 Generator  ..>  Grid: «create»
 Generator  ..>  LineConstraint: «create»
+Generator  ..>  MultiGrid: «create»
 Generator  ..>  NotEmptyConstraint: «create»
+Generator  ..>  Pair~K, V~: «create»
 Generator  ..>  Vec2i: «create»
 Grid "1" *--> "constraints *" AbstractConstraint
-Grid "1" *--> "innerGrid 1" InnerGrid
 Grid  ..>  InnerGrid: «create»
-Grid  ..>  Move2i: «create»
+Grid "1" *--> "innerGrid 1" InnerGrid
 Grid "1" *--> "moves *" Move2i
-Grid  ..>  ShallowCopyable~T~
-Grid  -->  Solvable
-Grid  ..>  Vec2i: «create»
+Grid  ..>  Move2i: «create»
+Grid  -->  Solvable~T~
 Grid "1" *--> "emptyCellsPossibilities *" Vec2i
-ImGUIFrame "1" *--> "originalGrid 1" Grid
+Grid  ..>  Vec2i: «create»
+ImGUIFrame  ..>  Grid: «create»
 ImGUIFrame  ..>  ObservableGrid: «create»
-ImGUIFrame  ..>  Vec2i: «create»
+ImGUIFrame "1" *--> "originalSolvable 1" Solvable~T~
 ImGUIFrame "1" *--> "selected_pos 1" Vec2i
+ImGUIFrame  ..>  Vec2i: «create»
 InnerGrid  ..>  Vec2i: «create»
 LineConstraint  ..>  AbstractConstraint
 Move2i "1" *--> "position 1" Vec2i
+MultiGrid  ..>  Box2D: «create»
 MultiGrid "1" *--> "grids *" Grid
-MultiGrid  ..>  Move2i: «create»
 MultiGrid "1" *--> "moves *" Move2i
-MultiGrid  ..>  ShallowCopyable~T~
-MultiGrid  -->  Solvable
-MultiGrid  ..>  Vec2i: «create»
+MultiGrid  ..>  Move2i: «create»
+MultiGrid  ..>  Pair~K, V~: «create»
+MultiGrid  -->  Solvable~T~
 MultiGrid "1" *--> "paddings *" Vec2i
+MultiGrid  ..>  Vec2i: «create»
 NotEmptyConstraint  ..>  AbstractConstraint
 ObservableGrid "1" *--> "grid 1" Grid
 ObservableGrid "1" *--> "listener 1" GridListener
-ObservableGrid  ..>  ShallowCopyable~T~
-ObservableGrid  -->  Solvable
-SudokuBoard "1" *--> "solvedGrid 1" Grid
+ObservableGrid  -->  Solvable~T~
+SudokuBoard "1" *--> "previousGrid 1" Grid
 SudokuBoard  ..>  Grid: «create»
 SudokuBoard  ..>  Vec2i: «create»
-SudokuFrame  ..>  Grid : «create»
 SudokuFrame "1" *--> "grid 1" Grid
-SudokuFrame "1" *--> "board 1" SudokuBoard
+SudokuFrame  ..>  Grid : «create»
 SudokuFrame  ..>  SudokuBoard: «create»
+SudokuFrame "1" *--> "board 1" SudokuBoard
 SudokuFrame  ..>  SudokuOptions: «create»
-SudokuSolver  ..>  Pair~K, V~ : «create»
+SudokuSolver  ..>  Pair~K, V~: «create»
 Tui  ..>  Grid: «create»
+Tui  ..>  MultiGrid: «create»
+Tui  ..>  Pair~K, V~: «create»
 Tui  ..>  Vec2i: «create»
-
 ```
 
 <!-- END_CLASS -->

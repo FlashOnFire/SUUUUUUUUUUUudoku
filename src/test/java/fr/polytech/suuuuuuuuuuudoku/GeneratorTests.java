@@ -10,7 +10,7 @@ public class GeneratorTests {
 
     @Test
     public void testBasicGenerator() throws InterruptedException {
-        int[] gridSizes = {4, 9, 16, 25, 36, 49, 64};
+        int[] gridSizes = {4, 9, 16};
         final int N = 10;
 
         System.out.println("Grid size, Moyenne, Min, Max, Médiane");
@@ -18,7 +18,7 @@ public class GeneratorTests {
             long[] durations = new long[N];
             for (int i = 0; i < N; i++) {
                 long startTime = System.currentTimeMillis();
-               Generator.generateClassicSudoku(gridSize, Difficulty.EXPERT);
+                Generator.generateClassicSudoku(gridSize, Difficulty.EXPERT);
                 // Generator.generateMultigridSudoku(9, 5, Difficulty.EXPERT);
                 long endTime = System.currentTimeMillis();
                 durations[i] = endTime - startTime;

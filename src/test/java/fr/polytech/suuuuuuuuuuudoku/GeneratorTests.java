@@ -3,6 +3,7 @@ package fr.polytech.suuuuuuuuuuudoku;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
 import org.junit.jupiter.api.Test;
 
+import static fr.polytech.suuuuuuuuuuudoku.algorithm.Generator.createExempleSolvedSudoku;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class GeneratorTests {
@@ -38,5 +39,17 @@ public class GeneratorTests {
         long endTime5 = System.currentTimeMillis();
         System.out.println("Generation time for 25x25 grid: " + (endTime4 - startTime4) + "ms");
         assertTrue((endTime5 - startTime5) < 20000, "Generation time for 25x25 grid exceeded limit");
+    }
+
+    @Test
+    public void testFastSolvedExempleGeneration() {
+        var grid3x2 = createExempleSolvedSudoku(3, 2);
+        assertTrue(grid3x2.isSolved());
+        var grid2x3 = createExempleSolvedSudoku(2, 3);
+        assertTrue(grid2x3.isSolved());
+        var grid3x3 = createExempleSolvedSudoku(3, 3);
+        assertTrue(grid3x3.isSolved());
+        var grid4x4 = createExempleSolvedSudoku(4, 4);
+        assertTrue(grid4x4.isSolved());
     }
 }

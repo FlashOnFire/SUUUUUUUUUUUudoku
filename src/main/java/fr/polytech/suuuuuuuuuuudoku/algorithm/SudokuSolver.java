@@ -54,7 +54,9 @@ public class SudokuSolver {
                     return new Pair<>(SolvingState.PARTIALLY_SOLVED, currentGrid);
                 }
             }
-
+            if (currentGrid.getEmptyCellsPossibilities().isEmpty()) {
+                continue;
+            }
             currentList.addAll(doBacktracking(currentGrid, store_moves));
         }
 

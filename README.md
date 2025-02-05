@@ -4,22 +4,22 @@ Projet mené par Eymeric Dechelette, Thibaut Laracine et Guillaume Calderon
 
 ## Fonctionnalités
 
-Ce SUUUUUUUUUUUudoku dispose des fonctionalité suivantes :
+Ce SUUUUUUUUUUUudoku dispose des fonctionnalités suivantes :
 
 - Génération de grille
 
-  Vous pouvez générer une grille de sudoku de taille avec des performance résonnable jusqu'a 16\*16
+  Vous pouvez générer une grille de sudoku de taille avec des performances raisonnables jusqu'à 16\*16.
 
 - Résolution de grille
 
-  Vous pouvez résoudre une grille de sudoku de taille avec des performance résonnable jusqu'a 100\*100
-  Vous pouvez aussi résoudre des multi-doku (prés codé via des fichier dans le dossier
+  Vous pouvez résoudre une grille de sudoku de taille avec des performances raisonnables jusqu'à 100\*100.
+  Vous pouvez aussi résoudre des multi-doku (pré-codé via des fichiers dans le dossier
   `src/test/resources`)
 
 - Consulter l'historique des modifications
 
   Vous pouvez consulter l'historique des modifications de la grille (particulièrement utile pour les résolutions
-  automatique)
+  automatiques).
 
 - Résolution manuelle
 
@@ -27,11 +27,11 @@ Ce SUUUUUUUUUUUudoku dispose des fonctionalité suivantes :
 
 - Interface graphique
 
-  Vous pouvez utiliser une interface graphique pour jouer au sudokus
+  Vous pouvez utiliser une interface graphique pour jouer au sudoku
 
 - Interface en ligne de commande
 
-  Vous pouvez utiliser une interface en ligne de commande pour jouer au sudokus
+  Vous pouvez utiliser une interface en ligne de commande pour jouer au sudoku
 
 ## Utilisation
 
@@ -39,7 +39,7 @@ Ce SUUUUUUUUUUUudoku dispose des fonctionalité suivantes :
 
 #### Utilisateur nix
 
-La methode privilégiée pour lancer le programme est d'utiliser nix, car celui-ci vous assure d'avoir un environement
+La methode privilégiée pour lancer le programme est d'utiliser nix, car celui-ci vous assure d'avoir un environnement
 identique au autre utilisateur de nix.
 
 Si vous disposez de nix, vous pouvez lancer la compilation avec la commande suivante :
@@ -48,7 +48,7 @@ Si vous disposez de nix, vous pouvez lancer la compilation avec la commande suiv
 nix build
 ```
 
-Vous pouvez ensuite lancer les differents executables avec les commande suivante :
+Vous pouvez ensuite lancer les différents executables avec les commandes suivantes :
 
 ```bash
 ./result/bin/tui # Interface en ligne de commande
@@ -70,7 +70,7 @@ Vous pouvez ensuite lancer la compilation avec la commande suivante :
 ./gradlew buildAllJars
 ```
 
-Vous pouvez ensuite lancer les differents executables avec les commande suivante :
+Vous pouvez ensuite lancer les différents executables avec les commandes suivantes :
 
 ```bash
 java -jar ./build/libs/imGUI-1.0-SNAPSHOT.jar # Interface en ligne de commande
@@ -83,13 +83,13 @@ java -jar ./build/libs/swing-1.0-SNAPSHOT.jar # Interface graphique avec swing
 ```mermaid
 flowchart LR
     subgraph system["system"]
-        B(["CreerGrille"])
-        C(["AjouterGrille"])
-        D(["GenererGrille"])
-        G(["ResoudreAutomatiquement"])
-        E(["ResoudreGrille"])
-        F(["ResoudreManuellement"])
-        I(["EtapeDeResolution"])
+        B(["Créer Grille"])
+        C(["Ajouter Grille"])
+        D(["Générer Grille"])
+        G(["Résoudre Automatiquement"])
+        E(["Résoudre Grille"])
+        F(["Résoudre Manuellement"])
+        I(["Étape De Resolution"])
         H(["Afficher"])
         J(["Grille"])
     end
@@ -479,13 +479,27 @@ Tui ..> MultiGrid: «create»
 ```
 
 
-### Diagramme d'activité du générateur :
+### Générateur :
+
+#### Explication de la méthode de génération de grille simple optimisé :
 
 ```
 TODO
 ```
 
-### Diagramme d'activité du solveur :
+#### Explication de la méthode de génération de multi grille :
+
+```
+TODO
+```
+
+#### Méthode de génération des contraintes pour un sudoku avec des contraintes de blocs de NxM :
+
+```
+TODO
+```
+
+### Solveur :
 
 ```mermaid
 stateDiagram
@@ -549,10 +563,7 @@ partial --> [*]
 }
 ```
 
-
 On peut également observer la méthode de résolution à travers un diagramme de séquence :
-
-### Diagramme de séquence solveur
 
 ```mermaid
 sequenceDiagram

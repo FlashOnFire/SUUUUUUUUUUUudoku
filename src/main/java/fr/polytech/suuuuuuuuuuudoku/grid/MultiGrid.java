@@ -1,5 +1,6 @@
 package fr.polytech.suuuuuuuuuuudoku.grid;
 
+import fr.polytech.suuuuuuuuuuudoku.algorithm.Box2D;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Pair;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 
@@ -31,6 +32,8 @@ public class MultiGrid extends Solvable<MultiGrid> {
                         .orElse(0);
 
         this.size = new Vec2i(maxX, maxY);
+        fillOverlappingCells();
+        computeAllEmptyCellsPossibilities();
     }
 
     public MultiGrid(MultiGrid other) {
@@ -156,6 +159,12 @@ public class MultiGrid extends Solvable<MultiGrid> {
     }
 
     @Override
+    public void cleanMoves() {
+        moves.clear();
+    }
+
+
+    @Override
     public void undoLastMove(boolean updatePossibilities) {
         if (moves.isEmpty()) {
             return;
@@ -182,6 +191,42 @@ public class MultiGrid extends Solvable<MultiGrid> {
                 }
             }
             System.out.println();
+        }
+    }
+
+    /**
+     * Fills the overlapping cells of the grids with the same value if one of them has it.
+     */
+    public void fillOverlappingCells() {
+        for (int i = 0; i < paddings.length; i++) {
+            Box2D box = new Box2D(paddings[i], grids[i].getSize());
+            for (int j = 0; j < paddings.length; j++) {
+                if (i == j) {
+                    continue;
+                }
+                Box2D otherBox = new Box2D(paddings[j], grids[j].getSize());
+                Box2D overlap = box.overlap(otherBox);
+                if (overlap != null) {
+                    for (int x = overlap.x(); x < overlap.dx(); x++) {
+                        for (int y = overlap.y(); y < overlap.dy(); y++) {
+                            Vec2i pos = new Vec2i(x, y);
+                            if (grids[i].getSymbolAt((new Vec2i(pos)).substract(paddings[i])) == null
+                                    && grids[j].getSymbolAt((new Vec2i(pos)).substract(paddings[j])) != null) {
+                                Integer symbol = grids[j].getSymbolAt((new Vec2i(pos)).substract(paddings[j]));
+                                if (symbol != null) {
+                                    placeUnchecked(pos, symbol, false, false);
+                                }
+                            } else if (grids[j].getSymbolAt((new Vec2i(pos)).substract(paddings[j])) == null
+                                    && grids[i].getSymbolAt((new Vec2i(pos)).substract(paddings[i])) != null) {
+                                Integer symbol = grids[i].getSymbolAt((new Vec2i(pos)).substract(paddings[i]));
+                                if (symbol != null) {
+                                    placeUnchecked(pos, symbol, false, false);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

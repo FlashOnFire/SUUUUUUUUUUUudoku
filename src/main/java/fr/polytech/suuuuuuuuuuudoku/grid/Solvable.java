@@ -42,5 +42,8 @@ public abstract class Solvable<T> {
     }
 
     public abstract List<Move2i> getMoves();
+
     public abstract void undoLastMove(boolean updatePossibilities);
+
+    public abstract void cleanMoves();
 }

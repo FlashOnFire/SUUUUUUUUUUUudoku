@@ -290,6 +290,12 @@ public class Grid extends Solvable<Grid> {
         return this.symbols;
     }
 
+    @Override
+    public void cleanMoves() {
+        this.moves.clear();
+    }
+
+
     public int length() {
         return this.innerGrid.get().length;
     }

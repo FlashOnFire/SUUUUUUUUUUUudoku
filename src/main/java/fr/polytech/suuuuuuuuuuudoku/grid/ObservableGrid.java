@@ -70,6 +70,11 @@ public class ObservableGrid extends Solvable<ObservableGrid> {
     }
 
     @Override
+    public void cleanMoves() {
+        grid.cleanMoves();
+    }
+
+    @Override
     public void undoLastMove(boolean updatePossibilities) {
         grid.undoLastMove(updatePossibilities);
         listener.onGridChange(this.getGrid().getInnerGrid());

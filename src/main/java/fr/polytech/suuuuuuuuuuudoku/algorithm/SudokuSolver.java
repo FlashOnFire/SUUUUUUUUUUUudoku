@@ -139,7 +139,9 @@ public class SudokuSolver {
                 }
             }
 
-            currentList.addAll(doBacktracking(currentGrid, false));
+            if (!currentGrid.getEmptyCellsPossibilities().isEmpty()) {
+                currentList.addAll(doBacktracking(currentGrid, false));
+            }
         }
 
         return false;

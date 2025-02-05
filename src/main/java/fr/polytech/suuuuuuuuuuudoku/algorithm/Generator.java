@@ -41,61 +41,47 @@ public class Generator {
         var blockSize = (int) Math.sqrt(n);
         var maxDiag = (int) Math.sqrt(Math.pow(n, 2) + Math.pow(n, 2)) * m;
 
-        var paddings = new Vec2i[]{
+        var allPaddings = new Vec2i[][]{
+                new Vec2i[]{
                 new Vec2i(0, 0),
                 new Vec2i(12, 0),
                 new Vec2i(6, 6),
                 new Vec2i(0, 12),
                 new Vec2i(12, 12)
+                },
+                new Vec2i[]{
+                        new Vec2i(6, 0),
+                        new Vec2i(0, 6),
+                        new Vec2i(6, 6),
+                        new Vec2i(12, 6),
+                        new Vec2i(6, 12)
+                }
         };
 
-
+        var paddings = allPaddings[(int) (Math.random() * allPaddings.length)];
         var symbols = SymbolSets.generateSymbols(n);
+
+        var centeredGrid = fastSolvedGridCreation(blockSize, blockSize);
         var innerGrid = new Integer[n][n];
         for (var i = 0; i < blockSize; i++) {
             Arrays.fill(innerGrid[i], null);
         }
 
-        Set<Box2D> filledGrids = new HashSet<>();
-        filledGrids.add(new Box2D(paddings[0].getX(), paddings[0].getY(), n, n));
-        grids.add(new Pair<>(paddings[0], fastSolvedGridCreation(blockSize, blockSize)));
-
-
-        for (int i = 0; i < m - 1; i++) {
-            var padding = paddings[i + 1];
-            var box = new Box2D(padding.getX(), padding.getY(), n, n);
-            if (filledGrids.stream().anyMatch(box2D -> box2D.overlap(box) != null)) {
-                grids.add(new Pair<>(Vec2i.random(maxDiag / m, maxDiag / m), new Grid(innerGrid.clone(),
-                        new HashSet<>(symbols))));
-            } else {
-                grids.add(i, new Pair<>(padding, fastSolvedGridCreation(blockSize, blockSize)));
-                filledGrids.add(box);
+        for (int i = 0; i < m; i++) {
+            if (i == 2) {
+                grids.add(new Pair<>(paddings[i], centeredGrid));
+                continue;
             }
+            grids.add(new Pair<>(paddings[i],
+                    new Grid(Arrays.stream(innerGrid).map(Integer[]::clone).toArray(Integer[][]::new),
+                        new HashSet<>(symbols))));
         }
 
-
         var multigrid = new MultiGrid(grids);
-
-        // Place symbols on the diagonal if the cell is available
-//        var symbolsList = new ArrayList<>(symbols);
-//        for (int i = 0; i < maxDiag; i++) {
-//            Vec2i pos = new Vec2i(i, i);
-//            if (multigrid.isInGrid(pos)) {
-//                multigrid.placeUnchecked(pos, symbolsList.get(i % symbolsList.size()), false, false);
-//            }
-//        }
-
-        multigrid.display();
-        multigrid.computeAllEmptyCellsPossibilities();
         multigrid = SudokuSolver.solve(multigrid, true, true, false).getSecond();
-
-        System.out.println();
-        System.out.println();
-        multigrid.display();
-
-        var size = multigrid.getSize();
-        var max = Math.max(size.getX(), size.getY());
-        return removeRandomCells(multigrid, max);
+        removeRandomCells(multigrid, Math.max(multigrid.getSize().getX(), multigrid.getSize().getY()));
+        multigrid.cleanMoves();
+        return multigrid;
     }
 
     /**

@@ -10,6 +10,13 @@ public class Box2D {
         this.dy = y + length;
     }
 
+    public Box2D(Vec2i pos, Vec2i size) {
+        this.x = pos.getX();
+        this.y = pos.getY();
+        this.dx = x + size.getX();
+        this.dy = y + size.getY();
+    }
+
     static public Box2D absolute(int x, int y, int dx, int dy) {
         return new Box2D(x, y, dx - x, dy - y);
     }
@@ -68,7 +75,7 @@ public class Box2D {
     }
 
     public Box2D substract(Box2D other) {
-      return Box2D.absolute(x - other.x, y - other.y, dx - other.x, dy - other.y);
+        return Box2D.absolute(x - other.x, y - other.y, dx - other.x, dy - other.y);
     }
 
     @Override

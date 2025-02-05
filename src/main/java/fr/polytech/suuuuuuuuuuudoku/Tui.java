@@ -33,7 +33,7 @@ public class Tui {
     static final String RESSOURCES_PATH = "src/test/resources/";
     private final Terminal terminal;
     private final TextGraphics textGraphics;
-    private final HashMap<Integer, Integer> mapGridSize = new HashMap<Integer, Integer>() {{
+    private final HashMap<Integer, Integer> mapGridSize = new HashMap<>() {{
         put(0, 4);
         put(1, 9);
         put(2, 16);

@@ -110,7 +110,10 @@ public class Generator {
         int difficultyValue = difficulty.getValue();
         for (int i = 0; i < lengthInnerGrid; i++) {
             for (int j = 0; j < lengthInnerGrid; j++) {
-                toTestRemove.add(new Vec2i(i, j));
+                Vec2i pos = new Vec2i(i, j);
+                if (!(solvedGrid instanceof MultiGrid) || ((MultiGrid) solvedGrid).isInGrid(pos)) {
+                    toTestRemove.add(new Vec2i(i, j));
+                }
             }
         }
         Collections.shuffle(toTestRemove);
@@ -119,18 +122,7 @@ public class Generator {
                 lengthInnerGrid * lengthInnerGrid / (Difficulty.getValues().length - difficultyValue));
 
         do {
-            Vec2i pos = null;
-            do {
-                if (toTestRemove.isEmpty()) {
-                    break;
-                }
-                pos = toTestRemove.removeFirst();
-            } while ((solvedGrid instanceof MultiGrid) && !((MultiGrid) solvedGrid).isInGrid(pos));
-            if (pos == null) {
-                break;
-            }
-            solvedGrid.placeUnchecked(pos, null, false, true);
-
+            solvedGrid.placeUnchecked(toTestRemove.removeFirst(), null, false, true);
             solvedGrid.computeAllEmptyCellsPossibilities();
             if (SudokuSolver.solve(solvedGrid, true, false, false).getFirst() != SolvingState.SOLVED) {
                 solvedGrid.undoLastMove(true);
@@ -240,6 +232,13 @@ public class Generator {
         return solvedGrid;
     }
 
+    /**
+     * Generates a solved grid of size NxM * NxM
+     *
+     * @param blockRow:     The number of block rows
+     * @param blockColumns: The number of block columns
+     * @return A solved grid
+     */
     public static Grid createExempleSolvedSudoku(int blockRow, int blockColumns) {
         var symbols = SymbolSets.generateSymbols(blockRow * blockColumns);
         var innerGrid = new Integer[blockRow * blockColumns][blockRow * blockColumns];
@@ -364,13 +363,4 @@ public class Generator {
         }
     }
 
-    static public void printGrid(Integer[][] grid) {
-        for (Integer[] integers : grid) {
-            for (int j = 0; j < grid.length; j++) {
-                System.out.print(integers[j] + " ");
-            }
-            System.out.println();
-        }
-        System.out.println();
-    }
 }

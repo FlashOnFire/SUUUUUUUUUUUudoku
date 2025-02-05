@@ -118,8 +118,7 @@ public class Generator {
         }
         Collections.shuffle(toTestRemove);
         //keep only lengthInnerGrid * lengthInnerGrid / difficultyValue cells
-        toTestRemove = toTestRemove.subList(0,
-                lengthInnerGrid * lengthInnerGrid / (Difficulty.getValues().length - difficultyValue));
+        toTestRemove = toTestRemove.subList(0, toTestRemove.size() / (Difficulty.getValues().length - difficultyValue));
 
         do {
             solvedGrid.placeUnchecked(toTestRemove.removeFirst(), null, false, true);

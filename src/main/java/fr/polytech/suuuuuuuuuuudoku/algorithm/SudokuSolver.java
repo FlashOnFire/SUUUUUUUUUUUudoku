@@ -154,17 +154,12 @@ public class SudokuSolver {
      * @return the solving state of the Sudoku grid
      */
     private static <T extends Solvable<T>> List<T> doBacktracking(T grid, boolean store_moves) {
-        // System.out.println("Backtracking");
-
         assert !grid.getEmptyCellsPossibilities().isEmpty() : "No empty cells";
 
         var cell = grid.getEmptyCellsPossibilities().entrySet().stream()
                        .min(Comparator.comparingInt(e -> e.getValue().size()))
                        .orElseThrow();
-        // System.out.println("Trying " + cell.getKey() + " with " + cell.getValue());
 
-        // disable assert to allow solving with only backtracking
-        //assert cell.getValue().size() > 1 : "Cell has less than two possibilities";
         if (cell.getValue().isEmpty()) {
             return List.of();
         }
@@ -210,8 +205,6 @@ public class SudokuSolver {
                         grid.placeUnchecked(cell, possibilities.iterator().next(), true, store_moves);
                         finished = false;
                     } else if (possibilities.isEmpty()) {
-                        // System.out.println("Empty cell has no possibilities");
-
                         return SolvingState.UNSOLVABLE;
                     }
                 }

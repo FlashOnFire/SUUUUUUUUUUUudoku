@@ -232,53 +232,6 @@ public class Generator {
     }
 
     /**
-     * Generates a solved grid of size NxM * NxM
-     *
-     * @param blockRow:     The number of block rows
-     * @param blockColumns: The number of block columns
-     * @return A solved grid
-     */
-    public static Grid createExempleSolvedSudoku(int blockRow, int blockColumns) {
-        var symbols = SymbolSets.generateSymbols(blockRow * blockColumns);
-        var innerGrid = new Integer[blockRow * blockColumns][blockRow * blockColumns];
-        for (var i = 0; i < blockRow; i++) {
-            Arrays.fill(innerGrid[i], null);
-        }
-        Grid seedGrid = new Grid(innerGrid, symbols, blockRow, blockColumns);
-        List<Integer> symbolsArray = new ArrayList<>(symbols);
-        for (var i = 0; i < blockRow; i++) {
-            // we place the value in the column i
-            for (var j = 0; j < blockColumns * blockRow; j++) {
-                seedGrid.placeUnchecked(new Vec2i(i, j), symbolsArray.get(j), false, false);
-            }
-            // we shift the values in the array
-            for (var k = 0; k < blockColumns; k++) {
-                symbolsArray.add(symbolsArray.getFirst());
-                symbolsArray.removeFirst();
-            }
-        }
-
-        for (var k = 1; k <= blockRow; k++) {
-            symbolsArray.remove(((blockRow - k) * blockColumns));
-        }
-
-        for (var i = 0; i < blockRow; i++) {
-            for (var j = 0; j < symbolsArray.size(); j++) {
-                seedGrid.placeUnchecked(new Vec2i(j + blockRow, i * blockColumns), symbolsArray.get(j), false, false);
-            }
-            // we shift the values in the array once only (we don't have block constraint here)
-            symbolsArray.add(symbolsArray.getFirst());
-            symbolsArray.removeFirst();
-        }
-
-        seedGrid.computeAllEmptyCellsPossibilities();
-        var pair = SudokuSolver.solve(seedGrid, true, true, false);
-        var state = pair.getFirst();
-        assert state == SolvingState.SOLVED;
-        return pair.getSecond();
-    }
-
-    /**
      * Try to generate a solved grid faster using previous generated grid. We shuffled row and column, keeping block
      * constraints at the same time.
      *
@@ -361,5 +314,4 @@ public class Generator {
             return grid;
         }
     }
-
 }

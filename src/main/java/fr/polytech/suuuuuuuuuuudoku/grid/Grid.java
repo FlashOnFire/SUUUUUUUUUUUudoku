@@ -57,13 +57,6 @@ public class Grid extends Solvable<Grid> {
     }
 
     /**
-     * Displays the grid to the console.
-     */
-    public void display() {
-        this.innerGrid.display();
-    }
-
-    /**
      * Checks if all constraints are satisfied.
      *
      * @return true if all constraints are satisfied, false otherwise
@@ -137,6 +130,7 @@ public class Grid extends Solvable<Grid> {
         }
     }
 
+    // don't delete this method for now
     public boolean applyNakedPairs() {
         AtomicBoolean changed = new AtomicBoolean(false);
 
@@ -154,7 +148,7 @@ public class Grid extends Solvable<Grid> {
                    ));
 
         // Iterate over blocks
-        blockToEmptyCells.forEach((constraint, cells) -> {
+        blockToEmptyCells.forEach((_, cells) -> {
             // Create a map of possibilities to cells within this block
             Map<Set<Integer>, List<Vec2i>> possibilitiesToCells = new HashMap<>();
             for (Vec2i cell : cells) {
@@ -209,47 +203,20 @@ public class Grid extends Solvable<Grid> {
     }
 
     /**
-     * Tries to place a value at the specified position.
+     * Places a value at the specified position without checking constraints.
      *
-     * @param pos   the position to place the value
-     * @param value the value to place
-     * @return true if the placement is valid, false otherwise
+     * @param pos: the position to place the value
+     * @param value: the value to place
+     * @param updatePossibilities: whether to update the possibilities
+     * @param store_move: whether to store the move
      */
-    public boolean tryPlace(Vec2i pos, Integer value, boolean updatePossibilities, boolean store_move) {
-        var oldValue = this.innerGrid.at(pos);
-        this.innerGrid.set(pos, value);
-        if (!this.areConstraintsSatisfied(true)) {
-            // revert
-            System.out.println("Invalid placement (" + value + ") at " + pos + ", reverting");
-            this.innerGrid.set(pos, value);
-
-            return false;
-        }
-
-        if (oldValue == null && value != null) {
-            this.emptyCellsPossibilities.remove(pos);
-        } else if (oldValue != null && value == null) {
-            System.out.println("Placing empty cell at " + pos);
-            this.emptyCellsPossibilities.put(pos, new HashSet<>(this.symbols));
-        }
-
-        if (updatePossibilities) {
-            computeChangedEmptyCellsPossibilities(pos, true);
-        }
-
-        // System.out.println("Placed " + value + " at " + pos);
-        return true;
-    }
-
     @Override
     public void placeUnchecked(Vec2i pos, Integer value, boolean updatePossibilities, boolean store_move) {
         Integer oldValue = getSymbolAt(pos);
 
         if (oldValue == null && value != null) {
-            //System.out.println("Suppress empty cell at " + pos);
             this.emptyCellsPossibilities.remove(pos);
         } else if (oldValue != null && value == null) {
-            //System.out.println("Placing empty cell at " + pos);
             this.emptyCellsPossibilities.put(pos, new HashSet<>(this.symbols));
         }
 
@@ -264,10 +231,23 @@ public class Grid extends Solvable<Grid> {
         }
     }
 
+    /**
+     * Returns the symbol at the specified position.
+     *
+     * @param pos: the position to get the symbol
+     * @return the symbol at the position
+     */
     public Integer getSymbolAt(Vec2i pos) {
         return this.innerGrid.get()[pos.getY()][pos.getX()];
     }
 
+    /**
+     * Returns the symbol at the specified position.
+     *
+     * @param x: the x-coordinate of the position
+     * @param y: the y-coordinate of the position
+     * @return the symbol at the position
+     */
     public Integer getSymbolAt(int x, int y) {
         return this.innerGrid.get()[y][x];
     }
@@ -290,30 +270,58 @@ public class Grid extends Solvable<Grid> {
         return this.symbols;
     }
 
+
+    /**
+     * Clears all moves.
+     */
     @Override
     public void cleanMoves() {
         this.moves.clear();
     }
 
-
+    /**
+     * Returns the length of the grid.
+     *
+     * @return the length of the grid
+     */
     public int length() {
         return this.innerGrid.get().length;
     }
 
+    /**
+     * Returns the size of the grid.
+     *
+     * @return the size of the grid
+     */
     public Vec2i getSize() {
         return new Vec2i(this.innerGrid.get().length, this.innerGrid.length() == 0 ? 0 :
                 this.innerGrid.get()[0].length);
     }
 
+    /**
+     * Returns a copied version of the grid.
+     *
+     * @return a copied version of the grid
+     */
     @Override
     public Grid shallowCopy() {
         return new Grid(this);
     }
 
+    /**
+     * Returns the list of moves.
+     *
+     * @return the list of moves
+     */
     public List<Move2i> getMoves() {
         return moves;
     }
 
+    /**
+     * Undoes the last move made by the users
+     *
+     * @param updatePossibilities: whether to update the possibilities
+     */
     @Override
     public void undoLastMove(boolean updatePossibilities) {
         if (this.moves.isEmpty()) {

@@ -168,4 +168,20 @@ public class MultiGrid extends Solvable<MultiGrid> {
     public Vec2i[] getPaddings() {
         return paddings;
     }
+
+    public void display() {
+        for (int y = 0; y < size.getY(); y++) {
+            for (int x = 0; x < size.getX(); x++) {
+                Pair<Integer, Grid> grid = getGridFor(x, y);
+                if (grid != null) {
+                    Vec2i subGridPosition = new Vec2i(x, y).substract(paddings[grid.getFirst()]);
+                    System.out.print(grid.getSecond().getSymbolAt(subGridPosition) != null ?
+                            grid.getSecond().getSymbolAt(subGridPosition) : ".");
+                } else {
+                    System.out.print(" ");
+                }
+            }
+            System.out.println();
+        }
+    }
 }

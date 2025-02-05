@@ -4,6 +4,8 @@ import fr.polytech.suuuuuuuuuuudoku.CsvUtils;
 import fr.polytech.suuuuuuuuuuudoku.constraints.*;
 import fr.polytech.suuuuuuuuuuudoku.graphics.Utils;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
+import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
+import fr.polytech.suuuuuuuuuuudoku.grid.Solvable;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
 import java.nio.file.Path;
@@ -25,6 +27,75 @@ public class Generator {
         assert sqrt * sqrt == n;
 
         return generateSudokuWithBlockConstraints((int) Math.sqrt(n), (int) Math.sqrt(n));
+    }
+
+    /**
+     * Generates a multigrid with block constraints of size NxM
+     *
+     * @param n: The size of the sub grid
+     * @param m: The number of sub grids
+     * @return A playable multigrid
+     */
+    public static MultiGrid generateMultigridSudoku(int n, int m) throws InterruptedException {
+        List<Pair<Vec2i, Grid>> grids = new ArrayList<>();
+        var blockSize = (int) Math.sqrt(n);
+        var maxDiag = (int) Math.sqrt(Math.pow(n, 2) + Math.pow(n, 2)) * m;
+
+        var paddings = new Vec2i[]{
+                new Vec2i(0, 0),
+                new Vec2i(12, 0),
+                new Vec2i(6, 6),
+                new Vec2i(0, 12),
+                new Vec2i(12, 12)
+        };
+
+
+        var symbols = SymbolSets.generateSymbols(n);
+        var innerGrid = new Integer[n][n];
+        for (var i = 0; i < blockSize; i++) {
+            Arrays.fill(innerGrid[i], null);
+        }
+
+        Set<Box2D> filledGrids = new HashSet<>();
+        filledGrids.add(new Box2D(paddings[0].getX(), paddings[0].getY(), n, n));
+        grids.add(new Pair<>(paddings[0], fastSolvedGridCreation(blockSize, blockSize)));
+
+
+        for (int i = 0; i < m - 1; i++) {
+            var padding = paddings[i + 1];
+            var box = new Box2D(padding.getX(), padding.getY(), n, n);
+            if (filledGrids.stream().anyMatch(box2D -> box2D.overlap(box) != null)) {
+                grids.add(new Pair<>(Vec2i.random(maxDiag / m, maxDiag / m), new Grid(innerGrid.clone(),
+                        new HashSet<>(symbols))));
+            } else {
+                grids.add(i, new Pair<>(padding, fastSolvedGridCreation(blockSize, blockSize)));
+                filledGrids.add(box);
+            }
+        }
+
+
+        var multigrid = new MultiGrid(grids);
+
+        // Place symbols on the diagonal if the cell is available
+//        var symbolsList = new ArrayList<>(symbols);
+//        for (int i = 0; i < maxDiag; i++) {
+//            Vec2i pos = new Vec2i(i, i);
+//            if (multigrid.isInGrid(pos)) {
+//                multigrid.placeUnchecked(pos, symbolsList.get(i % symbolsList.size()), false, false);
+//            }
+//        }
+
+        multigrid.display();
+        multigrid.computeAllEmptyCellsPossibilities();
+        multigrid = SudokuSolver.solve(multigrid, true, true, false).getSecond();
+
+        System.out.println();
+        System.out.println();
+        multigrid.display();
+
+        var size = multigrid.getSize();
+        var max = Math.max(size.getX(), size.getY());
+        return removeRandomCells(multigrid, max);
     }
 
     /**
@@ -64,8 +135,9 @@ public class Generator {
      * @param lengthInnerGrid: The length of the inner grid
      * @return A playable grid
      */
-    private static Grid removeRandomCells(Grid solvedGrid, int lengthInnerGrid) throws InterruptedException {
-        int nToRemove = (int) Math.sqrt(lengthInnerGrid);
+    private static <T extends Solvable<T>> T removeRandomCells(T solvedGrid, int lengthInnerGrid) throws InterruptedException {
+//        int nToRemove = (int) Math.sqrt(lengthInnerGrid);
+        int nToRemove = lengthInnerGrid / 2;
         boolean canSolve = true;
         Set<Vec2i> emptyCells = new HashSet<>();
         do {
@@ -202,7 +274,7 @@ public class Generator {
         List<Integer> symbolsArray = new ArrayList<>(symbols);
         for (var i = 0; i < blockRow; i++) {
             // we place the value in the column i
-            for (var j = 0; j < blockColumns*blockRow; j++) {
+            for (var j = 0; j < blockColumns * blockRow; j++) {
                 seedGrid.placeUnchecked(new Vec2i(i, j), symbolsArray.get(j), false, false);
             }
             // we shift the values in the array
@@ -231,6 +303,7 @@ public class Generator {
         assert state == SolvingState.SOLVED;
         return pair.getSecond();
     }
+
     /**
      * Try to generate a solved grid faster using previous generated grid. We shuffled row and column, keeping block
      * constraints at the same time.

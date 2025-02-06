@@ -83,5 +83,54 @@ Pour ce projets, nous nous sommes repartis les tache en tirant partis des compé
 - Guillaume c'est occupé de concevoir et d'implementer la résolutions de sudoku. Il a également réalisé l'interface graphique avec ImGUI et a beaucoup participé au différente réorganisation du code.
 - Thibaut c'est quand a lui occupé de l'interface graphique via swing qui à ensuite été abandonné car non adapté pour l'affichage de multidoku simple.
 	Il c'est également occupé en collaboration avec Eymeric de la génération de sudoku, et plus particulièrement de la génération des contrainte de block déstructuré ainsi que la génération accéléré via des grilles préremplis
-- Eymeric de son coté c'est occupé de l'interface en console ainsi que de la generation des sudoku. Il à également réalisé plusieurs réorganisation afin de simplifier le code.
+- Eymeric de son coté c'est occupé de l'interface en console ainsi que de la generation des sudoku. Il à également réalisé plusieurs réorganisation afin de simplifier le code. Et la pipeline github actions pour verifier les tests unitaire à chaque push.
 
+## Extensions
+
+- Environnement de travail : [github](https://github.com/FlashOnFire/SUUUUUUUUUUUudoku)
+	+ Nous avons pris soint de respecter le nommage conventionnel des commits
+- Tests unitaires
+	+ Toute les fonctions importante du projet sont testé a l'aide de plusieur tests unitaires
+- Pipeline de test automatique avec github actions et nix
+	+ Nous avons réalisé des configuration nix (flake + package) afin d'avoir un environnement de developement identique entre tout les developeurs.
+	+ Cela nous a permis de simplement créer un pipeline github action qui lance la compilation du projet ainsi que les test et envoie un mail en cas de problèmes
+- Interface graphique
+	+ Nous avons réalisé deux interface graphique.
+		* Une première avec Swing qui à été abandonné a mis projet par la découverte d'un autre outil plus puissant
+		* Une deuxieme avec imGUI une librairie cpp a l'origine avec des binding java. C'est cette interface qui es privilégié aujourd'hui.
+			Elle a permis d'integrer les multidoku plus simplement
+
+- Fichier de config et sauvegarde (un peu)
+	+ Nous avons créer des methods permettant d'importer et exporter des sudoku ainsi que des multidoku. Cela nous sert pour les test ainsi que pour l'acceleration de la génération.
+	+ Cependant ces fichier sont intégré dans le fichier .jar ce qui permet pas simplement de les modifiers. et par manque de temps, nous n'avons pas intégré la possibilité de les charger depuis un autre endroits que les resources du jar.
+
+- Grilles avec multiples solution:
+	+ La fonction permettans de trouver toute les solutions existe cependant elle n'es pas utilisé car cela aurai demandé de lourde modification dans les interfaces d'affichage.
+
+- Rajout de contraintes:
+	+ L'architecture de l'application es pensé pour pouvoir ajouter des contrainte simplement.
+	+ Cela nous a permis d'ajouter une contrainte sur une liste de position qui es en quelque sorte une contrainte de bloc destrcturé (les elements du bloc sont éclaté à travers la grille)
+
+- Resolution par l'humain  FAUT VOIR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+- Génération de grille optimal
+	+ Vous pouvez générer une grille de sudoku de taille avec des performances raisonnables (6s) jusqu'à 25x25.
+	+ Voir les diagramme de generateur pour les détails sur la methode utilisé
+
+- Résolution de grille
+	+ Vous pouvez résoudre une grille de sudoku de taille avec des performances raisonnables jusqu'à 100x100.
+	+ Vous pouvez également résoudre des multigrid efficacement
+
+- Consulter l'historique des modifications
+	+ Vous pouvez consulter l'historique des modifications de la grille.
+	Particulièrement utile pour les résolutions automatiques.
+
+- Résolution manuelle
+  + Vous pouvez résoudre une grille de sudoku de manière manuelle
+
+- Interface graphique
+  + Vous pouvez utiliser une interface graphique pour jouer au sudoku
+
+- Interface en ligne de commande ergonomique
+  + Vous pouvez utiliser une interface en ligne de commande pour jouer au sudoku avec une ergonomie proche de l'interface graphique

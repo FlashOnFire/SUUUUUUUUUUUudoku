@@ -31,6 +31,8 @@ public class ImGUIFrame extends Application {
      * A boolean indicating if the game is currently solving.
      */
     final AtomicBoolean solving = new AtomicBoolean(false);
+    boolean solveDeducing = true;
+    boolean solveBacktracking = true;
 
     /**
      * The width of the grid for the generator.
@@ -187,20 +189,34 @@ public class ImGUIFrame extends Application {
                             new ObservableGrid(
                                     (Grid) solvable,
                                     innerGrid -> ((Grid) solvable).setInnerGrid(innerGrid)
-                            ), true, true, true
+                            ), solveDeducing, solveBacktracking, true
                     ).getSecond().getGrid();
                     solving.set(false);
                 }).start();
             } else if (solvable instanceof MultiGrid) {
                 new Thread(() -> {
                     solving.set(true);
-                    solvable = SudokuSolver.solve((MultiGrid) solvable, true, true, true).getSecond();
+                    solvable = SudokuSolver.solve((MultiGrid) solvable, solveDeducing, solveBacktracking, true).getSecond();
                     solving.set(false);
                 }).start();
             }
         }
 
+        if (ImGui.checkbox("Deducing", solveDeducing)) {
+            solveDeducing = !solveDeducing;
+            if (!solveDeducing) {
+                solveBacktracking = true;
+            }
+        }
         ImGui.sameLine();
+
+        if (ImGui.checkbox("Backtracking", solveBacktracking)) {
+            solveBacktracking = !solveBacktracking;
+            if (!solveBacktracking) {
+                solveDeducing = true;
+            }
+        }
+
         if (ImGui.button("Reset")) {
             if (originalSolvable instanceof Grid) {
                 solvable = ((Grid) originalSolvable).shallowCopy();

@@ -142,7 +142,8 @@ public class Generator {
      * @param grid: A solved grid
      * @return A list of constraints with random positions for each GeneralSymbolConstraint
      */
-    static List<AbstractConstraint> createRandomConstraints(Grid grid) {
+    private static List<AbstractConstraint> createRandomConstraints(Grid grid) {
+        assert grid.isSolved();
         int length = grid.length();
 
         // Create a list with associate Symbols with all the coordinates containing it
@@ -152,11 +153,8 @@ public class Generator {
         for (int x = 0; x < length; x++) {
             for (int y = 0; y < length; y++) {
                 Integer symbol = grid.getSymbolAt(x, y);
-                if (symbol != null) {
-                    positionList.get(symbol - 1).add(new Vec2i(x, y));
-                } else {
-                    System.out.println("Error: symbol is null");
-                }
+                // grid is solved, so we can use getSymbolAt without checking if it's null
+                positionList.get(symbol - 1).add(new Vec2i(x, y));
             }
         }
 
@@ -168,7 +166,7 @@ public class Generator {
                 int selectedPos = (int) (Math.random() * positionList.get(j).size());
                 Vec2i pos = positionList.get(j).get(selectedPos);
                 listInConstraint.add(pos);
-                positionList.get(i).remove(pos);
+                positionList.get(j).remove(pos);
             }
 
             constraints.add(new PositionListConstraint(SymbolSets.generateSymbols(length),

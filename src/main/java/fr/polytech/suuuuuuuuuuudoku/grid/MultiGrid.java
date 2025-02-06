@@ -1,8 +1,9 @@
 package fr.polytech.suuuuuuuuuuudoku.grid;
 
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Box2D;
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Pair;
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
+import fr.polytech.suuuuuuuuuuudoku.utils.Box2D;
+import fr.polytech.suuuuuuuuuuudoku.utils.Move2i;
+import fr.polytech.suuuuuuuuuuudoku.utils.Pair;
+import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 
 import java.util.*;
 

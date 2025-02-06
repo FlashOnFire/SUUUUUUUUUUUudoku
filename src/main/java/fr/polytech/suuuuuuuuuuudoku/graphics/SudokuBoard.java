@@ -1,9 +1,9 @@
 package fr.polytech.suuuuuuuuuuudoku.graphics;
 
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.GeneralSymbolConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
+import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;

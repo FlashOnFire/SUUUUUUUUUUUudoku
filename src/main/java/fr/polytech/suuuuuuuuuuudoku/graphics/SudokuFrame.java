@@ -1,9 +1,9 @@
 package fr.polytech.suuuuuuuuuuudoku.graphics;
 
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Difficulty;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
+import fr.polytech.suuuuuuuuuuudoku.utils.Difficulty;
 
 import javax.swing.*;
 import java.awt.*;

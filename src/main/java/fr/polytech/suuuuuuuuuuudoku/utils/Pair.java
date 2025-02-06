@@ -1,4 +1,4 @@
-package fr.polytech.suuuuuuuuuuudoku.algorithm;
+package fr.polytech.suuuuuuuuuuudoku.utils;
 
 public class Pair<K, V> {
     private final K first;

@@ -1,8 +1,8 @@
 package fr.polytech.suuuuuuuuuuudoku.constraints;
 
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Box2D;
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.grid.InnerGrid;
+import fr.polytech.suuuuuuuuuuudoku.utils.Box2D;
+import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +29,8 @@ public interface AbstractConstraint {
     /**
      * Generates the rectangular constraints for a Sudoku grid.
      *
-     * @param width: the width of the grid
-     * @param height: the height of the grid
+     * @param width:   the width of the grid
+     * @param height:  the height of the grid
      * @param symbols: the set of symbols used in the grid
      * @return a list of rectangular constraints
      */

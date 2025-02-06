@@ -1,7 +1,7 @@
 package fr.polytech.suuuuuuuuuuudoku.constraints;
 
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.grid.InnerGrid;
+import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -49,15 +49,15 @@ public class DiagonalConstraint implements AbstractConstraint {
         }
 
         var list = Arrays.stream(diagonal1)
-                .filter(Objects::nonNull)
-                .toList();
+                         .filter(Objects::nonNull)
+                         .toList();
         if (!symbols.containsAll(list) || list.stream().distinct().count() != list.size()) {
             return false;
         }
 
         list = Arrays.stream(diagonal2)
-                .filter(Objects::nonNull)
-                .toList();
+                     .filter(Objects::nonNull)
+                     .toList();
         return symbols.containsAll(list) && list.stream().distinct().count() == list.size();
     }
 
@@ -75,9 +75,9 @@ public class DiagonalConstraint implements AbstractConstraint {
         assert grid.at(pos) == null;
 
         var column = Arrays.stream(grid.get())
-                .map(line -> line[pos.getX()])
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+                           .map(line -> line[pos.getX()])
+                           .filter(Objects::nonNull)
+                           .collect(Collectors.toSet());
 
         var list = symbols.stream().filter(c -> !column.contains(c)).collect(Collectors.toSet());
 

@@ -1,7 +1,7 @@
 package fr.polytech.suuuuuuuuuuudoku.constraints;
 
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.grid.InnerGrid;
+import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -56,8 +56,8 @@ public class LineConstraint implements AbstractConstraint {
         assert grid.at(pos) == null;
 
         var row = Arrays.stream(grid.get()[pos.getY()])
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toSet());
 
         var list = symbols
                 .stream()

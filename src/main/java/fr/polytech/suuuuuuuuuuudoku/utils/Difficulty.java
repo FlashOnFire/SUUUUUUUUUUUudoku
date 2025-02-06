@@ -1,4 +1,4 @@
-package fr.polytech.suuuuuuuuuuudoku.algorithm;
+package fr.polytech.suuuuuuuuuuudoku.utils;
 
 public enum Difficulty {
     EASY, MEDIUM, HARD, VERY_HARD, IMPOSSIBLE, INSANE, EXPERT;

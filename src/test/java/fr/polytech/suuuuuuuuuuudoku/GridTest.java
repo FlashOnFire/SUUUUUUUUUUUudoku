@@ -1,8 +1,8 @@
 package fr.polytech.suuuuuuuuuuudoku;
 
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
+import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -12,6 +12,9 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Basic tests for the grid.
+ */
 public class GridTest {
 
     @Test

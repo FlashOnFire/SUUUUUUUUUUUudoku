@@ -1,9 +1,10 @@
 package fr.polytech.suuuuuuuuuuudoku.grid;
 
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.constraints.AbstractConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.NotEmptyConstraint;
+import fr.polytech.suuuuuuuuuuudoku.utils.Move2i;
+import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -205,10 +206,10 @@ public class Grid extends Solvable<Grid> {
     /**
      * Places a value at the specified position without checking constraints.
      *
-     * @param pos: the position to place the value
-     * @param value: the value to place
+     * @param pos:                 the position to place the value
+     * @param value:               the value to place
      * @param updatePossibilities: whether to update the possibilities
-     * @param store_move: whether to store the move
+     * @param store_move:          whether to store the move
      */
     @Override
     public void placeUnchecked(Vec2i pos, Integer value, boolean updatePossibilities, boolean store_move) {

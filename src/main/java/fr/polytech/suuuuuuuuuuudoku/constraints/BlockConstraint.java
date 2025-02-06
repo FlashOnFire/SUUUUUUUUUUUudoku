@@ -1,8 +1,8 @@
 package fr.polytech.suuuuuuuuuuudoku.constraints;
 
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Box2D;
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.grid.InnerGrid;
+import fr.polytech.suuuuuuuuuuudoku.utils.Box2D;
+import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -88,8 +88,8 @@ public class BlockConstraint implements AbstractConstraint {
 
         // Return the symbols that are not present in the block
         var possibilities = symbols.stream()
-                .filter(c -> !values.contains(c))
-                .collect(Collectors.toSet());
+                                   .filter(c -> !values.contains(c))
+                                   .collect(Collectors.toSet());
 
         return Optional.of(possibilities);
     }

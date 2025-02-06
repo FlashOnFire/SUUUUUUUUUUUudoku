@@ -1,15 +1,18 @@
 package fr.polytech.suuuuuuuuuuudoku;
 
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Difficulty;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
+import fr.polytech.suuuuuuuuuuudoku.utils.Difficulty;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
+/**
+ * Tests to benchmark the generator.
+ */
 public class GeneratorTests {
 
     @Test
-    public void testBasicGenerator() throws InterruptedException {
+    public void benchmarkTests() throws InterruptedException {
         int[] gridSizes = {4, 9, 16};
         final int N = 10;
 

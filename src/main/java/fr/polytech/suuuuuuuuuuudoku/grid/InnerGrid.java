@@ -1,6 +1,6 @@
 package fr.polytech.suuuuuuuuuuudoku.grid;
 
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
+import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -43,7 +43,7 @@ public class InnerGrid {
             for (Integer cell : lines) {
                 if (cell == null) {
                     System.out.print("  ");
-                } else{
+                } else {
                     System.out.print(cell + " ");
                 }
             }

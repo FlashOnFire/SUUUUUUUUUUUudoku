@@ -1,7 +1,7 @@
 package fr.polytech.suuuuuuuuuuudoku.constraints;
 
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.grid.InnerGrid;
+import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 
 import java.util.Arrays;
 import java.util.Objects;

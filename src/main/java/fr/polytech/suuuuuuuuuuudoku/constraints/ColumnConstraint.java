@@ -1,7 +1,7 @@
 package fr.polytech.suuuuuuuuuuudoku.constraints;
 
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.grid.InnerGrid;
+import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -44,14 +44,14 @@ public class ColumnConstraint implements AbstractConstraint {
             // This is a workaround to use the variable i in the lambda
             int finalI = i;
             Integer[] column = Arrays.stream(grid.get())
-                    .map(line -> line[finalI])
-                    .filter(Objects::nonNull)
-                    .toArray(Integer[]::new);
+                                     .map(line -> line[finalI])
+                                     .filter(Objects::nonNull)
+                                     .toArray(Integer[]::new);
 
             if (!symbols.containsAll(Arrays.asList(column))
                     || Arrays.stream(column)
-                    .distinct()
-                    .count() != column.length) {
+                             .distinct()
+                             .count() != column.length) {
                 return false;
             }
         }
@@ -73,9 +73,9 @@ public class ColumnConstraint implements AbstractConstraint {
         assert grid.at(pos) == null;
 
         var column = Arrays.stream(grid.get())
-                .map(line -> line[pos.getX()])
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+                           .map(line -> line[pos.getX()])
+                           .filter(Objects::nonNull)
+                           .collect(Collectors.toSet());
 
         var list = symbols.stream().filter(c -> !column.contains(c)).collect(Collectors.toSet());
 

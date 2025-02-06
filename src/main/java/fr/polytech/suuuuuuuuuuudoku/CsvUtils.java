@@ -1,10 +1,10 @@
 package fr.polytech.suuuuuuuuuuudoku;
 
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Pair;
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
+import fr.polytech.suuuuuuuuuuudoku.utils.Pair;
+import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -24,8 +24,8 @@ public class CsvUtils {
         return new BufferedReader(new FileReader(file.toFile()))
                 .lines()
                 .map(line -> Arrays.stream(line.split(",(?<!\\r)")).map(cell -> cell.equals(".") ? null :
-                                Integer.parseInt(cell))
-                        .toArray(Integer[]::new))
+                                           Integer.parseInt(cell))
+                                   .toArray(Integer[]::new))
                 .toArray(Integer[][]::new);
     }
 
@@ -67,8 +67,8 @@ public class CsvUtils {
         assert paddings.size() == grids.size();
         // merge the grids
         var mergedGrids = grids.stream()
-                .map(grid -> new Pair<>(paddings.removeFirst(), grid))
-                .collect(Collectors.toList());
+                               .map(grid -> new Pair<>(paddings.removeFirst(), grid))
+                               .collect(Collectors.toList());
         return new MultiGrid(mergedGrids);
     }
 
@@ -80,10 +80,10 @@ public class CsvUtils {
      */
     static public void exportGrid(Path path, Grid grid) {
         var csvData = Arrays.stream(grid.getInnerGrid().get())
-                .map(line -> Arrays.stream(line)
-                        .map(cell -> cell == null ? "." : cell.toString())
-                        .collect(Collectors.joining(",")))
-                .collect(Collectors.joining("\n"));
+                            .map(line -> Arrays.stream(line)
+                                               .map(cell -> cell == null ? "." : cell.toString())
+                                               .collect(Collectors.joining(",")))
+                            .collect(Collectors.joining("\n"));
 
         try (var writer = new BufferedWriter(new FileWriter(path.toFile()))) {
             writer.write(csvData);

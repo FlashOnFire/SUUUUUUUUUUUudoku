@@ -1,6 +1,7 @@
 package fr.polytech.suuuuuuuuuuudoku.algorithm;
 
 import fr.polytech.suuuuuuuuuuudoku.grid.Solvable;
+import fr.polytech.suuuuuuuuuuudoku.utils.Pair;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -151,8 +152,8 @@ public class SudokuSolver {
         assert !grid.getEmptyCellsPossibilities().isEmpty() : "No empty cells";
 
         var cell = grid.getEmptyCellsPossibilities().entrySet().stream()
-                .min(Comparator.comparingInt(e -> e.getValue().size()))
-                .orElseThrow();
+                       .min(Comparator.comparingInt(e -> e.getValue().size()))
+                       .orElseThrow();
 
         if (cell.getValue().isEmpty()) {
             return List.of();

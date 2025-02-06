@@ -7,6 +7,9 @@ import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
 import fr.polytech.suuuuuuuuuuudoku.grid.Solvable;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
+import fr.polytech.suuuuuuuuuuudoku.utils.Difficulty;
+import fr.polytech.suuuuuuuuuuudoku.utils.Pair;
+import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 
 import java.nio.file.Path;
 import java.util.*;

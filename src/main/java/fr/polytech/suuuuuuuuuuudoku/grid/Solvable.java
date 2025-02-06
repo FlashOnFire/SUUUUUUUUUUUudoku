@@ -1,6 +1,7 @@
 package fr.polytech.suuuuuuuuuuudoku.grid;
 
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
+import fr.polytech.suuuuuuuuuuudoku.utils.Move2i;
+import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 
 import java.util.List;
 import java.util.Map;

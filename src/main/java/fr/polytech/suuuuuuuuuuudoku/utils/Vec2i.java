@@ -1,4 +1,4 @@
-package fr.polytech.suuuuuuuuuuudoku.algorithm;
+package fr.polytech.suuuuuuuuuuudoku.utils;
 
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;

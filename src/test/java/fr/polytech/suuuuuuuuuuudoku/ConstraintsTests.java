@@ -1,12 +1,12 @@
 package fr.polytech.suuuuuuuuuuudoku;
 
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Box2D;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.ColumnConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.DiagonalConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.LineConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
+import fr.polytech.suuuuuuuuuuudoku.utils.Box2D;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -14,6 +14,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Tests for constraints.
+ */
 public class ConstraintsTests {
 
     @Test

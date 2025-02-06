@@ -1,16 +1,19 @@
 package fr.polytech.suuuuuuuuuuudoku;
 
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Box2D;
-import fr.polytech.suuuuuuuuuuudoku.algorithm.Vec2i;
 import fr.polytech.suuuuuuuuuuudoku.constraints.*;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
+import fr.polytech.suuuuuuuuuuudoku.utils.Box2D;
+import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Tests for grid with strange constraints.
+ */
 public class NoClassicGridTests {
     @Test
     public void testNoSquareGridConstraint() {

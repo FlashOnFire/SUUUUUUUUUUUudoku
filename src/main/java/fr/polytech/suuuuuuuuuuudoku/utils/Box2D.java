@@ -1,4 +1,4 @@
-package fr.polytech.suuuuuuuuuuudoku.algorithm;
+package fr.polytech.suuuuuuuuuuudoku.utils;
 
 public class Box2D {
     private final int x, y, dx, dy;

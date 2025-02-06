@@ -93,7 +93,7 @@ public class SudokuBoard extends JPanel {
                     grid.getConstraints().stream()
                         .filter(PositionListConstraint.class::isInstance)
                         .map(PositionListConstraint.class::cast)
-                        .filter(positionListConstraint -> Arrays.stream(positionListConstraint.getPositionList()).anyMatch(pos -> pos.getX() == column && pos.getY() == row))
+                        .filter(positionListConstraint -> positionListConstraint.getPositionSet().stream().anyMatch(pos -> pos.getX() == column && pos.getY() == row))
                         .findFirst()
                         .ifPresent(blockConstraint -> c.setBackground(new Color((grid.getConstraints().indexOf(blockConstraint) * 1234567) % 0x888888 + 0x777777)));
 
@@ -124,7 +124,7 @@ public class SudokuBoard extends JPanel {
     /**
      * Updates the Sudoku board with new data.
      *
-     * @param newData the new data to update the board with
+     * @param newData    the new data to update the board with
      * @param isSolution whether the new data represents a solved Sudoku
      */
     public void update(Integer[][] newData, boolean isSolution) {

@@ -73,20 +73,20 @@ public class Generator {
     /**
      * Generates a grid with random block constraints (block can be of any size and any form, even not contiguous)
      *
-     * @param difficulty:      The difficulty of the generated grid
+     * @param difficulty:   The difficulty of the generated grid
      * @param blockRows:    The number of block rows
      * @param blockColumns: The number of block columns
      * @return A playable grid
      */
     public static Grid generateSudokuWithRandomBlockConstraint(int blockRows, int blockColumns, Difficulty difficulty) {
-        var symbols = SymbolSets.generateSymbols(blockRows*blockColumns);
+        var symbols = SymbolSets.generateSymbols(blockRows * blockColumns);
         Grid solvedGrid = fastSolvedGridCreation(blockRows, blockColumns);
         var generalSymbolConstraints = createRandomConstraints(solvedGrid);
 
         // We update the new constraints
         solvedGrid = new Grid(solvedGrid.getInnerGrid().get(), generalSymbolConstraints, symbols);
         assert solvedGrid.isSolved();
-        removeRandomCells(solvedGrid, blockRows*blockColumns, difficulty);
+        removeRandomCells(solvedGrid, blockRows * blockColumns, difficulty);
         solvedGrid.cleanMoves();
         return solvedGrid;
     }
@@ -158,15 +158,16 @@ public class Generator {
         // Swap the positions of the element with same values to create random constraints
         List<AbstractConstraint> constraints = new ArrayList<>();
         for (int i = 0; i < length; i++) {
-            List<Vec2i> listInConstraint = new ArrayList<>();
+            HashSet<Vec2i> listInConstraint = new HashSet<>();
             for (int j = 0; j < length; j++) {
                 int selectedPos = (int) (Math.random() * positionList.get(j).size());
                 Vec2i pos = positionList.get(j).get(selectedPos);
                 listInConstraint.add(pos);
                 positionList.get(i).remove(pos);
             }
+
             constraints.add(new PositionListConstraint(SymbolSets.generateSymbols(length),
-                    listInConstraint.toArray(Vec2i[]::new)));
+                    listInConstraint));
         }
         constraints.add(new LineConstraint(grid.getSymbols()));
         constraints.add(new ColumnConstraint(grid.getSymbols()));

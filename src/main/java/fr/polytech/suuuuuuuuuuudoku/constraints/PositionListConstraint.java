@@ -3,7 +3,10 @@ package fr.polytech.suuuuuuuuuuudoku.constraints;
 import fr.polytech.suuuuuuuuuuudoku.grid.InnerGrid;
 import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -19,7 +22,7 @@ public class PositionListConstraint implements AbstractConstraint {
     /**
      * The list of position which define value to check.
      */
-    private final Vec2i[] positionList;
+    private final HashSet<Vec2i> positionList;
 
     /**
      * Constructs a GeneralSymbolConstraint with the specified symbols and positions.
@@ -29,9 +32,9 @@ public class PositionListConstraint implements AbstractConstraint {
      * @throws IllegalArgumentException if the positionList is empty or the length of the positionList
      *                                  is different from the length of the symbols
      */
-    public PositionListConstraint(Set<Integer> symbols, Vec2i[] positionList) {
-        assert positionList.length != 0;
-        assert positionList.length == symbols.size();
+    public PositionListConstraint(Set<Integer> symbols, HashSet<Vec2i> positionList) {
+        assert !positionList.isEmpty();
+        assert positionList.size() == symbols.size();
 
         this.symbols = symbols;
         this.positionList = positionList;
@@ -45,11 +48,23 @@ public class PositionListConstraint implements AbstractConstraint {
      */
     @Override
     public boolean isSatisfied(InnerGrid grid) {
-        // Extract all the values from the grid
-        Set<Integer> set = extractValues(grid);
+        HashSet<Integer> set = new HashSet<>();
 
-        // Check if the block contains all the symbols and has no duplicates
-        return symbols.containsAll(set) && set.size() == symbols.size();
+        for (var pos : positionList) {
+            // Ignore empty cells
+            if (grid.at(pos) != null) {
+                // Check for duplicates
+                if (set.contains(grid.at(pos))) {
+                    return false;
+                }
+
+                set.add(grid.at(pos));
+            }
+        }
+
+        // Check if all values in the block are present in the symbols
+        // (not the other way around to allow empty cells to pass the constraint satisfaction)
+        return symbols.containsAll(set);
     }
 
     /**
@@ -110,7 +125,7 @@ public class PositionListConstraint implements AbstractConstraint {
      * @return true if the position is within the block, false otherwise
      */
     private boolean isInPositionList(Vec2i pos) {
-        return Arrays.asList(positionList).contains(pos);
+        return positionList.contains(pos);
     }
 
     /**
@@ -132,9 +147,9 @@ public class PositionListConstraint implements AbstractConstraint {
     /**
      * Returns the list of positions which define the values to check.
      *
-     * @return the array of positions which define the values to check
+     * @return the set of positions which define the values to check
      */
-    public Vec2i[] getPositionList() {
+    public HashSet<Vec2i> getPositionSet() {
         return positionList;
     }
 }

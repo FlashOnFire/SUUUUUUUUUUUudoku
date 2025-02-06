@@ -4,6 +4,7 @@ import fr.polytech.suuuuuuuuuuudoku.grid.Solvable;
 import fr.polytech.suuuuuuuuuuudoku.utils.Pair;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -114,6 +115,47 @@ public class SudokuSolver {
 
         return false;
     }
+
+    /**
+     * Finds all solutions to the given Sudoku grid.
+     *
+     * @param grid:         the Sudoku grid to solve
+     * @param deducing:     whether to use deduction
+     * @param backtracking: whether to use backtracking
+     * @param store_moves:  whether to store the moves
+     * @return a list of all solutions to the Sudoku grid
+     */
+    public static <T extends Solvable<T>> List<T> findAllSolutions(T grid, boolean deducing,
+                                                                   boolean backtracking,
+                                                                   boolean store_moves) {
+        assert deducing || backtracking : "At least one of deducing or backtracking must be enabled";
+
+        ArrayDeque<T> currentList = new ArrayDeque<>();
+        currentList.add(grid.shallowCopy());
+        List<T> solutions = new ArrayList<>();
+
+        while (!currentList.isEmpty()) {
+            var currentGrid = currentList.removeLast();
+
+            if (deducing) {
+                var state = solveDeduction(currentGrid, store_moves);
+
+                if (state == SolvingState.SOLVED) {
+                    solutions.add(currentGrid);
+                    continue;
+                } else if (state == SolvingState.UNSOLVABLE) {
+                    continue;
+                } else if (!backtracking) {
+                    continue;
+                }
+            }
+
+            currentList.addAll(doBacktracking(currentGrid, store_moves));
+        }
+
+        return solutions;
+    }
+
 
     /**
      * Performs backtracking to solve the Sudoku grid.

@@ -1,24 +1,31 @@
 package fr.polytech.suuuuuuuuuuudoku.grid;
 
 import fr.polytech.suuuuuuuuuuudoku.constraints.AbstractConstraint;
-import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.NotEmptyConstraint;
 import fr.polytech.suuuuuuuuuuudoku.utils.Move2i;
 import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Represents a Sudoku grid with constraints.
  */
 public class Grid extends Solvable<Grid> {
+    /**
+     * The list of constraints.
+     */
     final List<AbstractConstraint> constraints;
+    /**
+     * The list of moves.
+     */
     private final ArrayList<Move2i> moves = new ArrayList<>();
     /**
      * The Sudoku grid represented as a 2D array of Strings.
      */
     private InnerGrid innerGrid;
+    /**
+     * The possibilities for each empty cell in the grid.
+     */
     private HashMap<Vec2i, Set<Integer>> emptyCellsPossibilities = new HashMap<>();
 
     /**
@@ -26,6 +33,7 @@ public class Grid extends Solvable<Grid> {
      *
      * @param grid        the initial grid
      * @param constraints the list of constraints
+     * @param symbols     the set of symbols
      */
     public Grid(Integer[][] grid, List<AbstractConstraint> constraints, Set<Integer> symbols) {
         super(symbols);
@@ -45,10 +53,22 @@ public class Grid extends Solvable<Grid> {
         this(grid, AbstractConstraint.getClassicConstraints(grid.length, symbols), symbols);
     }
 
+    /**
+     * Constructs a Grid with the specified grid, width, height, and symbols.
+     * The constraints are generated automatically.
+     *
+     * @param grid    the initial grid
+     * @param symbols the set of symbols
+     * @param width   the width of the block
+     * @param height  the height of the block
+     */
     public Grid(Integer[][] grid, Set<Integer> symbols, int width, int height) {
         this(grid, AbstractConstraint.getRectConstraints(width, height, symbols), symbols);
     }
 
+    /**
+     * Constructs a Grid by copying another grid.
+     */
     public Grid(Grid otherGrid) {
         super(otherGrid.symbols);
         this.constraints = otherGrid.constraints;
@@ -60,6 +80,7 @@ public class Grid extends Solvable<Grid> {
     /**
      * Checks if all constraints are satisfied.
      *
+     * @param skip_not_empty: whether to skip the NotEmptyConstraint
      * @return true if all constraints are satisfied, false otherwise
      */
     @Override
@@ -95,6 +116,9 @@ public class Grid extends Solvable<Grid> {
 
     /**
      * Computes the possibilities for each empty cell in the grid that is affected by the changed position.
+     *
+     * @param changedPos:     the position that has changed
+     * @param skip_not_empty: whether to skip the NotEmptyConstraint
      */
     public void computeChangedEmptyCellsPossibilities(Vec2i changedPos, boolean skip_not_empty) {
         Set<Vec2i> affectedCells = new HashSet<>();
@@ -131,55 +155,11 @@ public class Grid extends Solvable<Grid> {
         }
     }
 
-    // don't delete this method for now
-    public boolean applyNakedPairs() {
-        AtomicBoolean changed = new AtomicBoolean(false);
-
-        // Precompute blocks only once to avoid unnecessary filtering
-        // Create a mapping of each block to its related empty cells
-        Map<BlockConstraint, List<Vec2i>> blockToEmptyCells = new HashMap<>();
-        constraints.stream()
-                   .filter(c -> c instanceof BlockConstraint)
-                   .map(c -> (BlockConstraint) c)
-                   .forEach(c -> blockToEmptyCells.put(
-                           c,
-                           this.emptyCellsPossibilities.keySet().stream()
-                                                       .filter(c::isInBlock) // precompute cells in the block
-                                                       .toList()
-                   ));
-
-        // Iterate over blocks
-        blockToEmptyCells.forEach((_, cells) -> {
-            // Create a map of possibilities to cells within this block
-            Map<Set<Integer>, List<Vec2i>> possibilitiesToCells = new HashMap<>();
-            for (Vec2i cell : cells) {
-                var possibilities = this.emptyCellsPossibilities.get(cell);
-                if (possibilities.size() == 2) { // Only consider cells with size 2
-                    possibilitiesToCells.computeIfAbsent(possibilities, _ -> new ArrayList<>()).add(cell);
-                }
-            }
-
-            // Check for Naked Pairs in the block
-            possibilitiesToCells.forEach((possibilities, matchingCells) -> {
-                if (matchingCells.size() == 2) { // Found a pair of matching possibilities
-                    System.out.println("Naked pair found at " + matchingCells + " with possibilities " + possibilities);
-
-                    // Remove these possibilities from all other cells in the block
-                    for (Vec2i cell : cells) {
-                        if (!matchingCells.contains(cell)) { // Skip the pair itself
-                            var cellPossibilities = this.emptyCellsPossibilities.get(cell);
-                            if (cellPossibilities.removeAll(possibilities)) {
-                                changed.set(true); // Mark as changed if any possibility was removed
-                            }
-                        }
-                    }
-                }
-            });
-        });
-
-        return changed.get();
-    }
-
+    /**
+     * Returns the possibilities for each empty cell in the grid.
+     *
+     * @return the possibilities for each empty cell in the grid
+     */
     @Override
     public HashMap<Vec2i, Set<Integer>> getEmptyCellsPossibilities() {
         return this.emptyCellsPossibilities;

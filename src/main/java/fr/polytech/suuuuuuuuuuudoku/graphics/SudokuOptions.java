@@ -5,7 +5,23 @@ import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
+/**
+ * This class represents the options panel for the Sudoku game.
+ * It contains buttons for various actions such as solving, resetting, generating puzzles, etc.
+ */
 public class SudokuOptions extends JPanel {
+
+    /**
+     * Constructs a SudokuOptions panel with the specified background color and action listeners.
+     *
+     * @param background_color the background color of the panel
+     * @param solve the action to perform when the "Solve" button is clicked
+     * @param reset the action to perform when the "Reset" button is clicked
+     * @param generate the action to perform when the "Classic" button is clicked
+     * @param generateRandom the action to perform when the "Random" button is clicked
+     * @param generateNxM the action to perform when the "NxM" button is clicked
+     * @param hint the action to perform when the "Hint" button is clicked
+     */
     public SudokuOptions(Color background_color, Runnable solve, Runnable reset, Runnable generate, Runnable generateRandom, Runnable generateNxM, Runnable hint) {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
@@ -66,6 +82,11 @@ public class SudokuOptions extends JPanel {
         revalidate();
     }
 
+    /**
+     * Applies material design styling to the specified button.
+     *
+     * @param button the button to style
+     */
     private void applyMaterialDesign(JButton button) {
         button.setFocusPainted(false);
         button.setBackground(new Color(144, 226, 226));

@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Interface representing a constraint in the Sudoku solver.
+ * Interface representing a constraint for a Sudoku grid.
  */
 public interface AbstractConstraint {
 
@@ -28,9 +28,10 @@ public interface AbstractConstraint {
 
     /**
      * Generates the rectangular constraints for a Sudoku grid.
+     * These are the line, column, block and not empty constraints.
      *
-     * @param width:   the width of the grid
-     * @param height:  the height of the grid
+     * @param width:   the width of the block
+     * @param height:  the height  of the block
      * @param symbols: the set of symbols used in the grid
      * @return a list of rectangular constraints
      */

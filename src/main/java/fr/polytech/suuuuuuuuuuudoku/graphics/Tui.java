@@ -1,4 +1,4 @@
-package fr.polytech.suuuuuuuuuuudoku;
+package fr.polytech.suuuuuuuuuuudoku.graphics;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
@@ -7,10 +7,10 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
+import fr.polytech.suuuuuuuuuuudoku.CsvUtils;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
-import fr.polytech.suuuuuuuuuuudoku.graphics.Utils;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
 import fr.polytech.suuuuuuuuuuudoku.grid.Solvable;
@@ -38,8 +38,19 @@ import static java.lang.System.exit;
  * The Tui class represents a text-based user interface for the Sudoku game.
  */
 public class Tui {
+    /**
+     * The terminal used for displaying the TUI.
+     */
     private final Terminal terminal;
+
+    /**
+     * The text graphics used for drawing on the terminal.
+     */
     private final TextGraphics textGraphics;
+
+    /**
+     * A map that associates grid size options with their corresponding values.
+     */
     private final HashMap<Integer, Integer> mapGridSize = new HashMap<>() {{
         put(0, 4);
         put(1, 9);
@@ -47,7 +58,15 @@ public class Tui {
         put(3, 25);
         put(4, -1);
     }};
+
+    /**
+     * An array of grid size options.
+     */
     private final String[] sizes = {"4", "9", "16", "25", "multigrid"};
+
+    /**
+     * An array of generation duration descriptions for each grid size.
+     */
     private final String[] generationDurations = {
             "(mediane 4ms)",
             "(mediane 39ms)",
@@ -55,10 +74,30 @@ public class Tui {
             "(mediane 6s 435ms)",
             "(mediane 1s 572ms)"
     };
+
+    /**
+     * The thread used for displaying the loader animation.
+     */
     private Thread loaderThread;
+
+    /**
+     * The current line position in the terminal.
+     */
     private int line = 0;
+
+    /**
+     * The number of colors used for displaying blocks.
+     */
     private int usedColors = 0;
+
+    /**
+     * The horizontal scroll position.
+     */
     private int scrollX = 0;
+
+    /**
+     * The vertical scroll position.
+     */
     private int scrollY = 0;
 
     /**
@@ -78,6 +117,14 @@ public class Tui {
 
     }
 
+    /**
+     * The main method to start the TUI.
+     *
+     * @param args Command line arguments
+     * @throws IOException          if an I/O error occurs
+     * @throws InterruptedException if the thread is interrupted
+     * @throws URISyntaxException   if a URI syntax error occurs
+     */
     public static void main(String[] args) throws IOException, InterruptedException, URISyntaxException {
         Tui tui = new Tui();
         tui.start();
@@ -99,6 +146,7 @@ public class Tui {
      *
      * @throws IOException          if an I/O error occurs
      * @throws InterruptedException if the thread is interrupted
+     * @throws URISyntaxException   if a URI syntax error occurs
      */
     void start() throws IOException, InterruptedException, URISyntaxException {
         welcomeMessage();
@@ -129,7 +177,7 @@ public class Tui {
                     for (int i = 0; i < 5; i++) {
                         grids[i] = new Grid(new Integer[9][9], SymbolSets.generateSymbols(9));
                     }
-                    var paddings = MultiGrid.getRandomPadding();
+                    var paddings = MultiGrid.getRandomOffset();
                     grid = new MultiGrid(IntStream.range(0, 5).mapToObj(i -> new Pair<>(paddings[i], grids[i])).collect(Collectors.toList()));
                 } else {
                     grid = new Grid(new Integer[size][size], SymbolSets.generateSymbols(size));
@@ -354,10 +402,11 @@ public class Tui {
      * Displays a multi-grid Sudoku on the terminal.
      *
      * @param grid The MultiGrid object containing multiple Sudoku grids.
+     * @throws IOException if an I/O error occurs
      */
     private void displayMultiGrid(MultiGrid grid) throws IOException {
         for (int i = 0; i < grid.getGrids().length; i++) {
-            displayGrid(grid.getGrids()[i], grid.getPaddings()[i]);
+            displayGrid(grid.getGrids()[i], grid.getOffsets()[i]);
         }
     }
 
@@ -366,6 +415,7 @@ public class Tui {
      *
      * @param grid    The Sudoku grid to display.
      * @param padding The padding to apply around the grid.
+     * @throws IOException if an I/O error occurs
      */
     private void displayGrid(Grid grid, Vec2i padding) throws IOException {
         int gridSize = grid.getInnerGrid().length();

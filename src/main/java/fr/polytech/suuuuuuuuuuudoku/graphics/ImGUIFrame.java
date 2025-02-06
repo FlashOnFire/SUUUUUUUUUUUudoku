@@ -21,29 +21,74 @@ import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-
+/**
+ * A class representing the main frame of the Sudoku game using ImGui.
+ */
 public class ImGUIFrame extends Application {
+    /**
+     * A boolean indicating if the game is currently solving.
+     */
     final AtomicBoolean solving = new AtomicBoolean(false);
+
+    /**
+     * The width of the grid for the generator.
+     */
     final int[] selectedGeneratorGridSizeWidth = {2};
+
+    /**
+     * The height of the grid for the generator.
+     */
     final int[] selectedGeneratorGridSizeHeight = {2};
+
+    /**
+     * The original solvable grid before any modifications.
+     */
     Solvable<?> originalSolvable;
+
+    /**
+     * The current solvable grid.
+     */
     Solvable<?> solvable;
+
+    /**
+     * The currently selected position in the grid.
+     */
     Vec2i selected_pos = null;
+
+    /**
+     * The current symbol selected for placement in the grid.
+     */
     String current_symbol = null;
 
+    /**
+     * The main method of the application.
+     *
+     * @param args the command line arguments
+     */
     public static void main(String[] args) {
         launch(new ImGUIFrame());
     }
 
+    /**
+     * Configures the application.
+     *
+     * @param config the configuration to set
+     */
     @Override
     protected void configure(Configuration config) {
         config.setTitle("Suuuuuuuuuuudoku");
     }
 
+    /**
+     * The pre-run method of the application.
+     */
     @Override
     protected void preRun() {
     }
 
+    /**
+     * The post-run method of the application.
+     */
     @Override
     public void process() {
         ImGui.begin("Suuuuuuuuuuudoku");
@@ -116,8 +161,6 @@ public class ImGUIFrame extends Application {
                 new Thread(() -> {
                     solving.set(true);
                     solvable = SudokuSolver.solve((MultiGrid) solvable, true, true, true).getSecond();
-                    //grid = SudokuSolver.solve(new ObservableGrid((MultiGrid) grid, innerGrid -> ((MultiGrid) grid)
-                    // .setInnerGrid(innerGrid)), true, true, true).getSecond().getGrid();
                     solving.set(false);
                 }).start();
             }
@@ -266,9 +309,9 @@ public class ImGUIFrame extends Application {
                 int finalY = y;
                 int finalX = x;
                 var block = grid.getConstraints().stream()
-                        .filter(c -> c instanceof BlockConstraint)
-                        .filter(c -> c.isPosAffected(new Vec2i(finalX, finalY)))
-                        .findFirst();
+                                .filter(c -> c instanceof BlockConstraint)
+                                .filter(c -> c.isPosAffected(new Vec2i(finalX, finalY)))
+                                .findFirst();
 
                 block.ifPresent(c -> {
                     int color = c.hashCode();
@@ -349,15 +392,15 @@ public class ImGUIFrame extends Application {
 
                 var pair = mg.getGridFor(x, y);
 
-                var padding = mg.getPaddings()[pair.getFirst()];
+                var padding = mg.getOffsets()[pair.getFirst()];
                 int withoutPaddingX = x - padding.getX();
                 int withoutPaddingY = y - padding.getY();
 
                 var block = pair.getSecond().getConstraints().stream()
-                        .filter(c -> c instanceof BlockConstraint)
-                        .filter(c -> c.isPosAffected(new Vec2i(withoutPaddingX, withoutPaddingY)))
-                        .map(c -> (BlockConstraint) c)
-                        .findFirst();
+                                .filter(c -> c instanceof BlockConstraint)
+                                .filter(c -> c.isPosAffected(new Vec2i(withoutPaddingX, withoutPaddingY)))
+                                .map(c -> (BlockConstraint) c)
+                                .findFirst();
 
                 block.ifPresent(c -> {
                     int color = c.getBlock().offset(padding.getX(), padding.getY()).hashCode() % 360;

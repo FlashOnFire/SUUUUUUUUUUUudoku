@@ -1,7 +1,7 @@
 package fr.polytech.suuuuuuuuuuudoku.graphics;
 
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
-import fr.polytech.suuuuuuuuuuudoku.constraints.GeneralSymbolConstraint;
+import fr.polytech.suuuuuuuuuuudoku.constraints.PositionListConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 
@@ -13,14 +13,40 @@ import java.awt.event.ComponentEvent;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
+/**
+ * This class represents a graphical Sudoku board using Swing components.
+ */
 public class SudokuBoard extends JPanel {
+    /**
+     * The previous grid.
+     */
     final Grid previousGrid;
+    /**
+     * The table representing the Sudoku board.
+     */
     final JTable table;
+    /**
+     * Whether the Sudoku board has already been solved.
+     */
     Boolean alreadySolved = false;
+    /**
+     * The solved grid.
+     */
     Grid solvedGrid;
+    /**
+     * The current grid.
+     */
     Grid grid;
+    /**
+     * The trace of the Sudoku board.
+     */
     boolean[][] trace;
 
+    /**
+     * Constructs a SudokuBoard with the given grid.
+     *
+     * @param grid the initial grid to display on the board
+     */
     SudokuBoard(Grid grid) {
         final Integer[][][] value = {grid.getInnerGrid().get()};
 
@@ -65,9 +91,9 @@ public class SudokuBoard extends JPanel {
                         .ifPresent(blockConstraint -> c.setBackground(new Color((grid.getConstraints().indexOf(blockConstraint) * 1234567) % 0x888888 + 0x777777)));
 
                     grid.getConstraints().stream()
-                        .filter(GeneralSymbolConstraint.class::isInstance)
-                        .map(GeneralSymbolConstraint.class::cast)
-                        .filter(generalSymbolConstraint -> Arrays.stream(generalSymbolConstraint.getPositionList()).anyMatch(pos -> pos.getX() == column && pos.getY() == row))
+                        .filter(PositionListConstraint.class::isInstance)
+                        .map(PositionListConstraint.class::cast)
+                        .filter(positionListConstraint -> Arrays.stream(positionListConstraint.getPositionList()).anyMatch(pos -> pos.getX() == column && pos.getY() == row))
                         .findFirst()
                         .ifPresent(blockConstraint -> c.setBackground(new Color((grid.getConstraints().indexOf(blockConstraint) * 1234567) % 0x888888 + 0x777777)));
 
@@ -95,6 +121,12 @@ public class SudokuBoard extends JPanel {
         add(table);
     }
 
+    /**
+     * Updates the Sudoku board with new data.
+     *
+     * @param newData the new data to update the board with
+     * @param isSolution whether the new data represents a solved Sudoku
+     */
     public void update(Integer[][] newData, boolean isSolution) {
         for (int row = 0; row < newData.length; row++) {
             for (int column = 0; column < newData[row].length; column++) {
@@ -108,6 +140,11 @@ public class SudokuBoard extends JPanel {
         table.repaint();
     }
 
+    /**
+     * Recovers the previous Sudoku state from the given grid.
+     *
+     * @param currentGrid the current grid to recover the previous state from
+     */
     public void recoverPreviousSudoku(Grid currentGrid) {
         var integerTab = currentGrid.getInnerGrid().get();
         IntStream.range(0, integerTab.length).forEach(row -> IntStream.range(0, integerTab[row].length).forEach(column -> {

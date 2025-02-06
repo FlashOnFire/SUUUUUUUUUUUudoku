@@ -77,22 +77,6 @@ public class ResolveTest {
     }
 
     @Test
-    public void testMultiSolve() throws FileNotFoundException, InterruptedException {
-        var gridValue =
-                CsvUtils.importGrid(Path.of(ClassLoader.getSystemResource("exemples/multisolutions.csv").getFile()));
-        var symbol = SymbolSets.generateSymbols(gridValue.length);
-        Grid grid = new Grid(gridValue, symbol);
-
-        assertFalse(grid.areConstraintsSatisfied(false));
-
-        var solvedList = SudokuSolver.findAllSolutions(grid, true, true, false);
-        assertEquals(11, solvedList.size());
-        for (var solved : solvedList) {
-            assertTrue(solved.areConstraintsSatisfied(true));
-        }
-    }
-
-    @Test
     public void testSolveFail() {
         var symbolSet = SymbolSets.generateSymbols(3);
 

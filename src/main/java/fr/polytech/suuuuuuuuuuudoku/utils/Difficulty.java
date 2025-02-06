@@ -1,8 +1,16 @@
 package fr.polytech.suuuuuuuuuuudoku.utils;
 
+/**
+ * Enum representing the difficulty levels for the Sudoku game.
+ */
 public enum Difficulty {
     EASY, MEDIUM, HARD, VERY_HARD, IMPOSSIBLE, INSANE, EXPERT;
 
+    /**
+     * Returns an array of difficulty level names as strings.
+     *
+     * @return an array of difficulty level names
+     */
     public static String[] getValues() {
         return new String[]{
                 "EASY",
@@ -15,6 +23,13 @@ public enum Difficulty {
         };
     }
 
+    /**
+     * Converts an integer value to the corresponding Difficulty enum.
+     *
+     * @param value the integer value representing the difficulty level
+     * @return the corresponding Difficulty enum
+     * @throws IllegalArgumentException if the value is invalid
+     */
     public static Difficulty fromInt(int value) {
         return switch (value) {
             case 0 -> EASY;
@@ -28,6 +43,11 @@ public enum Difficulty {
         };
     }
 
+    /**
+     * Returns the integer value corresponding to the Difficulty enum.
+     *
+     * @return the integer value of the difficulty level
+     */
     public int getValue() {
         return switch (this) {
             case EASY -> 0;

@@ -71,7 +71,6 @@ public class BlockConstraint implements AbstractConstraint {
      * @param pos  the position to check the possibilities for
      * @return an Optional containing a list of possible symbols, or an empty Optional if the position is not within
      * the block
-     * @throws AssertionError if the position is out of the grid bounds or the grid cell is empty
      */
     @Override
     public Optional<Set<Integer>> getPossibilities(InnerGrid grid, Vec2i pos) {
@@ -136,6 +135,11 @@ public class BlockConstraint implements AbstractConstraint {
         return set;
     }
 
+    /**
+     * Returns the block of characters defined by the coordinates.
+     *
+     * @return the block of characters
+     */
     public Box2D getBlock() {
         return box;
     }

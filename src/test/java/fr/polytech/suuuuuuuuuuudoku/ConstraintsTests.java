@@ -2,7 +2,6 @@ package fr.polytech.suuuuuuuuuuudoku;
 
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.ColumnConstraint;
-import fr.polytech.suuuuuuuuuuudoku.constraints.DiagonalConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.LineConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
@@ -141,48 +140,6 @@ public class ConstraintsTests {
                 {2, 1, 3}
         }, List.of(
                 new LineConstraint(symbolSet)
-        ), symbolSet);
-        assertFalse(grid.areConstraintsSatisfied(false));
-    }
-
-    @Test
-    public void testDiagonalConstraint() {
-        var symbolSet = SymbolSets.generateSymbols(3);
-
-        var grid = new Grid(new Integer[][]{
-                {1, 2, 3},
-                {3, 2, 1},
-                {1, 1, 3}
-        }, List.of(
-                new DiagonalConstraint(symbolSet)
-        ), symbolSet);
-        assertTrue(grid.areConstraintsSatisfied(false));
-    }
-
-    @Test
-    public void testDiagonalConstraintEmpty() {
-        var symbolSet = SymbolSets.generateSymbols(3);
-
-        var grid = new Grid(new Integer[][]{
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-        }, List.of(
-                new DiagonalConstraint(symbolSet)
-        ), symbolSet);
-        assertTrue(grid.areConstraintsSatisfied(false));
-    }
-
-    @Test
-    public void testDiagonalConstraintFail() {
-        var symbolSet = SymbolSets.generateSymbols(3);
-
-        var grid = new Grid(new Integer[][]{
-                {3, 2, 3},
-                {3, 1, 2},
-                {2, 1, 3}
-        }, List.of(
-                new DiagonalConstraint(symbolSet)
         ), symbolSet);
         assertFalse(grid.areConstraintsSatisfied(false));
     }

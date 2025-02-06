@@ -6,7 +6,11 @@ import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class GeneralSymbolConstraint implements AbstractConstraint {
+/**
+ * Represents a constraint that checks for the presence of specific symbols at specific positions in a grid.
+ * Like a block constraint but destructured.
+ */
+public class PositionListConstraint implements AbstractConstraint {
     /**
      * The set of symbols to be checked within the constraints.
      */
@@ -25,7 +29,7 @@ public class GeneralSymbolConstraint implements AbstractConstraint {
      * @throws IllegalArgumentException if the positionList is empty or the length of the positionList
      *                                  is different from the length of the symbols
      */
-    public GeneralSymbolConstraint(Set<Integer> symbols, Vec2i[] positionList) {
+    public PositionListConstraint(Set<Integer> symbols, Vec2i[] positionList) {
         assert positionList.length != 0;
         assert positionList.length == symbols.size();
 
@@ -48,6 +52,13 @@ public class GeneralSymbolConstraint implements AbstractConstraint {
         return symbols.containsAll(set) && set.size() == symbols.size();
     }
 
+    /**
+     * Gets the possible values for a given position in the grid.
+     *
+     * @param grid the Sudoku grid
+     * @param pos  the position in the grid
+     * @return the possible values for the given position in the grid
+     */
     @Override
     public Optional<Set<Integer>> getPossibilities(InnerGrid grid, Vec2i pos) {
         assert pos.getX() < grid.get()[0].length;
@@ -69,20 +80,45 @@ public class GeneralSymbolConstraint implements AbstractConstraint {
         return Optional.of(possibilities);
     }
 
+    /**
+     * Checks if the two given positions have an effect on each other with respect to the constraint.
+     *
+     * @param pos1 the first position
+     * @param pos2 the second position
+     * @return true if the two positions have an effect on each other, false otherwise
+     */
     @Override
     public boolean isAffectedBy(Vec2i pos1, Vec2i pos2) {
         return isInPositionList(pos1) && isInPositionList(pos2);
     }
 
+    /**
+     * Checks if the given position is affected by the constraint.
+     *
+     * @param pos the position to check
+     * @return true if the position is affected by the constraint, false otherwise
+     */
     @Override
     public boolean isPosAffected(Vec2i pos) {
         return isInPositionList(pos);
     }
 
+    /**
+     * Checks if the given position is within the block.
+     *
+     * @param pos the position to check
+     * @return true if the position is within the block, false otherwise
+     */
     private boolean isInPositionList(Vec2i pos) {
         return Arrays.asList(positionList).contains(pos);
     }
 
+    /**
+     * Extracts the block of characters from the grid based on the defined coordinates.
+     *
+     * @param grid the grid from which to extract the block
+     * @return a set of characters within the block, excluding empty cells
+     */
     private Set<Integer> extractValues(InnerGrid grid) {
         HashSet<Integer> set = new HashSet<>();
         for (Vec2i vec2i : positionList) {
@@ -93,6 +129,11 @@ public class GeneralSymbolConstraint implements AbstractConstraint {
         return set;
     }
 
+    /**
+     * Returns the list of positions which define the values to check.
+     *
+     * @return the array of positions which define the values to check
+     */
     public Vec2i[] getPositionList() {
         return positionList;
     }

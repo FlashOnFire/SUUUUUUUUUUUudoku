@@ -23,6 +23,11 @@ public class InnerGrid {
         this.grid = grid;
     }
 
+    /**
+     * Constructs a Grid with the specified inner grid.
+     *
+     * @param otherGrid the inner grid
+     */
     public InnerGrid(InnerGrid otherGrid) {
         if (otherGrid.grid.length == 0) {
             this.grid = new Integer[0][0];
@@ -36,21 +41,10 @@ public class InnerGrid {
     }
 
     /**
-     * Displays the grid to the console.
+     * Computes the empty cells in the grid.
+     *
+     * @return the set of empty cells
      */
-    public void display() {
-        for (Integer[] lines : this.grid) {
-            for (Integer cell : lines) {
-                if (cell == null) {
-                    System.out.print("  ");
-                } else {
-                    System.out.print(cell + " ");
-                }
-            }
-            System.out.println();
-        }
-    }
-
     public HashSet<Vec2i> computeEmptyCells() {
         var emptyCells = new HashSet<Vec2i>();
 
@@ -65,10 +59,22 @@ public class InnerGrid {
         return emptyCells;
     }
 
+    /**
+     * Returns the value at the specified position.
+     *
+     * @param pos the position
+     * @return the value at the specified position
+     */
     public Integer at(Vec2i pos) {
         return grid[pos.getY()][pos.getX()];
     }
 
+    /**
+     * Sets the value at the specified position.
+     *
+     * @param pos   the position
+     * @param value the value
+     */
     public void set(Vec2i pos, Integer value) {
         grid[pos.getY()][pos.getX()] = value;
     }
@@ -82,6 +88,11 @@ public class InnerGrid {
         return grid;
     }
 
+    /**
+     * Returns the length of the grid.
+     *
+     * @return the length of the grid
+     */
     public int length() {
         return grid.length;
     }

@@ -1,12 +1,17 @@
 package fr.polytech.suuuuuuuuuuudoku;
 
+import fr.polytech.suuuuuuuuuuudoku.graphics.Tui;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 import static fr.polytech.suuuuuuuuuuudoku.algorithm.Generator.fastSolvedGridCreation;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, URISyntaxException, InterruptedException {
         //SudokuFrame.main(null);
-        //Tui.main(null);
-        //ImGUIFrame.main(null);
+        Tui.main(null);
+//        ImGUIFrame.main(null);
         var grid = fastSolvedGridCreation(2, 4);
         var grid2 = fastSolvedGridCreation(3, 2);
         var grid3 = fastSolvedGridCreation(4, 2);

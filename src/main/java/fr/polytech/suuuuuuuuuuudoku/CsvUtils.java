@@ -44,7 +44,7 @@ public class CsvUtils {
         files = Arrays.stream(files).sorted().toArray(File[]::new);
 
         // load the grids
-        ArrayList<Grid> grids = Arrays.stream(files).filter(file -> !file.getName().equals("padding.csv")).map(file -> {
+        ArrayList<Grid> grids = Arrays.stream(files).filter(file -> !file.getName().equals("offset.csv")).map(file -> {
             try {
                 var gridValue = importGrid(file.toPath());
                 var symbols = SymbolSets.generateSymbols(gridValue.length);
@@ -54,9 +54,9 @@ public class CsvUtils {
             }
         }).collect(Collectors.toCollection(ArrayList::new));
 
-        // load the padding
-        ArrayList<Vec2i> paddings = new BufferedReader(new FileReader(
-                Arrays.stream(files).filter(file -> file.getName().equals("padding.csv")).findFirst().orElseThrow(FileNotFoundException::new)))
+        // load the offset
+        ArrayList<Vec2i> offsets = new BufferedReader(new FileReader(
+                Arrays.stream(files).filter(file -> file.getName().equals("offset.csv")).findFirst().orElseThrow(FileNotFoundException::new)))
                 .lines()
                 .map(line -> {
                     String[] parts = line.split(",(?<!\\r)");
@@ -64,10 +64,10 @@ public class CsvUtils {
                 })
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        assert paddings.size() == grids.size();
+        assert offsets.size() == grids.size();
         // merge the grids
         var mergedGrids = grids.stream()
-                               .map(grid -> new Pair<>(paddings.removeFirst(), grid))
+                               .map(grid -> new Pair<>(offsets.removeFirst(), grid))
                                .collect(Collectors.toList());
         return new MultiGrid(mergedGrids);
     }
@@ -104,10 +104,10 @@ public class CsvUtils {
             exportGrid(folder.resolve(i + ".csv"), grid.getGrids()[i]);
         }
 
-        // save the padding
-        var padding = grid.getPaddings();
-        try (var writer = new BufferedWriter(new FileWriter(folder.resolve("padding.csv").toFile()))) {
-            for (Vec2i vec2i : padding) {
+        // save the offset
+        var offset = grid.getOffsets();
+        try (var writer = new BufferedWriter(new FileWriter(folder.resolve("offset.csv").toFile()))) {
+            for (Vec2i vec2i : offset) {
                 writer.write(vec2i.getX() + "," + vec2i.getY() + "\n");
             }
         } catch (IOException e) {

@@ -6,9 +6,6 @@ titlepage: true
 
 ##  Méthodologie
 
-> Vous expliquerez votre méthodologie de travail (articulation entre conception et codage, déroulé temporel
-du projet, ...) et la répartition des tâches entre les différents membres du groupe.
-
 ### Articulation conception codage
 
 Pour aborder ce projet, nous avons commencé, aprés avoir lu attentivement le cahier des charge, par réaliser un diagramme de cas d'utilisation afin de s'assurer que chaque membre du groupe a parfaitement compris les objectif requis de l'application.

@@ -26,7 +26,7 @@ public class Generator {
     public static MultiGrid generateMultigridSudoku(Difficulty difficulty) {
         List<Pair<Vec2i, Grid>> grids = new ArrayList<>();
         var blockSize = (int) Math.sqrt(9);
-        var offsets = MultiGrid.getRandomOffset();
+        var offsets = MultiGrid.getRandomPadding();
         var symbols = SymbolSets.generateSymbols(9);
 
         var centeredGrid = fastSolvedGridCreation(blockSize, blockSize);
@@ -69,19 +69,19 @@ public class Generator {
     /**
      * Generates a grid with random block constraints
      *
-     * @param lengthInnerGrid: The length of the inner grid
+     * @param blockRows:    The number of block rows
+     * @param blockColumns: The number of block columns
      * @return A playable grid
      */
-    public static Grid generateSudokuWithRandomBlockConstraint(int lengthInnerGrid, Difficulty difficulty) {
-        var symbols = SymbolSets.generateSymbols(lengthInnerGrid);
-        Vec2i dividers = findDividers(lengthInnerGrid);
-        Grid solvedGrid = fastSolvedGridCreation(dividers.getX(), dividers.getY());
+    public static Grid generateSudokuWithRandomBlockConstraint(int blockRows, int blockColumns, Difficulty difficulty) {
+        var symbols = SymbolSets.generateSymbols(blockRows*blockColumns);
+        Grid solvedGrid = fastSolvedGridCreation(blockRows, blockColumns);
         var generalSymbolConstraints = createRandomConstraints(solvedGrid);
 
         // We update the new constraints
         solvedGrid = new Grid(solvedGrid.getInnerGrid().get(), generalSymbolConstraints, symbols);
         assert solvedGrid.isSolved();
-        removeRandomCells(solvedGrid, lengthInnerGrid, difficulty);
+        removeRandomCells(solvedGrid, blockRows*blockColumns, difficulty);
         solvedGrid.cleanMoves();
         return solvedGrid;
     }
@@ -122,21 +122,6 @@ public class Generator {
         } while (SudokuSolver.hasMoreThanOneSolution(solvedGrid, true, true));
 
         solvedGrid.cleanMoves();
-    }
-
-    /**
-     * Finds 2 dividers of a number
-     *
-     * @param n: The number to find dividers for
-     * @return A position with the dividers inside
-     */
-    private static Vec2i findDividers(int n) {
-        for (int i = (int) Math.sqrt(n); i > 0; i--) {
-            if (n % i == 0) {
-                return new Vec2i(i, n / i);
-            }
-        }
-        return new Vec2i(1, n);
     }
 
     /**

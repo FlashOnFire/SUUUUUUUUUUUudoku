@@ -99,8 +99,9 @@ public class SudokuFrame extends JFrame {
 
 
     private final Runnable generateRandom = () -> {
-        var length = (int) (Math.random() * 6) + 4;
-        this.grid = new Grid(Generator.generateSudokuWithRandomBlockConstraint(length, Difficulty.EXPERT));
+        var length = (int) (Math.random() * 3) + 2;
+        var length2 = (int) (Math.random() * 3) + 2;
+        this.grid = new Grid(Generator.generateSudokuWithRandomBlockConstraint(length, length2, Difficulty.EXPERT));
         board = new SudokuBoard(grid);
         updateJpanel();
 

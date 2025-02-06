@@ -115,7 +115,7 @@ public class Tui {
 
                 startLoader();
                 if (size == -1) {
-                    grid = Generator.generateMultigridSudoku(9, 5, difficulty);
+                    grid = Generator.generateMultigridSudoku(difficulty);
                 } else {
                     grid = Generator.generateSudokuWithBlockConstraints((int) Math.sqrt(size), (int) Math.sqrt(size),
                             difficulty);

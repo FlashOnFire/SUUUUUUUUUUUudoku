@@ -41,17 +41,6 @@ tasks.named<JavaExec>("run") {
     classpath += files("src/test/resources")
 }
 
-tasks.jar {
-    manifest {
-        attributes["Main-Class"] = application.mainClass
-    }
-    from(sourceSets.main.get().output)
-    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
-    from("src/main/resources")
-    from("src/test/resources")
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
-
 tasks.register<Jar>("tuiJar") {
     archiveBaseName.set("tui")
     manifest {

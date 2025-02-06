@@ -4,6 +4,63 @@ author: Thibaut Laracine, Guillaume Calderon, Eymeric Dechelette
 titlepage: true
 ---
 
+## Tutoriel utilisation
+
+### Prérequis
+
+Si vous n'utilisez pas nix, les prérequis sont :
+
+- `openjdk-23`
+- `gradle`
+- `libGL`
+
+### Jar précompilé
+
+Vous pouvez lancer les fichier en .jar dans le dossier build 
+
+```bash
+java -jar ./build/libs/imGUI-1.0.jar # Interface en ligne de commande
+java -jar ./build/libs/tui-1.0.jar # Interface graphique avec imGUI
+java -jar ./build/libs/swing-1.0.jar # Interface graphique avec swing
+```
+
+### Compilation
+
+#### Utilisateur nix
+
+La methode privilégiée pour lancer le programme est d'utiliser nix, car celui-ci vous assure d'avoir un environnement
+identique au autre utilisateur de nix.
+
+Si vous disposez de nix, vous pouvez lancer la compilation avec la commande suivante :
+
+```bash
+nix build
+```
+
+Vous pouvez ensuite lancer les différents executables avec les commandes suivantes :
+
+```bash
+./result/bin/tui # Interface en ligne de commande
+./result/bin/imGUI # Interface graphique avec imGUI
+./result/bin/swing # Interface graphique avec swing
+```
+
+#### Utilisateur linux classique
+
+Vous pouvez lancer la compilation avec la commande suivante :
+
+```bash
+./gradlew buildAllJars
+```
+
+Vous pouvez ensuite lancer les différents executables avec les commandes suivantes :
+
+```bash
+java -jar ./build/libs/imGUI-1.0.jar # Interface en ligne de commande
+java -jar ./build/libs/tui-1.0.jar # Interface graphique avec imGUI
+java -jar ./build/libs/swing-1.0.jar # Interface graphique avec swing
+```
+
 ##  Méthodologie
 
 ### Articulation conception codage

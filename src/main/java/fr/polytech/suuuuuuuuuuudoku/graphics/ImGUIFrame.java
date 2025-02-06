@@ -24,7 +24,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ImGUIFrame extends Application {
     final AtomicBoolean solving = new AtomicBoolean(false);
-    final int[] selectedGeneratorGridSize = {9};
+    final int[] selectedGeneratorGridSizeWidth = {2};
+    final int[] selectedGeneratorGridSizeHeight = {2};
     Solvable<?> originalSolvable;
     Solvable<?> solvable;
     Vec2i selected_pos = null;
@@ -52,33 +53,27 @@ public class ImGUIFrame extends Application {
             ImGui.beginDisabled();
         }
 
+        ImGui.sameLine();
+        ImGui.setNextItemWidth(100);
+        ImGui.sliderInt("Block Width", selectedGeneratorGridSizeWidth, 2, 6, ImGuiSliderFlags.None);
+        ImGui.sameLine();
+        ImGui.setNextItemWidth(100);
+        ImGui.sliderInt("Block Height", selectedGeneratorGridSizeHeight, 2, 6, ImGuiSliderFlags.None);
+
         if (ImGui.button("Generate")) {
             var oldPace = SudokuSolver.solvePace[0];
             SudokuSolver.solvePace[0] = 1.0f;
 
-            solvable = Generator.generateSudokuWithBlockConstraints((int) Math.sqrt(selectedGeneratorGridSize[0]),
-                    (int) Math.sqrt(selectedGeneratorGridSize[0]), Difficulty.EXPERT);
+            solvable = Generator.generateSudokuWithBlockConstraints(
+                    selectedGeneratorGridSizeWidth[0],
+                    selectedGeneratorGridSizeHeight[0],
+                    Difficulty.EXPERT
+            );
 
             originalSolvable = ((Grid) solvable).shallowCopy();
             SudokuSolver.solvePace[0] = oldPace;
         }
 
-        ImGui.sameLine();
-
-        ImGui.sameLine();
-        ImGui.setNextItemWidth(100);
-        if (ImGui.beginCombo("##gridSize", String.valueOf(selectedGeneratorGridSize[0]))) {
-            for (int size : new int[]{4, 9, 16, 25}) {
-                boolean isSelected = (selectedGeneratorGridSize[0] == size);
-                if (ImGui.selectable(String.valueOf(size), isSelected)) {
-                    selectedGeneratorGridSize[0] = size;
-                }
-                if (isSelected) {
-                    ImGui.setItemDefaultFocus();
-                }
-            }
-            ImGui.endCombo();
-        }
 
         if (ImGui.button("MultiGrid")) {
             try {
@@ -271,9 +266,9 @@ public class ImGUIFrame extends Application {
                 int finalY = y;
                 int finalX = x;
                 var block = grid.getConstraints().stream()
-                                .filter(c -> c instanceof BlockConstraint)
-                                .filter(c -> c.isPosAffected(new Vec2i(finalX, finalY)))
-                                .findFirst();
+                        .filter(c -> c instanceof BlockConstraint)
+                        .filter(c -> c.isPosAffected(new Vec2i(finalX, finalY)))
+                        .findFirst();
 
                 block.ifPresent(c -> {
                     int color = c.hashCode();
@@ -359,10 +354,10 @@ public class ImGUIFrame extends Application {
                 int withoutPaddingY = y - padding.getY();
 
                 var block = pair.getSecond().getConstraints().stream()
-                                .filter(c -> c instanceof BlockConstraint)
-                                .filter(c -> c.isPosAffected(new Vec2i(withoutPaddingX, withoutPaddingY)))
-                                .map(c -> (BlockConstraint) c)
-                                .findFirst();
+                        .filter(c -> c instanceof BlockConstraint)
+                        .filter(c -> c.isPosAffected(new Vec2i(withoutPaddingX, withoutPaddingY)))
+                        .map(c -> (BlockConstraint) c)
+                        .findFirst();
 
                 block.ifPresent(c -> {
                     int color = c.getBlock().offset(padding.getX(), padding.getY()).hashCode() % 360;

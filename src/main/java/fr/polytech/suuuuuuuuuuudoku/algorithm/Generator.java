@@ -193,7 +193,6 @@ public class Generator {
         Grid seedGrid;
         SolvingState state;
         Grid solvedGrid;
-        do {
             seedGrid = new Grid(innerGrid, symbols, blockRows, blockColumns);
 
             var symbolsArray = new ArrayList<>(symbols);
@@ -208,7 +207,7 @@ public class Generator {
 
             state = pair.getFirst();
             solvedGrid = pair.getSecond();
-        } while (state != SolvingState.SOLVED);
+            assert state == SolvingState.SOLVED;
         return solvedGrid;
     }
 

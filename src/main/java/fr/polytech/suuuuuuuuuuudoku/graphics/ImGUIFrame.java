@@ -340,7 +340,6 @@ public class ImGUIFrame extends Application {
                 if (hashcode.get() != 1) {
                     int color = hashcode.get() % 360;
 
-
                     int[] rgb;
                     int[] rgbDarker;
                     if (isSelected) {

@@ -29,8 +29,6 @@ public class PositionListConstraint implements AbstractConstraint {
      *
      * @param symbols      the set of symbols to be checked within the constraints
      * @param positionList the list of position which define value to check
-     * @throws IllegalArgumentException if the positionList is empty or the length of the positionList
-     *                                  is different from the length of the symbols
      */
     public PositionListConstraint(Set<Integer> symbols, HashSet<Vec2i> positionList) {
         assert !positionList.isEmpty();

@@ -107,141 +107,142 @@ flowchart LR
 
 <!-- BEGIN_CLASS -->
 <!-- END_CLASS -->
+
 ```mermaid
 ---
 config:
 layout: elk
 ---
 classDiagram
-  direction TB
-  namespace Ui {
-    class ImGUIFrame {
-      Integer? currentSymbol
-      + ImGUIFrame()
-      - drawGrid(Grid, Vec2i, ImVec2) void
-      # configure(Configuration) void
-      - keyPress(int) void
-      - setSelection(int, int) void
-      + main(String[]) void
-      # preRun() void
-      - drawMultiGrid(MultiGrid, Vec2i, ImVec2) void
-      - applyLastChanges() void
-      - handleInput() void
-      + process() void
+    direction TB
+    namespace Ui {
+        class ImGUIFrame {
+            Integer? currentSymbol
+            + ImGUIFrame()
+            - drawGrid(Grid, Vec2i, ImVec2) void
+            # configure(Configuration) void
+            - keyPress(int) void
+            - setSelection(int, int) void
+            + main(String[]) void
+            # preRun() void
+            - drawMultiGrid(MultiGrid, Vec2i, ImVec2) void
+            - applyLastChanges() void
+            - handleInput() void
+            + process() void
+        }
+        class Tui {
+            + Tui()
+            - welcomeMessage() void
+            - displayGrid(Grid, Vec2i) void
+            - play(Solvable~?~) void
+            - showTimeLine(int, int) void
+            + main(String[]) void
+            - stopLoader() void
+            - selectMode(String[]) int
+            ~ start() void
+            - startLoader() void
+            - gameOver() void
+            - cleanTerminal() void
+            - solve(Solvable~?~) Solvable~?~
+            - displayMultiGrid(MultiGrid) void
+            - showHelper() void
+            - displayOptions(String[], int) void
+        }
+        class SudokuOptions {
+            + SudokuOptions(Color, Runnable, Runnable, Runnable, Runnable, Runnable, Runnable)
+            - applyMaterialDesign(JButton) void
+        }
+        class SudokuFrame {
+            + SudokuFrame(Grid)
+            + main(String[]) void
+            - updateJpanel() void
+        }
+        class SudokuBoard {
+            ~ SudokuBoard(Grid)
+            + recoverPreviousSudoku(Grid) void
+            + update(Integer[][], boolean) void
+        }
+        class ObservableGrid {
+            - Grid grid
+            Map~Vec2i, Set~ Integer~~ emptyCellsPossibilities
+            Grid grid
+            Vec2i size
+            List~Move2i~ moves
+            + ObservableGrid(Grid, GridListener)
+            + computeAllEmptyCellsPossibilities() void
+            + placeUnchecked(Vec2i, Integer, boolean, boolean) void
+            + undoLastMove(boolean) void
+            + cleanMoves() void
+            + areConstraintsSatisfied(boolean) boolean
+            + shallowCopy() ObservableGrid
+            + getSymbolAt(Vec2i) Integer
+        }
+        class GridListener {
+            + onGridChange(InnerGrid) void
+        }
     }
-    class Tui {
-      + Tui()
-      - welcomeMessage() void
-      - displayGrid(Grid, Vec2i) void
-      - play(Solvable~?~) void
-      - showTimeLine(int, int) void
-      + main(String[]) void
-      - stopLoader() void
-      - selectMode(String[]) int
-      ~ start() void
-      - startLoader() void
-      - gameOver() void
-      - cleanTerminal() void
-      - solve(Solvable~?~) Solvable~?~
-      - displayMultiGrid(MultiGrid) void
-      - showHelper() void
-      - displayOptions(String[], int) void
+    namespace Constraints {
+        class GeneralSymbolConstraint {
+            - Vec2i[] positionList
+            Vec2i[] positionList
+            + GeneralSymbolConstraint(Set~Integer~, Vec2i[])
+            + isSatisfied(InnerGrid) boolean
+            - extractValues(InnerGrid) Set~Integer~
+            + isPosAffected(Vec2i) boolean
+            - isInPositionList(Vec2i) boolean
+            + isAffectedBy(Vec2i, Vec2i) boolean
+            + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
+        }
+        class DiagonalConstraint {
+            + DiagonalConstraint(Set~Integer~)
+            + isAffectedBy(Vec2i, Vec2i) boolean
+            + isSatisfied(InnerGrid) boolean
+            + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
+            + isPosAffected(Vec2i) boolean
+        }
+        class BlockConstraint {
+            Box2D block
+            + BlockConstraint(Set~Integer~, Box2D)
+            + isAffectedBy(Vec2i, Vec2i) boolean
+            + isSatisfied(InnerGrid) boolean
+            - extractBlock(InnerGrid) Set~Integer~
+            + isInBlock(Vec2i) boolean
+            + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
+            + equals(Object) boolean
+            + hashCode() int
+            + isPosAffected(Vec2i) boolean
+        }
+        class AbstractConstraint {
+            + isSatisfied(InnerGrid) boolean
+            + isAffectedBy(Vec2i, Vec2i) boolean
+            + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
+            + isPosAffected(Vec2i) boolean
+            + getClassicConstraints(int, Set~Integer~) List~AbstractConstraint~
+            + getRectConstraints(int, int, Set~Integer~) List~AbstractConstraint~
+        }
+        class NotEmptyConstraint {
+            + NotEmptyConstraint()
+            + isAffectedBy(Vec2i, Vec2i) boolean
+            + isPosAffected(Vec2i) boolean
+            + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
+            + isSatisfied(InnerGrid) boolean
+        }
+        class LineConstraint {
+            + LineConstraint(Set~Integer~)
+            + isPosAffected(Vec2i) boolean
+            + isSatisfied(InnerGrid) boolean
+            + isAffectedBy(Vec2i, Vec2i) boolean
+            + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
+        }
+        class ColumnConstraint {
+            + ColumnConstraint(Set~Integer~)
+            + isSatisfied(InnerGrid) boolean
+            + isAffectedBy(Vec2i, Vec2i) boolean
+            + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
+            + isPosAffected(Vec2i) boolean
+        }
     }
-    class SudokuOptions {
-      + SudokuOptions(Color, Runnable, Runnable, Runnable, Runnable, Runnable, Runnable)
-      - applyMaterialDesign(JButton) void
-    }
-    class SudokuFrame {
-      + SudokuFrame(Grid)
-      + main(String[]) void
-      - updateJpanel() void
-    }
-    class SudokuBoard {
-      ~ SudokuBoard(Grid)
-      + recoverPreviousSudoku(Grid) void
-      + update(Integer[][], boolean) void
-    }
-    class ObservableGrid {
-      - Grid grid
-      Map~Vec2i, Set~ Integer~~ emptyCellsPossibilities
-      Grid grid
-      Vec2i size
-      List~Move2i~ moves
-      + ObservableGrid(Grid, GridListener)
-      + computeAllEmptyCellsPossibilities() void
-      + placeUnchecked(Vec2i, Integer, boolean, boolean) void
-      + undoLastMove(boolean) void
-      + cleanMoves() void
-      + areConstraintsSatisfied(boolean) boolean
-      + shallowCopy() ObservableGrid
-      + getSymbolAt(Vec2i) Integer
-    }
-    class GridListener {
-      + onGridChange(InnerGrid) void
-    }
-  }
-  namespace Constraints {
-    class GeneralSymbolConstraint {
-      - Vec2i[] positionList
-      Vec2i[] positionList
-      + GeneralSymbolConstraint(Set~Integer~, Vec2i[])
-      + isSatisfied(InnerGrid) boolean
-      - extractValues(InnerGrid) Set~Integer~
-      + isPosAffected(Vec2i) boolean
-      - isInPositionList(Vec2i) boolean
-      + isAffectedBy(Vec2i, Vec2i) boolean
-      + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
-    }
-    class DiagonalConstraint {
-      + DiagonalConstraint(Set~Integer~)
-      + isAffectedBy(Vec2i, Vec2i) boolean
-      + isSatisfied(InnerGrid) boolean
-      + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
-      + isPosAffected(Vec2i) boolean
-    }
-    class BlockConstraint {
-      Box2D block
-      + BlockConstraint(Set~Integer~, Box2D)
-      + isAffectedBy(Vec2i, Vec2i) boolean
-      + isSatisfied(InnerGrid) boolean
-      - extractBlock(InnerGrid) Set~Integer~
-      + isInBlock(Vec2i) boolean
-      + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
-      + equals(Object) boolean
-      + hashCode() int
-      + isPosAffected(Vec2i) boolean
-    }
-    class AbstractConstraint {
-      + isSatisfied(InnerGrid) boolean
-      + isAffectedBy(Vec2i, Vec2i) boolean
-      + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
-      + isPosAffected(Vec2i) boolean
-      + getClassicConstraints(int, Set~Integer~) List~AbstractConstraint~
-      + getRectConstraints(int, int, Set~Integer~) List~AbstractConstraint~
-    }
-    class NotEmptyConstraint {
-      + NotEmptyConstraint()
-      + isAffectedBy(Vec2i, Vec2i) boolean
-      + isPosAffected(Vec2i) boolean
-      + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
-      + isSatisfied(InnerGrid) boolean
-    }
-    class LineConstraint {
-      + LineConstraint(Set~Integer~)
-      + isPosAffected(Vec2i) boolean
-      + isSatisfied(InnerGrid) boolean
-      + isAffectedBy(Vec2i, Vec2i) boolean
-      + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
-    }
-    class ColumnConstraint {
-      + ColumnConstraint(Set~Integer~)
-      + isSatisfied(InnerGrid) boolean
-      + isAffectedBy(Vec2i, Vec2i) boolean
-      + getPossibilities(InnerGrid, Vec2i) Optional~Set~Integer~~
-      + isPosAffected(Vec2i) boolean
-    }
-  }
-  namespace UtilsNamespace {
+    namespace UtilsNamespace {
 class Box2D {
 + Box2D(Vec2i, Vec2i)
 + Box2D(int, int, int, int)
@@ -478,42 +479,31 @@ Tui ..> Grid: «create»
 Tui ..> MultiGrid: «create»
 ```
 
-### Système général :
-
-```
-TODO : diagramme de communication entre les différentes classes au démarrage
-ex : Main -> Tui -> Grid
-                 -> MultiGrid
-                 -> Solver
-                 -> Generateur
-          -> ImGUIFrame
-A voir un peu plus en détail
-```
-
 ### Grille de sudoku et multi grille (Solvable) :
 
 Voici un diagramme d'objet représentant un multi-doku résolu en partie :
+
 ```mermaid
 ---
 config:
   layout: elk
 ---
 classDiagram
-direction TD
+    direction TD
     class Object_5 {
-	    : MultiGrid$
-        - offsets = ( (x=0, y=0), (x=12, y=0), (x=6, y=6), (x=0, y=12), (x=12, y=12) )
-	    - size = Vec2i(x=21, y=21)
-        - moves = ( ((x=4, y=6), null, 4), ((x=8, y=11), null, 7), ....)
-        - emptyCellsPossibilities = ( (x=2, y=1), 4), ...)
+        : MultiGrid$
+        - offsets =((x=0, y=0), (x=12, y=0), (x=6, y=6), (x=0, y=12), (x=12, y=12))
+        - size = Vec2i(x=21, y=21)
+        - moves =(((x=4, y=6), null, 4), ((x=8, y=11), null, 7), ....)
+        - emptyCellsPossibilities =((x=2, y=1), 4), ...)
         - symbols = HashSet(1, 2, 3, 4, 5, 6, 7, 8, 9)
     }
     class Object_0 {
         : Grid$
-        innerGrid = ()
-        emptyCellsPossibilities = ( (x=2, y=1), 4), ... )
-        constraints (BlockConstraint, LineConstraint, ...)
-        moves = ( ((x=4, y=6), null, 4), ...)
+        innerGrid =()
+        emptyCellsPossibilities =((x=2, y=1), 4), ...)
+        constraints(BlockConstraint, LineConstraint, ...)
+        moves =(((x=4, y=6), null, 4), ...)
         symbols = HashSet(1, 2, 3, 4, 5, 6, 7, 8, 9)
     }
     class Object_1 {
@@ -543,12 +533,6 @@ direction TD
 Il peut représenter une grille de multi sudoku tel que celle-ci dessous :
 ![img.png](img.png)
 
-### UI :
-
-```
-TODO : diagramme d'état transition de l'interface graphique (optionel)
-```
-
 ### Générateur :
 
 ```mermaid
@@ -558,22 +542,21 @@ config:
   look: neo
 ---
 stateDiagram
-  Generated: Grille générée !
-  fastgeneration : Génération rapide <br/> d'une grille résolu avec <br/> contraintes de bloc <br/> de taille NxM
-  removeCells: Suppression des cellules <br/> dans la grille
-  cleanHistory: Suppression de <br/> l'historique  des mouvements <br/> après génération
-  generateConstraint: Générer des contraintes de <br/> bloc avec position aléatoire
-  getRandomPadding: Choisir les décalages <br/> basiques du multi-doku <br/> par rapport à l'origine <br/> N = M = 3
-  placeGrids: Placer les autres grilles <br/> autour de notre grille
+    Generated: Grille générée !
+    fastgeneration: Génération rapide <br/> d'une grille résolu avec <br/> contraintes de bloc <br/> de taille NxM
+    removeCells: Suppression des cellules <br/> dans la grille
+    cleanHistory: Suppression de <br/> l'historique des mouvements <br/> après génération
+    generateConstraint: Générer des contraintes de <br/> bloc avec position aléatoire
+    getRandomPadding: Choisir les décalages <br/> basiques du multi-doku <br/> par rapport à l'origine <br/> N = M = 3
+    placeGrids: Placer les autres grilles <br/> autour de notre grille
+    state choice_generation <<choice>>
+    state choice_grid_gen <<choice>>
 
 state Generation_Generale {
-state choice_generation <<choice>>
 [*] --> choice_generation: Grid ou Multigrid ?
 choice_generation --> fastgeneration: Grid (paramètre N et M demandé)
 choice_generation --> getRandomPadding: Multi-Grid
-
-state choice_grid_gen <<choice>>
-fastgeneration --> choice_grid_gen : type de génération ?
+fastgeneration --> choice_grid_gen: type de génération ?
 choice_grid_gen --> generateConstraint: generateSudokuWithRandomBlockConstraint
 generateConstraint --> removeCells
 choice_grid_gen --> removeCells: generateSudokuWithBlockConstraints
@@ -582,9 +565,7 @@ choice_grid_gen --> placeGrids: generateMultigridSudoku
 placeGrids --> SudokuSolver.solve
 SudokuSolver.solve --> removeCells
 cleanHistory --> Generated
-
 getRandomPadding --> fastgeneration
-
 Generated --> [*]
 }
 ```
@@ -598,63 +579,177 @@ config:
   look: neo
 ---
 stateDiagram
-  getPath: Récuperer le chemin <br/> du présumé fichier <br/> contenant la grille
-  export: Exporter la grille <br/> dans un fichier
-  return: Grille Résolu Générée !
-  init: initialiser la grille
-  shuffleBlockRow: Mélanger les <br/> lignes de blocs <br/> entre elles
-  shuffleBlockColumn: Mélanger les <br/> colonnes de blocs <br/> entre elles
-  shuffleRowInBlockRow: Dans les lignes de blocs <br/> mélanger les lignes
-  shuffleColumnInBlockColumn: Dans les colonnes de blocs <br/> mélanger les colonnes
-  shuffleSymbols: Mélanger tout les symboles
-  initGrid: Initialisation <br/> d'une grille vide <br/> (taille NxM*NxM)
-  initSymbolSet: Initialisation et mélange d'une liste  de <br/> symboles de taille NxM
-  placeSymbolOnDiagonal: Placer les symboles <br/> sur la diagonale dans <br/> l'ordre défini <br> (symbole)
-  computePossibility: Calculer toutes les possibilités par cases
-  solve: Résoudre
+    getPath: Récuperer le chemin <br/> du présumé fichier <br/> contenant la grille
+    export: Exporter la grille <br/> dans un fichier
+    return: Grille Résolu Générée !
+    init: initialiser la grille
+    shuffleBlockRow: Mélanger les <br/> lignes de blocs <br/> entre elles
+    shuffleBlockColumn: Mélanger les <br/> colonnes de blocs <br/> entre elles
+    shuffleRowInBlockRow: Dans les lignes de blocs <br/> mélanger les lignes
+    shuffleColumnInBlockColumn: Dans les colonnes de blocs <br/> mélanger les colonnes
+    shuffleSymbols: Mélanger tout les symboles
+    initGrid: Initialisation <br/> d'une grille vide <br/> (taille NxM*NxM)
+    initSymbolSet: Initialisation et mélange d'une liste de <br/> symboles de taille NxM
+    placeSymbolOnDiagonal: Placer les symboles <br/> sur la diagonale dans <br/> l'ordre défini <br> (symbole)
+    computePossibility: Calculer toutes les possibilités par cases
+    solve: Résoudre
 
-  state createSolvedSudoku {
-    [*] --> initGrid
-    initGrid --> initSymbolSet
-    initSymbolSet --> placeSymbolOnDiagonal
-    placeSymbolOnDiagonal --> computePossibility
-    computePossibility --> solve
-    solve --> [*]
-  }
+    state createSolvedSudoku {
+        [*] --> initGrid
+        initGrid --> initSymbolSet
+        initSymbolSet --> placeSymbolOnDiagonal
+        placeSymbolOnDiagonal --> computePossibility
+        computePossibility --> solve
+        solve --> [*]
+    }
 
-  state fastSolvedGridCreation {
-    [*] --> getPath: longueur et largeur des contraintes de block
-    state exist <<choice>>
-    getPath --> exist: Essayer de récuperer la <br/> grille à partir du fichier
+    state fastSolvedGridCreation {
+        [*] --> getPath: longueur et largeur des contraintes de block
+        state exist <<choice>>
+        getPath --> exist: Essayer de récuperer la <br/> grille à partir du fichier
+        exist --> init
+        export --> return
+        state isSolve <<choice>>
+        init --> isSolve: la grille est elle résolu ?
+        isSolve --> shuffleBlockRow: Oui
+        shuffleBlockRow --> shuffleBlockColumn
+        shuffleBlockColumn --> shuffleRowInBlockRow
+        shuffleRowInBlockRow --> shuffleColumnInBlockColumn
+        shuffleColumnInBlockColumn --> shuffleSymbols
+        shuffleSymbols --> return
+        return --> [*]
+    }
 
-    exist --> init
-    export --> return
-    state isSolve <<choice>>
-    init --> isSolve: la grille est elle résolu ?
-    isSolve --> shuffleBlockRow: Oui
-    shuffleBlockRow --> shuffleBlockColumn
-    shuffleBlockColumn --> shuffleRowInBlockRow
-    shuffleRowInBlockRow --> shuffleColumnInBlockColumn
-    shuffleColumnInBlockColumn --> shuffleSymbols
-    shuffleSymbols --> return
-    return --> [*]
-  }
-
-  createSolvedSudoku --> export
-  exist --> createSolvedSudoku: Le fichier n'existe pas
-  isSolve --> createSolvedSudoku: Non
+    createSolvedSudoku --> export
+    exist --> createSolvedSudoku: Le fichier n'existe pas
+    isSolve --> createSolvedSudoku: Non
 ```
 
 #### Explication de la méthode de suppression des cellules dans un Solvable résolu :
 
-```
-TODO : diagramme d'activité et/ou de séquence
+```mermaid
+---
+config:
+  theme: neo-dark
+---
+sequenceDiagram
+    actor .
+    participant Generator
+    participant Solvable
+    participant List(Vec2i)
+    participant SudokuSolver
+    . ->> Generator: removeRandomCells (solvedGrid, lengthInnerGrid, difficulty)
+    activate Generator
+    Generator ->> List(Vec2i): <<create>>
+    activate List(Vec2i)
+    List(Vec2i) -->> Generator: toTestRemove = new ArrayList<>()
+    deactivate List(Vec2i)
+    loop i : Allant de 0 à lengthInnerGrid
+        loop j : Allant de 0 à lengthInnerGrid
+            alt solvedGrid n'est pas une instance de MultiGrid <br> ou solvedGrid contient la position (i, j)
+                Generator ->> List(Vec2i): <<create>>
+                activate List(Vec2i)
+                List(Vec2i) -->> Generator: toTestRemove.add(new Vect2i(i, j))
+                deactivate List(Vec2i)
+            end
+        end
+    end
+    Generator ->> Generator: Collections.shuffle(toTestRemove);
+    Generator ->> Generator: toTestRemove = <br> sous ensemble de toTestRemove <br> basé sur difficulty
+loop Tant que TestRemove n'est pas vide
+Generator->>List(Vec2i): a = toTestRemove.removeFirst()
+activate List(Vec2i)
+List(Vec2i) -->> Generator: a = toTestRemove.removeFirst()
+deactivate List(Vec2i)
+Generator ->> Solvable: solvedGrid.placeUnchecked(a, null, null, true)
+activate Solvable
+Solvable -->> Generator: 
+Generator->>Solvable: solvedGrid.computeAllEmptyCellsPossibilities()
+Solvable -->> Generator: 
+deactivate Solvable
+Generator ->> SudokuSolver: bool = SudokuSolver.solve(solvedGrid).getFirst()
+activate SudokuSolver
+SudokuSolver -->> Generator: bool = SudokuSolver.solve(solvedGrid).getFirst()
+deactivate SudokuSolver
+alt if b != SOLVED
+Generator->>Solvable: undoLastMove()
+activate Solvable
+deactivate Solvable
+Solvable -->> Generator: 
+end
+end
+SudokuSolver->>Generator: c = hasMoreThanOneSolution()
+activate SudokuSolver
+Generator -->> SudokuSolver: c = hasMoreThanOneSolution()
+deactivate SudokuSolver
+loop Tant que c = true
+Generator->>Generator: undoLastMove()
+SudokuSolver->>Generator: c = hasMoreThanOneSolution()
+activate SudokuSolver
+Generator -->> SudokuSolver: c = hasMoreThanOneSolution()
+deactivate SudokuSolver
+end
+Generator->>Solvable: solvedGrid.cleanMoves()
+activate Solvable
+deactivate Solvable
+Solvable -->> Generator: 
+Generator ->> .: 
+deactivate Generator
 ```
 
 #### Méthode de génération des contraintes pour un sudoku avec des contraintes de blocs de NxM :
 
-```
-TODO: diagramme d'activité et/ou de séquence
+```mermaid
+---
+config:
+  theme: neo-dark
+  look: neo
+---
+stateDiagram
+    positionList: Initialiser positionList <br> la liste des <br>symboles possibles
+    constraint: Contraintes créé !
+    initConstraint: Initialiser une liste <br> de contraintes
+    addLastConstraint: Ajout des contraintes <br> de lignes, de colonnes <br> et de complétude <br> à constraints
+    i_1: I = 0
+    j_1: J = 0
+    i_2: I = 0
+    j_2: J = 0
+    initlistinconst: Initialisation d'une <br> liste de positions <br> qui sera placé <br> dans la contrainte
+    getpos: Selection au hasard <br> dans positionList[J]
+    addPos: Ajout de pos <br> à listInConstraint
+    delPos: Suppression de pos <br> dans positionList[J]
+    addConstraint: Ajout d'une contrainte <br> sur les positions <br> dans listInConstraint
+    add: ajout la position <br> Vec2i(I, J) à <br> positionList[symbol - 1]
+    state for_i_2 <<choice>>
+    state for_j_2 <<choice>>
+    state for_i_1 <<choice>>
+    state for_j_1 <<choice>>
+
+    state createRandomConstraint {
+        [*] --> positionList: Grid grid
+        positionList --> i_1: position List est <br> de taille grid.length()
+        for_i_1 --> initConstraint: Si I >= length
+        initConstraint --> i_2: AbstractConstraint constraints <br> List< List< Vec2i>> positionList
+        for_i_2 --> addLastConstraint: Si I >= length <br> constraints
+        addLastConstraint --> constraint
+        constraint --> [*]
+        i_2 --> for_i_2
+        j_2 --> for_j_2
+        addConstraint --> for_i_2: I++
+        for_j_2 --> addConstraint: Si J >= length <br>
+        getpos --> addPos: On obtient pos
+        for_j_2 --> getpos: Si J < length
+        for_i_2 --> initlistinconst: Si I < length
+        addPos --> delPos
+        delPos --> for_j_2: J++
+        initlistinconst --> j_2: listInConstraint
+        i_1 --> for_i_1
+        j_1 --> for_j_1
+        for_j_1 --> add: Si J < length <br> symbol = grid.getSymbolAt(I, J)
+        for_j_1 --> for_i_1: Si J >= length <br> I++
+        add --> for_j_1: J++
+        for_i_1 --> j_1: Si I < length
+    }
 ```
 
 ### Solveur :
@@ -673,56 +768,44 @@ stateDiagram
     suppress: On supprime un element de la queue
     SudokuSolver.doBacktracking: BACKTRACKING
 SudokuSolver.solveDeduction: DEDUCTION
-
 state SudokuSolver.solve {
 SudokuSolver.doBacktracking --> boucle
 [*] --> solve
 solve --> queue_init
 queue_init --> boucle
-
 state boucle_test <<choice>>
 boucle --> boucle_test
 boucle_test --> suppress: Non
 suppress --> if_solved
 boucle_test --> INSOLVABLE: Oui, on ne peut pas résoudre
 INSOLVABLE --> [*]
-
 state is_solved_test <<choice>>
 if_solved --> is_solved_test
 is_solved_test --> if_deduced: Non
-
 is_solved_bis_test --> RESOLU: Oui
 is_solved_test --> RESOLU: Oui
 RESOLU --> [*]
-
 if_deduced: Doit on essayer de déduire avec les contraintes ?
 state is_deduced_test <<choice>>
 if_deduced --> is_deduced_test
 is_backtracking_test --> SudokuSolver.doBacktracking: Oui
 is_deduced_test --> SudokuSolver.doBacktracking: Non, alors on fait forcement du backtracking et on récupère les possibilités engendrée
 is_deduced_test --> SudokuSolver.solveDeduction: Oui
-
 if_solved_bis: La grille est résolu ?
 SudokuSolver.solveDeduction --> if_solved_bis
 state is_solved_bis_test <<choice>>
 if_solved_bis --> is_solved_bis_test
 is_solved_bis_test --> if_unsolvable: Non
-
 if_unsolvable: La grille peut être résolu en l'état ?
 state is_unsolvable_test <<choice>>
 if_unsolvable --> is_unsolvable_test
 is_unsolvable_test --> INSOLVABLE: Non
 is_unsolvable_test --> if_backtracking: Oui
-
 if_backtracking: Doit on essayer le backtracking ?
 state is_backtracking_test <<choice>>
 if_backtracking --> is_backtracking_test
 is_backtracking_test --> partial: Non, on ne peut pas aller plus loin juste avec le déduction
-
-
 partial --> [*]
-
-
 }
 ```
 
@@ -730,93 +813,41 @@ On peut également observer la méthode de résolution à travers un diagramme d
 
 ```mermaid
 sequenceDiagram
-
-actor C as Client
-
-participant S as solver : SudokuSolver
-
-participant Fin
-
-participant G as Grid/Multgrid : T extends Solvable<C> & ShallowCopyable<T>
-
-  
-  
-
-C->>S: SudokuSolver.solve(grid, IsDeduce, IsBacktracked, IsMovesStored)
-
-activate S
-
-  
-
-create participant AD as currentList : ArrayDeque<T>
-
-S-->>AD: <<create>>
-
-  
-
-S->>G: copiedGrid = grid.shallowCopy()
-
-activate G
-
-G-->>S: copiedGrid = grid.shallowCopy()
-
-deactivate G
-
-  
-
-S->>S: currentList.add(copiedGrid)
-
-  
-
-loop while currentList isn't empty
-
-S->>S: currentGrid = currentList.removeLast()
-
-alt currentGrid.isSolved()
-
-S->>Fin: return new Pair<>SolvingState.SOLVED, currentGrid)
-
-else
-
-alt isDeduce is set to true
-
-S->>S: state = solveDeduction(currentGrid, IsMovesStored)
-
-alt state == SolvingState.SOLVED
-
-S->>Fin: return new Pair<>SolvingState.SOLVED, currentGrid)
-
-else
-
-alt state == SolvingState.UNSOLVABLE
-
-S->>Fin: return new Pair<>(SolvingState.UNSOLVABLE, null);
-
-else
-
-opt IsBacktracked
-
-S->>Fin: return new Pair<>(SolvingState.PARTIALLY_SOLVED, currentGrid);
-
-end
-
-end
-
-end
-
-end
-
-end
-
-  
-
-S->>S: currentList.addAll(doBacktracking(currentGrid, isMovesStored))
-
-end
-
-S->>Fin: return new Pair<>(SolvingState.UNSOLVABLE, null);
-
-  
-
-deactivate S
+    actor C as Client
+    participant S as solver : SudokuSolver
+    participant Fin
+    participant G as Grid/Multgrid : T extends Solvable<C> & ShallowCopyable<T>
+    C ->> S: SudokuSolver.solve(grid, IsDeduce, IsBacktracked, IsMovesStored)
+    activate S
+    create participant AD as currentList : ArrayDeque<T>
+    S -->> AD: <<create>>
+    S ->> G: copiedGrid = grid.shallowCopy()
+    activate G
+    G -->> S: copiedGrid = grid.shallowCopy()
+    deactivate G
+    S ->> S: currentList.add(copiedGrid)
+    loop while currentList isn't empty
+        S ->> S: currentGrid = currentList.removeLast()
+        alt currentGrid.isSolved()
+            S ->> Fin: return new Pair<>SolvingState.SOLVED, currentGrid)
+        else
+            alt isDeduce is set to true
+                S ->> S: state = solveDeduction(currentGrid, IsMovesStored)
+                alt state == SolvingState.SOLVED
+                    S ->> Fin: return new Pair<>SolvingState.SOLVED, currentGrid)
+                else
+                    alt state == SolvingState.UNSOLVABLE
+                        S ->> Fin: return new Pair<>(SolvingState.UNSOLVABLE, null);
+                    else
+                        opt IsBacktracked
+                            S ->> Fin: return new Pair<>(SolvingState.PARTIALLY_SOLVED, currentGrid);
+                        end
+                    end
+                end
+            end
+        end
+        S ->> S: currentList.addAll(doBacktracking(currentGrid, isMovesStored))
+    end
+    S ->> Fin: return new Pair<>(SolvingState.UNSOLVABLE, null);
+    deactivate S
 ```

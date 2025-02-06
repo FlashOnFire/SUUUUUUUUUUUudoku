@@ -42,8 +42,8 @@ public class ImGUIFrame extends Application {
      */
     final int[] selectedGeneratorGridSizeHeight = {2};
 
-    final int[] selectedRandomGeneratorHeight = {4};
-    final int[] selectedRandomGeneratorWidth = {4};
+    final int[] selectedRandomGeneratorHeight = {3};
+    final int[] selectedRandomGeneratorWidth = {3};
 
     /**
      * The original solvable grid before any modifications.
@@ -127,10 +127,10 @@ public class ImGUIFrame extends Application {
         ImGui.separator();
 
         ImGui.setNextItemWidth(100);
-        ImGui.sliderInt("Grid Width##Randomblocks", selectedRandomGeneratorWidth, 4, 6);
+        ImGui.sliderInt("Grid Width##Randomblocks", selectedRandomGeneratorWidth, 3, 6);
         ImGui.setNextItemWidth(100);
         ImGui.sameLine();
-        ImGui.sliderInt("Grid Height##Randombloks", selectedRandomGeneratorHeight, 4, 6);
+        ImGui.sliderInt("Grid Height##Randombloks", selectedRandomGeneratorHeight, 3, 6);
 
         ImGui.sameLine();
 
@@ -333,11 +333,9 @@ public class ImGUIFrame extends Application {
                 AtomicInteger hashcode = new AtomicInteger(1);
 
                 grid.getConstraints().stream()
-                        .filter(c -> c instanceof BlockConstraint || c instanceof PositionListConstraint)
-                        .filter(c -> c.isPosAffected(new Vec2i(finalX, finalY)))
-                        .forEach(c -> {
-                            hashcode.updateAndGet(v -> 17 * v + c.hashCode());
-                        });
+                    .filter(c -> c instanceof BlockConstraint || c instanceof PositionListConstraint)
+                    .filter(c -> c.isPosAffected(new Vec2i(finalX, finalY)))
+                    .forEach(c -> hashcode.updateAndGet(v -> 17 * v + c.hashCode()));
 
                 if (hashcode.get() != 1) {
                     int color = hashcode.get() % 360;
@@ -426,11 +424,9 @@ public class ImGUIFrame extends Application {
                 AtomicInteger hashcode = new AtomicInteger(1);
 
                 pair.getSecond().getConstraints().stream()
-                        .filter(c -> c instanceof BlockConstraint || c instanceof PositionListConstraint)
-                        .filter(c -> c.isPosAffected(new Vec2i(withoutPaddingX, withoutPaddingY)))
-                        .forEach(c -> {
-                            hashcode.updateAndGet(v -> 17 * v + c.hashCode());
-                        });
+                    .filter(c -> c instanceof BlockConstraint || c instanceof PositionListConstraint)
+                    .filter(c -> c.isPosAffected(new Vec2i(withoutPaddingX, withoutPaddingY)))
+                    .forEach(c -> hashcode.updateAndGet(v -> 17 * v + c.hashCode()));
 
                 if (hashcode.get() != 1) {
                     int color = hashcode.get() % 360;

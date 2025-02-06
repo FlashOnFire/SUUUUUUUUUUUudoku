@@ -19,8 +19,8 @@ Si vous n'utilisez pas nix, les prérequis sont :
 Vous pouvez lancer les fichier en .jar dans le dossier build 
 
 ```bash
-java -jar ./build/libs/imGUI-1.0.jar # Interface en ligne de commande
-java -jar ./build/libs/tui-1.0.jar # Interface graphique avec imGUI
+java -jar ./build/libs/imGUI-1.0.jar # Interface graphique avec imGUI
+java -jar ./build/libs/tui-1.0.jar # Interface en ligne de commande
 java -jar ./build/libs/swing-1.0.jar # Interface graphique avec swing
 ```
 
@@ -56,8 +56,8 @@ Vous pouvez lancer la compilation avec la commande suivante :
 Vous pouvez ensuite lancer les différents executables avec les commandes suivantes :
 
 ```bash
-java -jar ./build/libs/imGUI-1.0.jar # Interface en ligne de commande
-java -jar ./build/libs/tui-1.0.jar # Interface graphique avec imGUI
+java -jar ./build/libs/imGUI-1.0.jar # Interface graphique avec imGUI
+java -jar ./build/libs/tui-1.0.jar # Interface en ligne de commande
 java -jar ./build/libs/swing-1.0.jar # Interface graphique avec swing
 ```
 

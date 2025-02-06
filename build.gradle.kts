@@ -44,7 +44,7 @@ tasks.named<JavaExec>("run") {
 tasks.register<Jar>("tuiJar") {
     archiveBaseName.set("tui")
     manifest {
-        attributes["Main-Class"] = "fr.polytech.suuuuuuuuuuudoku.Tui"
+        attributes["Main-Class"] = "fr.polytech.suuuuuuuuuuudoku.graphics.Tui"
     }
     from(sourceSets.main.get().output)
     from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })

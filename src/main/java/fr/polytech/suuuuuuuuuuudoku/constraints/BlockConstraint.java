@@ -153,6 +153,6 @@ public class BlockConstraint implements AbstractConstraint {
 
     @Override
     public int hashCode() {
-        return Objects.hash(symbols, box);
+        return Objects.hash(box);
     }
 }

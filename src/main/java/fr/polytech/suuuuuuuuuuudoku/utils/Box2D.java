@@ -153,8 +153,7 @@ public class Box2D {
 
     @Override
     public int hashCode() {
-        int result = x;
-        result = 31 * result + y;
+        int result = 113 * x + 129 * y;
         result = 31 * result + dx;
         result = 31 * result + dy;
         return result;

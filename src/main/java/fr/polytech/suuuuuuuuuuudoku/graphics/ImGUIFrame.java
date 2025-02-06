@@ -4,6 +4,7 @@ import fr.polytech.suuuuuuuuuuudoku.CsvUtils;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
+import fr.polytech.suuuuuuuuuuudoku.constraints.PositionListConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
 import fr.polytech.suuuuuuuuuuudoku.grid.ObservableGrid;
@@ -20,6 +21,7 @@ import imgui.flag.*;
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A class representing the main frame of the Sudoku game using ImGui.
@@ -39,6 +41,9 @@ public class ImGUIFrame extends Application {
      * The height of the grid for the generator.
      */
     final int[] selectedGeneratorGridSizeHeight = {2};
+
+    final int[] selectedRandomGeneratorHeight = {4};
+    final int[] selectedRandomGeneratorWidth = {4};
 
     /**
      * The original solvable grid before any modifications.
@@ -105,6 +110,7 @@ public class ImGUIFrame extends Application {
         ImGui.setNextItemWidth(100);
         ImGui.sliderInt("Block Height", selectedGeneratorGridSizeHeight, 2, 6, ImGuiSliderFlags.None);
 
+        ImGui.sameLine();
         if (ImGui.button("Generate")) {
             var oldPace = SudokuSolver.solvePace[0];
             SudokuSolver.solvePace[0] = 1.0f;
@@ -118,28 +124,56 @@ public class ImGUIFrame extends Application {
             originalSolvable = ((Grid) solvable).shallowCopy();
             SudokuSolver.solvePace[0] = oldPace;
         }
+        ImGui.separator();
 
-
-        if (ImGui.button("MultiGrid")) {
-            try {
-                solvable = CsvUtils.importMultiGrid(Path.of(
-                        ClassLoader.getSystemResource("exemples/multigrid_1").getFile()));
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-            originalSolvable = ((MultiGrid) solvable).shallowCopy();
-        }
+        ImGui.setNextItemWidth(100);
+        ImGui.sliderInt("Grid Width##Randomblocks", selectedRandomGeneratorWidth, 4, 6);
+        ImGui.setNextItemWidth(100);
+        ImGui.sameLine();
+        ImGui.sliderInt("Grid Height##Randombloks", selectedRandomGeneratorHeight, 4, 6);
 
         ImGui.sameLine();
-        if (ImGui.button("MultiGrid2")) {
+
+        if (ImGui.button("Generate Random Blocks Grid")) {
+            var oldPace = SudokuSolver.solvePace[0];
+            SudokuSolver.solvePace[0] = 1.0f;
+
+            solvable = Generator.generateSudokuWithRandomBlockConstraint(
+                    selectedRandomGeneratorWidth[0],
+                    selectedRandomGeneratorHeight[0],
+                    Difficulty.EXPERT
+            );
+
+            originalSolvable = ((Grid) solvable).shallowCopy();
+            SudokuSolver.solvePace[0] = oldPace;
+        }
+        ImGui.separator();
+
+        if (ImGui.button("Generate MultiGrid")) {
+            var oldPace = SudokuSolver.solvePace[0];
+            SudokuSolver.solvePace[0] = 1.0f;
+
+            solvable = Generator.generateMultigridSudoku(Difficulty.EXPERT);
+
+            originalSolvable = ((MultiGrid) solvable).shallowCopy();
+            SudokuSolver.solvePace[0] = oldPace;
+        }
+
+        ImGui.separator();
+
+        if (ImGui.button("MaxiGrid")) {
             try {
-                solvable = CsvUtils.importMultiGrid(Path.of(
-                        ClassLoader.getSystemResource("exemples/multigrid_2").getFile()));
+                var innergrid =
+                        CsvUtils.importGrid(Path.of(ClassLoader.getSystemResource("exemples/100x100.csv").getFile()));
+                var symbolSet = SymbolSets.generateSymbols(innergrid.length);
+                solvable = new Grid(innergrid, symbolSet);
+                originalSolvable = ((Grid) solvable).shallowCopy();
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
-            originalSolvable = ((MultiGrid) solvable).shallowCopy();
         }
+
+        ImGui.separator();
 
         if (solvable == null) {
             ImGui.beginDisabled();
@@ -177,19 +211,6 @@ public class ImGUIFrame extends Application {
 
         if (solvable == null) {
             ImGui.endDisabled();
-        }
-
-        ImGui.sameLine();
-        if (ImGui.button("MaxiGrid")) {
-            try {
-                var innergrid =
-                        CsvUtils.importGrid(Path.of(ClassLoader.getSystemResource("exemples/100x100.csv").getFile()));
-                var symbolSet = SymbolSets.generateSymbols(innergrid.length);
-                solvable = new Grid(innergrid, symbolSet);
-                originalSolvable = ((Grid) solvable).shallowCopy();
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
         }
 
         if (disable) {
@@ -308,13 +329,18 @@ public class ImGUIFrame extends Application {
 
                 int finalY = y;
                 int finalX = x;
-                var block = grid.getConstraints().stream()
-                                .filter(c -> c instanceof BlockConstraint)
-                                .filter(c -> c.isPosAffected(new Vec2i(finalX, finalY)))
-                                .findFirst();
 
-                block.ifPresent(c -> {
-                    int color = c.hashCode();
+                AtomicInteger hashcode = new AtomicInteger(1);
+
+                grid.getConstraints().stream()
+                        .filter(c -> c instanceof BlockConstraint || c instanceof PositionListConstraint)
+                        .filter(c -> c.isPosAffected(new Vec2i(finalX, finalY)))
+                        .forEach(c -> {
+                            hashcode.updateAndGet(v -> 17 * v + c.hashCode());
+                        });
+
+                if (hashcode.get() != 1) {
+                    int color = hashcode.get() % 360;
 
 
                     int[] rgb;
@@ -347,7 +373,7 @@ public class ImGUIFrame extends Application {
                             1
                     );
 
-                });
+                }
 
                 if (isSelected) {
                     ImGui.button(
@@ -367,7 +393,7 @@ public class ImGUIFrame extends Application {
                     }
                 }
 
-                if (block.isPresent()) {
+                if (hashcode.get() != 1) {
                     ImGui.popStyleColor(3);
                 }
 
@@ -396,14 +422,18 @@ public class ImGUIFrame extends Application {
                 int withoutPaddingX = x - padding.getX();
                 int withoutPaddingY = y - padding.getY();
 
-                var block = pair.getSecond().getConstraints().stream()
-                                .filter(c -> c instanceof BlockConstraint)
-                                .filter(c -> c.isPosAffected(new Vec2i(withoutPaddingX, withoutPaddingY)))
-                                .map(c -> (BlockConstraint) c)
-                                .findFirst();
 
-                block.ifPresent(c -> {
-                    int color = c.getBlock().offset(padding.getX(), padding.getY()).hashCode() % 360;
+                AtomicInteger hashcode = new AtomicInteger(1);
+
+                pair.getSecond().getConstraints().stream()
+                        .filter(c -> c instanceof BlockConstraint || c instanceof PositionListConstraint)
+                        .filter(c -> c.isPosAffected(new Vec2i(withoutPaddingX, withoutPaddingY)))
+                        .forEach(c -> {
+                            hashcode.updateAndGet(v -> 17 * v + c.hashCode());
+                        });
+
+                if (hashcode.get() != 1) {
+                    int color = hashcode.get() % 360;
 
                     int[] rgb;
                     int[] rgbDarker;
@@ -435,7 +465,7 @@ public class ImGUIFrame extends Application {
                             1
                     );
 
-                });
+                }
 
                 if (isSelected) {
                     ImGui.button(
@@ -455,7 +485,7 @@ public class ImGUIFrame extends Application {
                     }
                 }
 
-                if (block.isPresent()) {
+                if (hashcode.get() != 1) {
                     ImGui.popStyleColor(3);
                 }
 

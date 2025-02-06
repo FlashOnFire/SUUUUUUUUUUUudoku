@@ -112,7 +112,6 @@ public class ImGUIFrame extends Application {
         ImGui.setNextItemWidth(100);
         ImGui.sliderInt("Block Height", selectedGeneratorGridSizeHeight, 2, 6, ImGuiSliderFlags.None);
 
-        ImGui.sameLine();
         if (ImGui.button("Generate")) {
             var oldPace = SudokuSolver.solvePace[0];
             SudokuSolver.solvePace[0] = 1.0f;
@@ -133,8 +132,6 @@ public class ImGUIFrame extends Application {
         ImGui.setNextItemWidth(100);
         ImGui.sameLine();
         ImGui.sliderInt("Grid Height##Randombloks", selectedRandomGeneratorHeight, 3, 6);
-
-        ImGui.sameLine();
 
         if (ImGui.button("Generate Random Blocks Grid")) {
             var oldPace = SudokuSolver.solvePace[0];

@@ -15,20 +15,6 @@ import java.util.stream.IntStream;
 
 public class Generator {
     /**
-     * Generates a classic NxN grid
-     *
-     * @param n: The size of the grid
-     * @return A playable grid
-     */
-    public static Grid generateClassicSudoku(int n, Difficulty difficulty) {
-        //assert n is perfect square
-        int sqrt = (int) Math.sqrt(n);
-        assert sqrt * sqrt == n;
-
-        return generateSudokuWithBlockConstraints((int) Math.sqrt(n), (int) Math.sqrt(n), difficulty);
-    }
-
-    /**
      * Generates a multigrid with block constraints of size NxM
      *
      * @param n: The size of the sub grid

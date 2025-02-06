@@ -16,9 +16,13 @@ import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
 import fr.polytech.suuuuuuuuuuudoku.grid.Solvable;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -70,7 +74,7 @@ public class Tui {
 
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException, InterruptedException, URISyntaxException {
         Tui tui = new Tui();
         tui.start();
     }
@@ -92,7 +96,7 @@ public class Tui {
      * @throws IOException          if an I/O error occurs
      * @throws InterruptedException if the thread is interrupted
      */
-    void start() throws IOException, InterruptedException {
+    void start() throws IOException, InterruptedException, URISyntaxException {
         welcomeMessage();
         Solvable<?> grid;
 
@@ -109,7 +113,8 @@ public class Tui {
                 if (size == -1) {
                     grid = Generator.generateMultigridSudoku(9, 5, difficulty);
                 } else {
-                    grid = Generator.generateClassicSudoku(size, difficulty);
+                    grid = Generator.generateSudokuWithBlockConstraints((int) Math.sqrt(size), (int) Math.sqrt(size),
+                            difficulty);
                 }
                 stopLoader();
             }
@@ -134,16 +139,29 @@ public class Tui {
                     terminal.flush();
                     return;
                 }
-                var files = new java.io.File(resourceUrl.getFile()).listFiles();
-                assert files != null;
-                String[] options = Arrays.stream(files).map(File::getName).toArray(String[]::new);
-                int selected = selectMode(options);
-                if (files[selected].isDirectory()) {
-                    grid = CsvUtils.importMultiGrid(files[selected].toPath());
+
+                Path path;
+                if (resourceUrl.getProtocol().equals("jar")) {
+                    var fileSystem = FileSystems.newFileSystem(resourceUrl.toURI(), Collections.emptyMap());
+                    path = fileSystem.getPath("exemples");
                 } else {
-                    Integer[][] t = CsvUtils.importGrid(files[selected].toPath());
-                    var symbols = SymbolSets.generateSymbols(t.length);
-                    grid = new Grid(t, symbols);
+                    path = Path.of(resourceUrl.toURI());
+                }
+                try (var stream = Files.list(path)) {
+                    Path[] files = stream.toArray(Path[]::new);
+                    String[] options =
+                            Arrays.stream(files).map(Path::getFileName).map(Path::toString).toArray(String[]::new);
+                    int selected = selectMode(options);
+                    if (Files.isDirectory(files[selected])) {
+                        grid = CsvUtils.importMultiGrid(files[selected]);
+                    } else {
+                        Integer[][] t = CsvUtils.importGrid(files[selected]);
+                        var symbols = SymbolSets.generateSymbols(t.length);
+                        grid = new Grid(t, symbols);
+                    }
+                } catch (IOException e) {
+                    System.out.println("Resource not found");
+                    return;
                 }
             }
             default -> throw new IllegalStateException("Unexpected value: " + selectMode(new String[]{"> Generer un " +

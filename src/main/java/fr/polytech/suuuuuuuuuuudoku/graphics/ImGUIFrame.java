@@ -56,7 +56,8 @@ public class ImGUIFrame extends Application {
             var oldPace = SudokuSolver.solvePace[0];
             SudokuSolver.solvePace[0] = 1.0f;
 
-            solvable = Generator.generateClassicSudoku(selectedGeneratorGridSize[0], Difficulty.EXPERT);
+            solvable = Generator.generateSudokuWithBlockConstraints((int) Math.sqrt(selectedGeneratorGridSize[0]),
+                    (int) Math.sqrt(selectedGeneratorGridSize[0]), Difficulty.EXPERT);
 
             originalSolvable = ((Grid) solvable).shallowCopy();
             SudokuSolver.solvePace[0] = oldPace;

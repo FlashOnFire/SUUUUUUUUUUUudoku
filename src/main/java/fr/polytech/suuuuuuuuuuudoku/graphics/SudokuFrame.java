@@ -63,7 +63,7 @@ public class SudokuFrame extends JFrame {
     }
 
     public static void main(String[] args) {
-        Grid grid = Generator.generateClassicSudoku(16, Difficulty.EXPERT);
+        Grid grid = Generator.generateSudokuWithBlockConstraints(4, 4, Difficulty.EXPERT);
 
         SwingUtilities.invokeLater(() ->
         {
@@ -81,7 +81,8 @@ public class SudokuFrame extends JFrame {
     }
 
     private final Runnable generate = () -> {
-        this.grid = new Grid(Generator.generateClassicSudoku(lengthClassicSudoku * lengthClassicSudoku, Difficulty.EXPERT));
+        this.grid = new Grid(Generator.generateSudokuWithBlockConstraints(lengthClassicSudoku, lengthClassicSudoku,
+                Difficulty.EXPERT));
         lengthClassicSudoku = (lengthClassicSudoku) % 4 + 1;
         if (lengthClassicSudoku < 2) lengthClassicSudoku = 2;
         board = new SudokuBoard(grid);

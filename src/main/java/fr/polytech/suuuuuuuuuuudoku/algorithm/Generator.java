@@ -20,28 +20,27 @@ public class Generator {
     /**
      * Generates a multigrid with block constraints of size NxM
      *
-     * @param n: The size of the sub grid
-     * @param m: The number of sub grids
+     * @param difficulty: The difficulty of the generated grid
      * @return A playable multigrid
      */
-    public static MultiGrid generateMultigridSudoku(int n, int m, Difficulty difficulty) {
+    public static MultiGrid generateMultigridSudoku(Difficulty difficulty) {
         List<Pair<Vec2i, Grid>> grids = new ArrayList<>();
-        var blockSize = (int) Math.sqrt(n);
-        var paddings = MultiGrid.getRandomPadding();
-        var symbols = SymbolSets.generateSymbols(n);
+        var blockSize = (int) Math.sqrt(9);
+        var offsets = MultiGrid.getRandomOffset();
+        var symbols = SymbolSets.generateSymbols(9);
 
         var centeredGrid = fastSolvedGridCreation(blockSize, blockSize);
-        var innerGrid = new Integer[n][n];
+        var innerGrid = new Integer[9][9];
         for (var i = 0; i < blockSize; i++) {
             Arrays.fill(innerGrid[i], null);
         }
 
-        for (int i = 0; i < m; i++) {
+        for (int i = 0; i < 5; i++) {
             if (i == 2) {
-                grids.add(new Pair<>(paddings[i], centeredGrid));
+                grids.add(new Pair<>(offsets[i], centeredGrid));
                 continue;
             }
-            grids.add(new Pair<>(paddings[i],
+            grids.add(new Pair<>(offsets[i],
                     new Grid(Arrays.stream(innerGrid).map(Integer[]::clone).toArray(Integer[][]::new),
                             new HashSet<>(symbols))));
         }

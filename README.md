@@ -98,9 +98,9 @@ flowchart LR
     C & D --> B
     F --> E
     I & J ---> H
-    F -. &lt ; &lt ; include&gt ; &gt ; .-> G
-I -. &lt ; &lt ; include&gt ; &gt ; .-> G
-G -. &lt ; &lt ; include&gt ; &gt ; .-> D
+    F -. << include >> .-> G
+    I -. << include >> .-> G
+    G -. << include >> .-> D
 ```
 
 ### Diagramme de classes :
@@ -492,9 +492,56 @@ A voir un peu plus en détail
 
 ### Grille de sudoku et multi grille (Solvable) :
 
+Voici un diagramme d'objet représentant un multi-doku résolu en partie :
+```mermaid
+---
+config:
+  layout: elk
+---
+classDiagram
+direction TD
+    class Object_5 {
+	    : MultiGrid$
+        - offsets = ( (x=0, y=0), (x=12, y=0), (x=6, y=6), (x=0, y=12), (x=12, y=12) )
+	    - size = Vec2i(x=21, y=21)
+        - moves = ( ((x=4, y=6), null, 4), ((x=8, y=11), null, 7), ....)
+        - emptyCellsPossibilities = ( (x=2, y=1), 4), ...)
+        - symbols = HashSet(1, 2, 3, 4, 5, 6, 7, 8, 9)
+    }
+    class Object_0 {
+        : Grid$
+        innerGrid = ()
+        emptyCellsPossibilities = ( (x=2, y=1), 4), ... )
+        constraints (BlockConstraint, LineConstraint, ...)
+        moves = ( ((x=4, y=6), null, 4), ...)
+        symbols = HashSet(1, 2, 3, 4, 5, 6, 7, 8, 9)
+    }
+    class Object_1 {
+        : Grid$
+    }
+    class Object_2 {
+        : Grid$
+    }
+    class Object_3 {
+        : Grid$
+    }
+    class Object_4 {
+        : Grid$
+    }
+    note for Object_0 "offset : x=0, y=0 <br/> Les grilles contiennent <br/> des valeurs qui leurs <br/> sont propres"
+    note for Object_1 "offset : x=12, y=0"
+    note for Object_2 "offset : x=6, y=6"
+    note for Object_3 "offset : x=0, y=12"
+    note for Object_4 "offset : x=12, y=12"
+    Object_5 -- Object_0
+    Object_5 -- Object_1
+    Object_5 -- Object_2
+    Object_5 -- Object_3
+    Object_5 -- Object_4
 ```
-TODO : diagrammes d'états qui montre les différentes agencement que l'on peut avoir
-```
+
+Il peut représenter une grille de multi sudoku tel que celle-ci dessous :
+![img.png](img.png)
 
 ### UI :
 
@@ -504,13 +551,101 @@ TODO : diagramme d'état transition de l'interface graphique (optionel)
 
 ### Générateur :
 
+```mermaid
+---
+config:
+  theme: neo-dark
+  look: neo
+---
+stateDiagram
+  Generated: Grille générée !
+  fastgeneration : Génération rapide <br/> d'une grille résolu avec <br/> contraintes de bloc <br/> de taille NxM
+  removeCells: Suppression des cellules <br/> dans la grille
+  cleanHistory: Suppression de <br/> l'historique  des mouvements <br/> après génération
+  generateConstraint: Générer des contraintes de <br/> bloc avec position aléatoire
+  getRandomPadding: Choisir les décalages <br/> basiques du multi-doku <br/> par rapport à l'origine <br/> N = M = 3
+  placeGrids: Placer les autres grilles <br/> autour de notre grille
+
+state Generation_Generale {
+state choice_generation <<choice>>
+[*] --> choice_generation: Grid ou Multigrid ?
+choice_generation --> fastgeneration: Grid (paramètre N et M demandé)
+choice_generation --> getRandomPadding: Multi-Grid
+
+state choice_grid_gen <<choice>>
+fastgeneration --> choice_grid_gen : type de génération ?
+choice_grid_gen --> generateConstraint: generateSudokuWithRandomBlockConstraint
+generateConstraint --> removeCells
+choice_grid_gen --> removeCells: generateSudokuWithBlockConstraints
+removeCells --> cleanHistory
+choice_grid_gen --> placeGrids: generateMultigridSudoku
+placeGrids --> SudokuSolver.solve
+SudokuSolver.solve --> removeCells
+cleanHistory --> Generated
+
+getRandomPadding --> fastgeneration
+
+Generated --> [*]
+}
+```
+
 #### Explication de la méthode de génération de grille simple optimisé :
 
-```
-TODO : diagramme d'activité et/ou de séquence. 
+```mermaid
+---
+config:
+  theme: neo-dark
+  look: neo
+---
+stateDiagram
+  getPath: Récuperer le chemin <br/> du présumé fichier <br/> contenant la grille
+  export: Exporter la grille <br/> dans un fichier
+  return: Grille Résolu Générée !
+  init: initialiser la grille
+  shuffleBlockRow: Mélanger les <br/> lignes de blocs <br/> entre elles
+  shuffleBlockColumn: Mélanger les <br/> colonnes de blocs <br/> entre elles
+  shuffleRowInBlockRow: Dans les lignes de blocs <br/> mélanger les lignes
+  shuffleColumnInBlockColumn: Dans les colonnes de blocs <br/> mélanger les colonnes
+  shuffleSymbols: Mélanger tout les symboles
+  initGrid: Initialisation <br/> d'une grille vide <br/> (taille NxM*NxM)
+  initSymbolSet: Initialisation et mélange d'une liste  de <br/> symboles de taille NxM
+  placeSymbolOnDiagonal: Placer les symboles <br/> sur la diagonale dans <br/> l'ordre défini <br> (symbole)
+  computePossibility: Calculer toutes les possibilités par cases
+  solve: Résoudre
+
+  state createSolvedSudoku {
+    [*] --> initGrid
+    initGrid --> initSymbolSet
+    initSymbolSet --> placeSymbolOnDiagonal
+    placeSymbolOnDiagonal --> computePossibility
+    computePossibility --> solve
+    solve --> [*]
+  }
+
+  state fastSolvedGridCreation {
+    [*] --> getPath: longueur et largeur des contraintes de block
+    state exist <<choice>>
+    getPath --> exist: Essayer de récuperer la <br/> grille à partir du fichier
+
+    exist --> init
+    export --> return
+    state isSolve <<choice>>
+    init --> isSolve: la grille est elle résolu ?
+    isSolve --> shuffleBlockRow: Oui
+    shuffleBlockRow --> shuffleBlockColumn
+    shuffleBlockColumn --> shuffleRowInBlockRow
+    shuffleRowInBlockRow --> shuffleColumnInBlockColumn
+    shuffleColumnInBlockColumn --> shuffleSymbols
+    shuffleSymbols --> return
+    return --> [*]
+  }
+
+  createSolvedSudoku --> export
+  exist --> createSolvedSudoku: Le fichier n'existe pas
+  isSolve --> createSolvedSudoku: Non
 ```
 
-#### Explication de la méthode de génération de multi grille :
+#### Explication de la méthode de suppression des cellules dans un Solvable résolu :
 
 ```
 TODO : diagramme d'activité et/ou de séquence
@@ -525,6 +660,11 @@ TODO: diagramme d'activité et/ou de séquence
 ### Solveur :
 
 ```mermaid
+---
+config:
+  theme: neo-dark
+  look: neo
+---
 stateDiagram
     queue_init: Ajouter grille à la queue
     boucle: La queue est vide ?

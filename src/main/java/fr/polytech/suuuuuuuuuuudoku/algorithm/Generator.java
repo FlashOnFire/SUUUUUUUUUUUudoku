@@ -193,21 +193,21 @@ public class Generator {
         Grid seedGrid;
         SolvingState state;
         Grid solvedGrid;
-            seedGrid = new Grid(innerGrid, symbols, blockRows, blockColumns);
+        seedGrid = new Grid(innerGrid, symbols, blockRows, blockColumns);
 
-            var symbolsArray = new ArrayList<>(symbols);
-            Collections.shuffle(symbolsArray);
-            for (var i = 0; i < blockColumns * blockRows; i++) {
-                seedGrid.placeUnchecked(new Vec2i(i, i), symbolsArray.get(i % symbolsArray.size()), false, false);
-            }
+        var symbolsArray = new ArrayList<>(symbols);
+        Collections.shuffle(symbolsArray);
+        for (var i = 0; i < blockColumns * blockRows; i++) {
+            seedGrid.placeUnchecked(new Vec2i(i, i), symbolsArray.get(i % symbolsArray.size()), false, false);
+        }
 
-            seedGrid.computeAllEmptyCellsPossibilities();
+        seedGrid.computeAllEmptyCellsPossibilities();
 
-            var pair = SudokuSolver.solve(seedGrid, true, true, false);
+        var pair = SudokuSolver.solve(seedGrid, true, true, false);
 
-            state = pair.getFirst();
-            solvedGrid = pair.getSecond();
-            assert state == SolvingState.SOLVED;
+        state = pair.getFirst();
+        solvedGrid = pair.getSecond();
+        assert state == SolvingState.SOLVED;
         return solvedGrid;
     }
 
@@ -221,9 +221,9 @@ public class Generator {
      */
     public static Grid fastSolvedGridCreation(int blockRows, int blockColumns) {
 
-        Path path =
-                Path.of(ClassLoader.getSystemResource("presolved/" + blockColumns * blockRows + "x" + blockColumns * blockRows + "(constraint" + blockRows + "x" + blockColumns + ").csv").getFile());
         try {
+            Path path =
+                    Path.of(ClassLoader.getSystemResource("presolved/" + blockColumns * blockRows + "x" + blockColumns * blockRows + "(constraint" + blockRows + "x" + blockColumns + ").csv").getFile());
             // Import the grid of length blockRows*blockColumns if it exists
             Integer[][] gridValue = CsvUtils.importGrid(path);
             var symbols = SymbolSets.generateSymbols(blockRows * blockColumns);
@@ -291,7 +291,12 @@ public class Generator {
             return grid;
         } catch (Exception e) {
             var grid = createSolvedSudoku(blockRows, blockColumns);
-            CsvUtils.exportGrid(path, grid);
+            
+            if (!ClassLoader.getSystemResource("exemples").getProtocol().equals("jar")) {
+                Path path =
+                        Path.of("src/main/resources/presolved/" + blockColumns * blockRows + "x" + blockColumns * blockRows + "(constraint" + blockRows + "x" + blockColumns + ").csv");
+                CsvUtils.exportGrid(path, grid);
+            }
             return grid;
         }
     }

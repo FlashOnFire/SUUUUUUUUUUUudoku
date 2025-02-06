@@ -18,7 +18,8 @@ public class GeneratorTests {
             long[] durations = new long[N];
             for (int i = 0; i < N; i++) {
                 long startTime = System.currentTimeMillis();
-                Generator.generateClassicSudoku(gridSize, Difficulty.EXPERT);
+                Generator.generateSudokuWithBlockConstraints((int) Math.sqrt(gridSize), (int) Math.sqrt(gridSize),
+                        Difficulty.EXPERT);
                 // Generator.generateMultigridSudoku(9, 5, Difficulty.EXPERT);
                 long endTime = System.currentTimeMillis();
                 durations[i] = endTime - startTime;

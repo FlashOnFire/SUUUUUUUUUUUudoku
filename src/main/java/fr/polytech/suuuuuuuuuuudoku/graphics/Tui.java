@@ -163,10 +163,10 @@ public class Tui {
 
                 startLoader();
                 if (size == -1) {
-                    grid = Generator.generateMultigridSudoku(difficulty);
+                    grid = Generator.generateMultigridSudoku(difficulty).getSecond();
                 } else {
                     grid = Generator.generateSudokuWithBlockConstraints((int) Math.sqrt(size), (int) Math.sqrt(size),
-                            difficulty);
+                            difficulty).getSecond();
                 }
                 stopLoader();
             }

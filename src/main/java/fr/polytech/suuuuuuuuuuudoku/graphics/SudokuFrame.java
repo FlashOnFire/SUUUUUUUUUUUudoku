@@ -107,7 +107,7 @@ public class SudokuFrame extends JFrame {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        Grid grid = Generator.generateSudokuWithBlockConstraints(4, 4, Difficulty.EXPERT);
+        Grid grid = Generator.generateSudokuWithBlockConstraints(4, 4, Difficulty.EXPERT).getSecond();
 
         SwingUtilities.invokeLater(() ->
         {
@@ -132,7 +132,7 @@ public class SudokuFrame extends JFrame {
      */
     private final Runnable generate = () -> {
         this.grid = new Grid(Generator.generateSudokuWithBlockConstraints(lengthClassicSudoku, lengthClassicSudoku,
-                Difficulty.EXPERT));
+                Difficulty.EXPERT).getSecond());
         lengthClassicSudoku = (lengthClassicSudoku) % 4 + 1;
         if (lengthClassicSudoku < 2) lengthClassicSudoku = 2;
         board = new SudokuBoard(grid);
@@ -153,7 +153,8 @@ public class SudokuFrame extends JFrame {
     private final Runnable generateRandom = () -> {
         var length = (int) (Math.random() * 3) + 2;
         var length2 = (int) (Math.random() * 3) + 2;
-        this.grid = new Grid(Generator.generateSudokuWithRandomBlockConstraint(length, length2, Difficulty.EXPERT));
+        this.grid =
+                new Grid(Generator.generateSudokuWithRandomBlockConstraint(length, length2, Difficulty.EXPERT).getSecond());
         board = new SudokuBoard(grid);
         updateJpanel();
 
@@ -173,7 +174,7 @@ public class SudokuFrame extends JFrame {
         var n = (int) (Math.random() * 3) + 2;
         var m = (int) (Math.random() * 3) + 2;
 
-        this.grid = new Grid(Generator.generateSudokuWithBlockConstraints(n, m, Difficulty.EXPERT));
+        this.grid = new Grid(Generator.generateSudokuWithBlockConstraints(n, m, Difficulty.EXPERT).getSecond());
         board = new SudokuBoard(grid);
         updateJpanel();
 

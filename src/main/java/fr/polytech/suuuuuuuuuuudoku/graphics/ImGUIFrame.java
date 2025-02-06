@@ -31,22 +31,18 @@ public class ImGUIFrame extends Application {
      * A boolean indicating if the game is currently solving.
      */
     final AtomicBoolean solving = new AtomicBoolean(false);
-    boolean solveDeducing = true;
-    boolean solveBacktracking = true;
-
     /**
      * The width of the grid for the generator.
      */
     final int[] selectedGeneratorGridSizeWidth = {2};
-
     /**
      * The height of the grid for the generator.
      */
     final int[] selectedGeneratorGridSizeHeight = {2};
-
     final int[] selectedRandomGeneratorHeight = {3};
     final int[] selectedRandomGeneratorWidth = {3};
-
+    boolean solveDeducing = true;
+    boolean solveBacktracking = true;
     /**
      * The original solvable grid before any modifications.
      */
@@ -120,7 +116,7 @@ public class ImGUIFrame extends Application {
                     selectedGeneratorGridSizeWidth[0],
                     selectedGeneratorGridSizeHeight[0],
                     Difficulty.EXPERT
-            );
+            ).getSecond();
 
             originalSolvable = ((Grid) solvable).shallowCopy();
             SudokuSolver.solvePace[0] = oldPace;
@@ -141,7 +137,7 @@ public class ImGUIFrame extends Application {
                     selectedRandomGeneratorWidth[0],
                     selectedRandomGeneratorHeight[0],
                     Difficulty.EXPERT
-            );
+            ).getSecond();
 
             originalSolvable = ((Grid) solvable).shallowCopy();
             SudokuSolver.solvePace[0] = oldPace;
@@ -152,7 +148,7 @@ public class ImGUIFrame extends Application {
             var oldPace = SudokuSolver.solvePace[0];
             SudokuSolver.solvePace[0] = 1.0f;
 
-            solvable = Generator.generateMultigridSudoku(Difficulty.EXPERT);
+            solvable = Generator.generateMultigridSudoku(Difficulty.EXPERT).getSecond();
 
             originalSolvable = ((MultiGrid) solvable).shallowCopy();
             SudokuSolver.solvePace[0] = oldPace;
@@ -193,7 +189,8 @@ public class ImGUIFrame extends Application {
             } else if (solvable instanceof MultiGrid) {
                 new Thread(() -> {
                     solving.set(true);
-                    solvable = SudokuSolver.solve((MultiGrid) solvable, solveDeducing, solveBacktracking, true).getSecond();
+                    solvable =
+                            SudokuSolver.solve((MultiGrid) solvable, solveDeducing, solveBacktracking, true).getSecond();
                     solving.set(false);
                 }).start();
             }

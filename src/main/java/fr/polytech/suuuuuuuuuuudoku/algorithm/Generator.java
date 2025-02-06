@@ -24,9 +24,9 @@ public class Generator {
      * Generates a multigrid with block constraints of size NxM
      *
      * @param difficulty: The difficulty of the generated grid
-     * @return A playable multigrid
+     * @return A pair of multigrids, the first one is solved and the second one is unsolved
      */
-    public static MultiGrid generateMultigridSudoku(Difficulty difficulty) {
+    public static Pair<MultiGrid, MultiGrid> generateMultigridSudoku(Difficulty difficulty) {
         List<Pair<Vec2i, Grid>> grids = new ArrayList<>();
         var blockSize = (int) Math.sqrt(9);
         var offsets = MultiGrid.getRandomOffset();
@@ -50,9 +50,10 @@ public class Generator {
 
         var multigrid = new MultiGrid(grids);
         multigrid = SudokuSolver.solve(multigrid, true, true, false).getSecond();
-        removeRandomCells(multigrid, Math.max(multigrid.getSize().getX(), multigrid.getSize().getY()), difficulty);
+        var unsolvedGrid = new MultiGrid(multigrid);
+        removeRandomCells(unsolvedGrid, Math.max(multigrid.getSize().getX(), multigrid.getSize().getY()), difficulty);
         multigrid.cleanMoves();
-        return multigrid;
+        return new Pair<>(multigrid, unsolvedGrid);
     }
 
     /**
@@ -61,13 +62,15 @@ public class Generator {
      * @param blockRows:    The number of block rows
      * @param blockColumns: The number of block columns
      * @param difficulty:   The difficulty of the generated grid
-     * @return A playable grid
+     * @return A pair of grid, the first one is solved and the second one is unsolved
      */
-    public static Grid generateSudokuWithBlockConstraints(int blockRows, int blockColumns, Difficulty difficulty) {
+    public static Pair<Grid, Grid> generateSudokuWithBlockConstraints(int blockRows, int blockColumns,
+                                                                      Difficulty difficulty) {
         var solvedGrid = fastSolvedGridCreation(blockRows, blockColumns);
-        removeRandomCells(solvedGrid, blockRows * blockColumns, difficulty);
+        var unsolvedGrid = new Grid(solvedGrid);
+        removeRandomCells(unsolvedGrid, blockRows * blockColumns, difficulty);
         solvedGrid.cleanMoves();
-        return solvedGrid;
+        return new Pair<>(solvedGrid, unsolvedGrid);
     }
 
     /**
@@ -76,9 +79,10 @@ public class Generator {
      * @param difficulty:   The difficulty of the generated grid
      * @param blockRows:    The number of block rows
      * @param blockColumns: The number of block columns
-     * @return A playable grid
+     * @return A pair of grid, the first one is solved and the second one is unsolved
      */
-    public static Grid generateSudokuWithRandomBlockConstraint(int blockRows, int blockColumns, Difficulty difficulty) {
+    public static Pair<Grid, Grid> generateSudokuWithRandomBlockConstraint(int blockRows, int blockColumns,
+                                                                           Difficulty difficulty) {
         var symbols = SymbolSets.generateSymbols(blockRows * blockColumns);
         Grid solvedGrid = fastSolvedGridCreation(blockRows, blockColumns);
         var generalSymbolConstraints = createRandomConstraints(solvedGrid);
@@ -86,9 +90,10 @@ public class Generator {
         // We update the new constraints
         solvedGrid = new Grid(solvedGrid.getInnerGrid().get(), generalSymbolConstraints, symbols);
         assert solvedGrid.isSolved();
-        removeRandomCells(solvedGrid, blockRows * blockColumns, difficulty);
+        var unsolvedGrid = new Grid(solvedGrid);
+        removeRandomCells(unsolvedGrid, blockRows * blockColumns, difficulty);
         solvedGrid.cleanMoves();
-        return solvedGrid;
+        return new Pair<>(solvedGrid, unsolvedGrid);
     }
 
     /**
@@ -291,7 +296,7 @@ public class Generator {
             return grid;
         } catch (Exception e) {
             var grid = createSolvedSudoku(blockRows, blockColumns);
-            
+
             if (!ClassLoader.getSystemResource("exemples").getProtocol().equals("jar")) {
                 Path path =
                         Path.of("src/main/resources/presolved/" + blockColumns * blockRows + "x" + blockColumns * blockRows + "(constraint" + blockRows + "x" + blockColumns + ").csv");

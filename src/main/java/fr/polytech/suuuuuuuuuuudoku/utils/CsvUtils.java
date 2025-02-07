@@ -1,10 +1,8 @@
-package fr.polytech.suuuuuuuuuuudoku;
+package fr.polytech.suuuuuuuuuuudoku.utils;
 
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
-import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
-import fr.polytech.suuuuuuuuuuudoku.utils.Pair;
-import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
+import fr.polytech.suuuuuuuuuuudoku.grid.SymbolSets;
 
 import java.io.*;
 import java.nio.file.Path;

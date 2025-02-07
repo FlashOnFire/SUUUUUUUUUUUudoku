@@ -1,4 +1,4 @@
-package fr.polytech.suuuuuuuuuuudoku.symbols;
+package fr.polytech.suuuuuuuuuuudoku.grid;
 
 import java.util.Set;
 import java.util.stream.IntStream;

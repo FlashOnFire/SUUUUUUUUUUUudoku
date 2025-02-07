@@ -1,12 +1,11 @@
 package fr.polytech.suuuuuuuuuuudoku.graphics;
 
-import fr.polytech.suuuuuuuuuuudoku.CsvUtils;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.PositionListConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.*;
-import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
+import fr.polytech.suuuuuuuuuuudoku.utils.CsvUtils;
 import fr.polytech.suuuuuuuuuuudoku.utils.Difficulty;
 import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 import imgui.ImGui;

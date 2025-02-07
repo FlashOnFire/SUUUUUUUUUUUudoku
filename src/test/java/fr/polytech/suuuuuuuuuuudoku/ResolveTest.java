@@ -4,8 +4,9 @@ import fr.polytech.suuuuuuuuuuudoku.algorithm.SolvingState;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
-import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
+import fr.polytech.suuuuuuuuuuudoku.grid.SymbolSets;
 import fr.polytech.suuuuuuuuuuudoku.utils.Box2D;
+import fr.polytech.suuuuuuuuuuudoku.utils.CsvUtils;
 import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 import org.junit.jupiter.api.Test;
 

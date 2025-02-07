@@ -1,12 +1,12 @@
 package fr.polytech.suuuuuuuuuuudoku.algorithm;
 
-import fr.polytech.suuuuuuuuuuudoku.CsvUtils;
 import fr.polytech.suuuuuuuuuuudoku.constraints.*;
 import fr.polytech.suuuuuuuuuuudoku.graphics.Utils;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
 import fr.polytech.suuuuuuuuuuudoku.grid.Solvable;
-import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
+import fr.polytech.suuuuuuuuuuudoku.grid.SymbolSets;
+import fr.polytech.suuuuuuuuuuudoku.utils.CsvUtils;
 import fr.polytech.suuuuuuuuuuudoku.utils.Difficulty;
 import fr.polytech.suuuuuuuuuuudoku.utils.Pair;
 import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
@@ -51,7 +51,8 @@ public class Generator {
         var solvedMultiGrid = new MultiGrid(gridList);
         solvedMultiGrid = SudokuSolver.solve(solvedMultiGrid, true, true, false).getSecond();
         var unsolvedMultiGrid = new MultiGrid(solvedMultiGrid);
-        removeRandomCells(unsolvedMultiGrid, Math.max(solvedMultiGrid.getSize().getX(), solvedMultiGrid.getSize().getY()), difficulty);
+        removeRandomCells(unsolvedMultiGrid, Math.max(solvedMultiGrid.getSize().getX(),
+                solvedMultiGrid.getSize().getY()), difficulty);
         solvedMultiGrid.cleanMoves();
         return new Pair<>(solvedMultiGrid, unsolvedMultiGrid);
     }
@@ -116,7 +117,8 @@ public class Generator {
         }
         Collections.shuffle(removableCells);
         //keep only gridSize * gridSize / difficultyValue cells
-        removableCells = removableCells.subList(0, removableCells.size() / (Difficulty.getValues().length - difficultyValue));
+        removableCells = removableCells.subList(0,
+                removableCells.size() / (Difficulty.getValues().length - difficultyValue));
 
         do {
             solvedGrid.placeUnchecked(removableCells.removeFirst(), null, false, true);
@@ -147,8 +149,8 @@ public class Generator {
 
         // Create a list with associate Symbols with all the coordinates containing it
         List<List<Vec2i>> symbolPositions = IntStream.range(0, gridSize)
-                .mapToObj(_ -> new ArrayList<Vec2i>())
-                .collect(Collectors.toList());
+                                                     .mapToObj(_ -> new ArrayList<Vec2i>())
+                                                     .collect(Collectors.toList());
 
         for (int row = 0; row < gridSize; row++) {
             for (int col = 0; col < gridSize; col++) {
@@ -257,9 +259,9 @@ public class Generator {
      * It shuffles rows of block, columns of block, rows inside rows of block and columns inside columns of block
      * In order to keep the grid solved
      *
-     * @param blockRows:   The number of rows in a block constraint
+     * @param blockRows:    The number of rows in a block constraint
      * @param blockColumns: The number of columns in a block constraint
-     * @param gridValue:  The grid to shuffle
+     * @param gridValue:    The grid to shuffle
      */
     private static void shuffleGrid(int blockRows, int blockColumns, Integer[][] gridValue) {
         var listOfIndexRows = new ArrayList<>(IntStream.rangeClosed(0, blockRows - 1).boxed().toList());

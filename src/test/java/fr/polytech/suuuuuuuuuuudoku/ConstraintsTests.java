@@ -4,7 +4,7 @@ import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.ColumnConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.LineConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
-import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
+import fr.polytech.suuuuuuuuuuudoku.grid.SymbolSets;
 import fr.polytech.suuuuuuuuuuudoku.utils.Box2D;
 import org.junit.jupiter.api.Test;
 

@@ -120,6 +120,8 @@ public class Generator {
         removableCells = removableCells.subList(0,
                 removableCells.size() / (Difficulty.getValues().length - difficultyValue));
 
+        // The number of cell to remove at each iteration
+        // This is divided by 2 at each iteration when the grid is not solvable to follow a dichotomic search strategy
         int nCellToRemove = Math.min((int) Math.sqrt(gridSize), removableCells.size());
 
         do {

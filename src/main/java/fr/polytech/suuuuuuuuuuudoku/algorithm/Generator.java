@@ -27,33 +27,33 @@ public class Generator {
      * @return A pair of multigrids, the first one is solved and the second one is unsolved
      */
     public static Pair<MultiGrid, MultiGrid> generateMultigridSudoku(Difficulty difficulty) {
-        List<Pair<Vec2i, Grid>> grids = new ArrayList<>();
+        List<Pair<Vec2i, Grid>> gridList = new ArrayList<>();
         var blockSize = (int) Math.sqrt(9);
-        var offsets = MultiGrid.getRandomOffset();
-        var symbols = SymbolSets.generateSymbols(9);
+        var gridOffsets = MultiGrid.getRandomOffset();
+        var symbolSet = SymbolSets.generateSymbols(9);
 
-        var centeredGrid = fastSolvedGridCreation(blockSize, blockSize);
-        var innerGrid = new Integer[9][9];
+        var baseGrid = fastSolvedGridCreation(blockSize, blockSize);
+        var emptyGrid = new Integer[9][9];
         for (var i = 0; i < blockSize; i++) {
-            Arrays.fill(innerGrid[i], null);
+            Arrays.fill(emptyGrid[i], null);
         }
 
         for (int i = 0; i < 5; i++) {
             if (i == 2) {
-                grids.add(new Pair<>(offsets[i], centeredGrid));
+                gridList.add(new Pair<>(gridOffsets[i], baseGrid));
                 continue;
             }
-            grids.add(new Pair<>(offsets[i],
-                    new Grid(Arrays.stream(innerGrid).map(Integer[]::clone).toArray(Integer[][]::new),
-                            new HashSet<>(symbols))));
+            gridList.add(new Pair<>(gridOffsets[i],
+                    new Grid(Arrays.stream(emptyGrid).map(Integer[]::clone).toArray(Integer[][]::new),
+                            new HashSet<>(symbolSet))));
         }
 
-        var multigrid = new MultiGrid(grids);
-        multigrid = SudokuSolver.solve(multigrid, true, true, false).getSecond();
-        var unsolvedGrid = new MultiGrid(multigrid);
-        removeRandomCells(unsolvedGrid, Math.max(multigrid.getSize().getX(), multigrid.getSize().getY()), difficulty);
-        multigrid.cleanMoves();
-        return new Pair<>(multigrid, unsolvedGrid);
+        var solvedMultiGrid = new MultiGrid(gridList);
+        solvedMultiGrid = SudokuSolver.solve(solvedMultiGrid, true, true, false).getSecond();
+        var unsolvedMultiGrid = new MultiGrid(solvedMultiGrid);
+        removeRandomCells(unsolvedMultiGrid, Math.max(solvedMultiGrid.getSize().getX(), solvedMultiGrid.getSize().getY()), difficulty);
+        solvedMultiGrid.cleanMoves();
+        return new Pair<>(solvedMultiGrid, unsolvedMultiGrid);
     }
 
     /**
@@ -83,12 +83,11 @@ public class Generator {
      */
     public static Pair<Grid, Grid> generateSudokuWithRandomBlockConstraint(int blockRows, int blockColumns,
                                                                            Difficulty difficulty) {
-        var symbols = SymbolSets.generateSymbols(blockRows * blockColumns);
+        var symbolSet = SymbolSets.generateSymbols(blockRows * blockColumns);
         Grid solvedGrid = fastSolvedGridCreation(blockRows, blockColumns);
-        var generalSymbolConstraints = createRandomConstraints(solvedGrid);
+        var constraints = createRandomConstraints(solvedGrid);
 
-        // We update the new constraints
-        solvedGrid = new Grid(solvedGrid.getInnerGrid().get(), generalSymbolConstraints, symbols);
+        solvedGrid = new Grid(solvedGrid.getInnerGrid().get(), constraints, symbolSet);
         assert solvedGrid.isSolved();
         var unsolvedGrid = new Grid(solvedGrid);
         removeRandomCells(unsolvedGrid, blockRows * blockColumns, difficulty);
@@ -99,33 +98,33 @@ public class Generator {
     /**
      * Removes random cells from a solved grid to generate a random Sudoku grid to solve
      *
-     * @param solvedGrid:      The solved grid
-     * @param lengthInnerGrid: The length of the inner grid
-     * @param difficulty:      The difficulty of the generated grid
+     * @param solvedGrid: The solved grid
+     * @param gridSize:   The length of the inner grid
+     * @param difficulty: The difficulty of the generated grid
      */
-    private static <T extends Solvable<T>> void removeRandomCells(T solvedGrid, int lengthInnerGrid,
+    private static <T extends Solvable<T>> void removeRandomCells(T solvedGrid, int gridSize,
                                                                   Difficulty difficulty) {
-        List<Vec2i> toTestRemove = new ArrayList<>();
+        List<Vec2i> removableCells = new ArrayList<>();
         int difficultyValue = difficulty.getValue();
-        for (int i = 0; i < lengthInnerGrid; i++) {
-            for (int j = 0; j < lengthInnerGrid; j++) {
-                Vec2i pos = new Vec2i(i, j);
-                if (!(solvedGrid instanceof MultiGrid) || ((MultiGrid) solvedGrid).isInGrid(pos)) {
-                    toTestRemove.add(new Vec2i(i, j));
+        for (int i = 0; i < gridSize; i++) {
+            for (int j = 0; j < gridSize; j++) {
+                Vec2i position = new Vec2i(i, j);
+                if (!(solvedGrid instanceof MultiGrid) || ((MultiGrid) solvedGrid).isInGrid(position)) {
+                    removableCells.add(new Vec2i(i, j));
                 }
             }
         }
-        Collections.shuffle(toTestRemove);
-        //keep only lengthInnerGrid * lengthInnerGrid / difficultyValue cells
-        toTestRemove = toTestRemove.subList(0, toTestRemove.size() / (Difficulty.getValues().length - difficultyValue));
+        Collections.shuffle(removableCells);
+        //keep only gridSize * gridSize / difficultyValue cells
+        removableCells = removableCells.subList(0, removableCells.size() / (Difficulty.getValues().length - difficultyValue));
 
         do {
-            solvedGrid.placeUnchecked(toTestRemove.removeFirst(), null, false, true);
+            solvedGrid.placeUnchecked(removableCells.removeFirst(), null, false, true);
             solvedGrid.computeAllEmptyCellsPossibilities();
             if (SudokuSolver.solve(solvedGrid, true, false, false).getFirst() != SolvingState.SOLVED) {
                 solvedGrid.undoLastMove(true);
             }
-        } while (!toTestRemove.isEmpty());
+        } while (!removableCells.isEmpty());
 
         //undo the moves until there's only one solution
         do {
@@ -139,41 +138,41 @@ public class Generator {
      * Generates random constraints for a solved grid
      * Uses a solved NxM block grid to generate random constraints (shuffles the positions of the constraints)
      *
-     * @param grid: A solved grid
+     * @param solvedGrid: A solved grid
      * @return A list of constraints with random positions for each GeneralSymbolConstraint
      */
-    private static List<AbstractConstraint> createRandomConstraints(Grid grid) {
-        assert grid.isSolved();
-        int length = grid.length();
+    private static List<AbstractConstraint> createRandomConstraints(Grid solvedGrid) {
+        assert solvedGrid.isSolved();
+        int gridSize = solvedGrid.length();
 
         // Create a list with associate Symbols with all the coordinates containing it
-        List<List<Vec2i>> positionList = IntStream.range(0, length)
-                                                  .mapToObj(_ -> new ArrayList<Vec2i>())
-                                                  .collect(Collectors.toList());
-        for (int x = 0; x < length; x++) {
-            for (int y = 0; y < length; y++) {
-                Integer symbol = grid.getSymbolAt(x, y);
+        List<List<Vec2i>> symbolPositions = IntStream.range(0, gridSize)
+                .mapToObj(_ -> new ArrayList<Vec2i>())
+                .collect(Collectors.toList());
+
+        for (int row = 0; row < gridSize; row++) {
+            for (int col = 0; col < gridSize; col++) {
+                Integer symbol = solvedGrid.getSymbolAt(row, col);
                 // grid is solved, so we can use getSymbolAt without checking if it's null
-                positionList.get(symbol - 1).add(new Vec2i(x, y));
+                symbolPositions.get(symbol - 1).add(new Vec2i(row, col));
             }
         }
 
         // Swap the positions of the element with same values to create random constraints
         List<AbstractConstraint> constraints = new ArrayList<>();
-        for (int i = 0; i < length; i++) {
-            HashSet<Vec2i> listInConstraint = new HashSet<>();
-            for (int j = 0; j < length; j++) {
-                int selectedPos = (int) (Math.random() * positionList.get(j).size());
-                Vec2i pos = positionList.get(j).get(selectedPos);
-                listInConstraint.add(pos);
-                positionList.get(j).remove(pos);
+        for (int i = 0; i < gridSize; i++) {
+            HashSet<Vec2i> constraintPositions = new HashSet<>();
+            for (int j = 0; j < gridSize; j++) {
+                int randomIndex = (int) (Math.random() * symbolPositions.get(j).size());
+                Vec2i position = symbolPositions.get(j).remove(randomIndex);
+                constraintPositions.add(position);
             }
 
-            constraints.add(new PositionListConstraint(SymbolSets.generateSymbols(length),
-                    listInConstraint));
+            constraints.add(new PositionListConstraint(SymbolSets.generateSymbols(gridSize),
+                    constraintPositions));
         }
-        constraints.add(new LineConstraint(grid.getSymbols()));
-        constraints.add(new ColumnConstraint(grid.getSymbols()));
+        constraints.add(new LineConstraint(solvedGrid.getSymbols()));
+        constraints.add(new ColumnConstraint(solvedGrid.getSymbols()));
         constraints.add(new NotEmptyConstraint());
         return constraints;
     }
@@ -188,108 +187,57 @@ public class Generator {
      */
     private static Grid createSolvedSudoku(int blockRows, int blockColumns) {
         var symbols = SymbolSets.generateSymbols(blockRows * blockColumns);
-        var innerGrid = new Integer[blockRows * blockColumns][blockRows * blockColumns];
-        for (var i = 0; i < blockRows; i++) {
-            Arrays.fill(innerGrid[i], null);
+        var gridValues = new Integer[blockRows * blockColumns][blockRows * blockColumns];
+        for (var row = 0; row < blockRows; row++) {
+            Arrays.fill(gridValues[row], null);
         }
 
-        Grid seedGrid;
-        SolvingState state;
-        Grid solvedGrid;
-        seedGrid = new Grid(innerGrid, symbols, blockRows, blockColumns);
+        Grid seedGrid = new Grid(gridValues, symbols, blockRows, blockColumns);
+        var shuffledSymbols = new ArrayList<>(symbols);
+        Collections.shuffle(shuffledSymbols);
 
-        var symbolsArray = new ArrayList<>(symbols);
-        Collections.shuffle(symbolsArray);
         for (var i = 0; i < blockColumns * blockRows; i++) {
-            seedGrid.placeUnchecked(new Vec2i(i, i), symbolsArray.get(i % symbolsArray.size()), false, false);
+            seedGrid.placeUnchecked(new Vec2i(i, i), shuffledSymbols.get(i % shuffledSymbols.size()), false, false);
         }
 
         seedGrid.computeAllEmptyCellsPossibilities();
-
-        var pair = SudokuSolver.solve(seedGrid, true, true, false);
-
-        state = pair.getFirst();
-        solvedGrid = pair.getSecond();
-        assert state == SolvingState.SOLVED;
-        return solvedGrid;
+        var solvedPair = SudokuSolver.solve(seedGrid, true, true, false);
+        assert solvedPair.getFirst() == SolvingState.SOLVED;
+        return solvedPair.getSecond();
     }
 
     /**
      * Fastly generates a solved grid of size blockRows*blockColumns x blockRows*blockColumns
      * It uses a pre-solved grid to generate and shuffle the row and columns while keeping it solved
      *
-     * @param blockRows    : the number of rows in a block constraint
-     * @param blockColumns : the number of columns in a block constraint
-     * @return a solved grid of size blockRows*blockColumns x blockRows*blockColumns
+     * @param blockRows:    The number of rows in a block constraint
+     * @param blockColumns: The number of columns in a block constraint
+     * @return A solved grid
      */
     public static Grid fastSolvedGridCreation(int blockRows, int blockColumns) {
-
         try {
-            Path path =
-                    Path.of(ClassLoader.getSystemResource("presolved/" + blockColumns * blockRows + "x" + blockColumns * blockRows + "(constraint" + blockRows + "x" + blockColumns + ").csv").getFile());
-            // Import the grid of length blockRows*blockColumns if it exists
-            Integer[][] gridValue = CsvUtils.importGrid(path);
-            var symbols = SymbolSets.generateSymbols(blockRows * blockColumns);
-            var listOfIndexRows = new ArrayList<>(IntStream.rangeClosed(0, blockRows - 1).boxed().toList());
-            var listOfIndexColumns = new ArrayList<>(IntStream.rangeClosed(0, blockColumns - 1).boxed().toList());
-            var grid = new Grid(gridValue, symbols, blockRows, blockColumns);
+            Path gridPath = Path.of(ClassLoader.getSystemResource(
+                    "presolved/" + blockColumns * blockRows + "x" + blockColumns * blockRows + "(constraint" + blockRows + "x" + blockColumns + ").csv"
+            ).getFile());
 
-            // The original grid is not solved, we need to regenerate it
+            Integer[][] gridValues = CsvUtils.importGrid(gridPath);
+            var symbols = SymbolSets.generateSymbols(blockRows * blockColumns);
+
+            Grid grid = new Grid(gridValues, symbols, blockRows, blockColumns);
             if (!grid.isSolved()) {
                 throw new Exception("The stored grid is not solved, we need to regenerate it");
             }
-            // Shuffle block in rows
-            Collections.shuffle(listOfIndexRows);
-            for (int i = 0; i < blockRows / 2; i++) {
-                for (int j = 0; j < blockColumns; j++) {
-                    var tmpValue = gridValue[blockColumns * i + j];
-                    gridValue[blockColumns * i + j] = gridValue[blockColumns * listOfIndexRows.get(i) + j];
-                    gridValue[blockColumns * listOfIndexRows.get(i) + j] = tmpValue;
-                }
-            }
-
-            // shuffle block in columns
-            Collections.shuffle(listOfIndexColumns);
-            for (int i = 0; i < blockColumns; i++) {
-                for (int j = 0; j < blockRows; j++) {
-                    for (int k = 0; k < blockColumns * blockRows; k++) {
-                        var tempValue = gridValue[k][blockRows * i + j];
-                        gridValue[k][blockRows * i + j] = gridValue[k][blockRows * listOfIndexColumns.get(i) + j];
-                        gridValue[k][blockRows * listOfIndexColumns.get(i) + j] = tempValue;
-                    }
-                }
-            }
-
-            // Shuffle rows
-            for (int i = 0; i < blockRows; i++) {
-                Collections.shuffle(listOfIndexColumns);
-                for (int j = 0; j < blockColumns; j++) {
-                    var tempValue = gridValue[blockColumns * i + j];
-                    gridValue[blockColumns * i + j] = gridValue[blockColumns * i + listOfIndexColumns.get(j)];
-                    gridValue[blockColumns * i + listOfIndexColumns.get(j)] = tempValue;
-                }
-            }
-
-            // Shuffle columns
-            for (int i = 0; i < blockColumns; i++) {
-                Collections.shuffle(listOfIndexRows);
-                for (int j = 0; j < blockRows; j++) {
-                    for (int k = 0; k < blockColumns * blockRows; k++) {
-                        var tempValue = gridValue[k][blockRows * i + j];
-                        gridValue[k][blockRows * i + j] = gridValue[k][blockRows * i + listOfIndexRows.get(j)];
-                        gridValue[k][blockRows * i + listOfIndexRows.get(j)] = tempValue;
-                    }
-                }
-            }
+            // We shuffle the grid to make it more random, but we keep it solved
+            shuffleGrid(blockRows, blockColumns, gridValues);
 
             // Shuffle symbols
             var symbolsList = new ArrayList<>(symbols);
             Collections.shuffle(symbolsList);
-            Utils.applyMapping(gridValue, gridValue, symbolsList.stream().collect(HashMap::new, (m, v) -> m.put(v,
+            Utils.applyMapping(gridValues, gridValues, symbolsList.stream().collect(HashMap::new, (m, v) -> m.put(v,
                     symbolsList.get(v - 1)), HashMap::putAll));
 
             // Check if the grid is solved to assure the grid is correct
-            grid = new Grid(gridValue, symbols, blockRows, blockColumns);
+            grid = new Grid(gridValues, symbols, blockRows, blockColumns);
             assert grid.isSolved();
             return grid;
         } catch (Exception e) {
@@ -301,6 +249,64 @@ public class Generator {
                 CsvUtils.exportGrid(path, grid);
             }
             return grid;
+        }
+    }
+
+    /**
+     * Shuffles the grid to make it more random
+     * It shuffles rows of block, columns of block, rows inside rows of block and columns inside columns of block
+     * In order to keep the grid solved
+     *
+     * @param blockRows:   The number of rows in a block constraint
+     * @param blockColumns: The number of columns in a block constraint
+     * @param gridValue:  The grid to shuffle
+     */
+    private static void shuffleGrid(int blockRows, int blockColumns, Integer[][] gridValue) {
+        var listOfIndexRows = new ArrayList<>(IntStream.rangeClosed(0, blockRows - 1).boxed().toList());
+        var listOfIndexColumns = new ArrayList<>(IntStream.rangeClosed(0, blockColumns - 1).boxed().toList());
+
+        // Shuffle block in rows
+        Collections.shuffle(listOfIndexRows);
+        for (int i = 0; i < blockRows / 2; i++) {
+            for (int j = 0; j < blockColumns; j++) {
+                var tmpValue = gridValue[blockColumns * i + j];
+                gridValue[blockColumns * i + j] = gridValue[blockColumns * listOfIndexRows.get(i) + j];
+                gridValue[blockColumns * listOfIndexRows.get(i) + j] = tmpValue;
+            }
+        }
+
+        // shuffle block in columns
+        Collections.shuffle(listOfIndexColumns);
+        for (int i = 0; i < blockColumns; i++) {
+            for (int j = 0; j < blockRows; j++) {
+                for (int k = 0; k < blockColumns * blockRows; k++) {
+                    var tempValue = gridValue[k][blockRows * i + j];
+                    gridValue[k][blockRows * i + j] = gridValue[k][blockRows * listOfIndexColumns.get(i) + j];
+                    gridValue[k][blockRows * listOfIndexColumns.get(i) + j] = tempValue;
+                }
+            }
+        }
+
+        // Shuffle rows
+        for (int i = 0; i < blockRows; i++) {
+            Collections.shuffle(listOfIndexColumns);
+            for (int j = 0; j < blockColumns; j++) {
+                var tempValue = gridValue[blockColumns * i + j];
+                gridValue[blockColumns * i + j] = gridValue[blockColumns * i + listOfIndexColumns.get(j)];
+                gridValue[blockColumns * i + listOfIndexColumns.get(j)] = tempValue;
+            }
+        }
+
+        // Shuffle columns
+        for (int i = 0; i < blockColumns; i++) {
+            Collections.shuffle(listOfIndexRows);
+            for (int j = 0; j < blockRows; j++) {
+                for (int k = 0; k < blockColumns * blockRows; k++) {
+                    var tempValue = gridValue[k][blockRows * i + j];
+                    gridValue[k][blockRows * i + j] = gridValue[k][blockRows * i + listOfIndexRows.get(j)];
+                    gridValue[k][blockRows * i + listOfIndexRows.get(j)] = tempValue;
+                }
+            }
         }
     }
 }

@@ -34,6 +34,8 @@ public class Vec2i {
     }
 
     /**
+     * Returns a new Vec2i with 0, 0 coordinates.
+     *
      * @return a new Vec2i with 0, 0 coordinates
      */
     public static Vec2i zero() {
@@ -120,6 +122,13 @@ public class Vec2i {
                 '}';
     }
 
+    /**
+     * Checks if the coordinates are equal to the given ones.
+     *
+     * @param i: the x-coordinate to compare
+     * @param j: the y-coordinate to compare
+     * @return true if the coordinates are equal, false otherwise
+     */
     public boolean equals(int i, int j) {
         return x == i && y == j;
     }

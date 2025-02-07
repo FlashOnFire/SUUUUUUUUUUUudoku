@@ -74,6 +74,7 @@ public interface AbstractConstraint {
      *
      * @param pos1 the first position
      * @param pos2 the second position
+     * @return true if the two positions have an effect on each other, false otherwise
      */
     boolean isAffectedBy(Vec2i pos1, Vec2i pos2);
 

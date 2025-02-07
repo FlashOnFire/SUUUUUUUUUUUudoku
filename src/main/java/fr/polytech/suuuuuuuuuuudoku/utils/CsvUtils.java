@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+/**
+ * Utility class for reading and writing Grid from CSV files.
+ */
 public class CsvUtils {
 
     /**
@@ -17,6 +20,7 @@ public class CsvUtils {
      *
      * @param file the CSV file representing the grid
      * @return the created Grid
+     * @throws FileNotFoundException if the file is not found
      */
     static public Integer[][] importGrid(Path file) throws FileNotFoundException {
         return new BufferedReader(new FileReader(file.toFile()))
@@ -32,6 +36,7 @@ public class CsvUtils {
      *
      * @param folder the CSV folder representing the grids
      * @return the created Grid
+     * @throws FileNotFoundException if the folder is not found
      */
     static public MultiGrid importMultiGrid(Path folder) throws FileNotFoundException {
         // list the files

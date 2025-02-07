@@ -68,6 +68,8 @@ public class Grid extends Solvable<Grid> {
 
     /**
      * Constructs a Grid by copying another grid.
+     *
+     * @param otherGrid the grid to copy
      */
     public Grid(Grid otherGrid) {
         super(otherGrid.symbols);

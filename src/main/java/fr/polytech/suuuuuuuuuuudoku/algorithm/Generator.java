@@ -120,11 +120,23 @@ public class Generator {
         removableCells = removableCells.subList(0,
                 removableCells.size() / (Difficulty.getValues().length - difficultyValue));
 
+        int nCellToRemove = Math.min((int) Math.sqrt(gridSize), removableCells.size());
+
         do {
-            solvedGrid.placeUnchecked(removableCells.removeFirst(), null, false, true);
+            for (int i = 0; i < nCellToRemove; i++) {
+                solvedGrid.placeUnchecked(removableCells.removeFirst(), null, false, true);
+            }
             solvedGrid.computeAllEmptyCellsPossibilities();
             if (SudokuSolver.solve(solvedGrid, true, false, false).getFirst() != SolvingState.SOLVED) {
-                solvedGrid.undoLastMove(true);
+                if (nCellToRemove > 1) {
+                    nCellToRemove = Math.max(nCellToRemove / 2, 1);
+                    for (int i = 0; i < nCellToRemove; i++) {
+                        removableCells.add(solvedGrid.getMoves().getLast().position());
+                        solvedGrid.undoLastMove(true);
+                    }
+                } else {
+                    solvedGrid.undoLastMove(true);
+                }
             }
         } while (!removableCells.isEmpty());
 

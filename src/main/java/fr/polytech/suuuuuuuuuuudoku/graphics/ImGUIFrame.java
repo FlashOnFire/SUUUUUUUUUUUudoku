@@ -5,10 +5,7 @@ import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.PositionListConstraint;
-import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
-import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
-import fr.polytech.suuuuuuuuuuudoku.grid.ObservableGrid;
-import fr.polytech.suuuuuuuuuuudoku.grid.Solvable;
+import fr.polytech.suuuuuuuuuuudoku.grid.*;
 import fr.polytech.suuuuuuuuuuudoku.symbols.SymbolSets;
 import fr.polytech.suuuuuuuuuuudoku.utils.Difficulty;
 import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
@@ -189,8 +186,13 @@ public class ImGUIFrame extends Application {
             } else if (solvable instanceof MultiGrid) {
                 new Thread(() -> {
                     solving.set(true);
-                    solvable =
-                            SudokuSolver.solve((MultiGrid) solvable, solveDeducing, solveBacktracking, true).getSecond();
+                    solvable = SudokuSolver.solve(
+                            new ObservableMultiGrid(
+                                    (MultiGrid) solvable,
+                                    (index, innerGrid) -> ((MultiGrid) solvable)
+                                            .getGrids()[index].setInnerGrid(innerGrid)
+                            ), solveDeducing, solveBacktracking, true
+                    ).getSecond().getGrid();
                     solving.set(false);
                 }).start();
             }

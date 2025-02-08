@@ -254,6 +254,9 @@ public class ImGUIFrame extends Application {
                 solvable = ((MultiGrid) solvedSolvable).shallowCopy();
             }
         }
+        if (ImGui.isItemHovered()) {
+            ImGui.setTooltip("Instant solve the grid by showing the solution to the original generated grid (not taking into account the current state of the grid).");
+        }
 
         ImGui.sameLine();
 
@@ -297,6 +300,9 @@ public class ImGUIFrame extends Application {
                 }).start();
             }
         }
+        if (ImGui.isItemHovered()) {
+            ImGui.setTooltip("Visual solve the grid by showing the solution step by step. The pace of the solving can be adjusted with the slider below.");
+        }
 
         if (ImGui.button("Reset")) {
             if (originalSolvable instanceof Grid) {
@@ -337,6 +343,9 @@ public class ImGUIFrame extends Application {
 
         ImGui.setNextItemWidth(100);
         ImGui.sliderFloat("Solve Pace", SudokuSolver.solvePace, 0.0f, 1.0f);
+        if (ImGui.isItemHovered()) {
+            ImGui.setTooltip("Adjust the pace of the solving. The lower the value, the slower the solving. (Only affects visual solving)");
+        }
 
         ImGui.end();
 
@@ -681,14 +690,13 @@ public class ImGUIFrame extends Application {
         } else if (ImGui.isKeyPressed(ImGuiKey.Keypad9)) {
             keyPress(9);
         } else if (ImGui.isKeyPressed(ImGuiKey.Enter) || ImGui.isKeyPressed(ImGuiKey.KeyPadEnter)) {
-            applyLastChanges();
-            selected_pos = null;
+            applyEnteredSymbol();
         }
     }
 
     private void setSelection(int x, int y) {
         if (x >= 0 && x < solvable.getSize().getX() && y >= 0 && y < solvable.getSize().getY()) {
-            applyLastChanges();
+            applyEnteredSymbol();
             selected_pos = new Vec2i(x, y);
             current_symbol = solvable.getSymbolAt(new Vec2i(x, y)) == null ? null : solvable.getSymbolAt(new Vec2i(
                     x,
@@ -697,9 +705,15 @@ public class ImGUIFrame extends Application {
         }
     }
 
-    private void applyLastChanges() {
+    private void applyEnteredSymbol() {
         if (selected_pos != null) {
-            solvable.placeUnchecked(selected_pos, getCurrentSymbol(), true, true);
+            var int_current_symbol = getCurrentSymbol();
+            if (solvable.getSymbols().contains(int_current_symbol) || int_current_symbol == null) {
+                solvable.placeUnchecked(selected_pos, int_current_symbol, true, true);
+                selected_pos = null;
+            } else {
+                current_symbol = null;
+            }
         }
     }
 

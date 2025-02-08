@@ -45,11 +45,11 @@ public class ObservableGrid extends Solvable<ObservableGrid> {
     }
 
     /**
-     * Gets the current grid.
+     * Gets the observed grid.
      *
-     * @return the current grid
+     * @return the observed grid
      */
-    public Grid getGrid() {
+    public Grid getInner() {
         return grid;
     }
 
@@ -103,7 +103,7 @@ public class ObservableGrid extends Solvable<ObservableGrid> {
     @Override
     public void placeUnchecked(Vec2i pos, Integer value, boolean updatePossibilities, boolean store_move) {
         grid.placeUnchecked(pos, value, updatePossibilities, store_move);
-        listener.onGridChange(this.getGrid().getInnerGrid());
+        listener.onGridChange(this.getInner().getInnerGrid());
     }
 
     /**
@@ -162,6 +162,6 @@ public class ObservableGrid extends Solvable<ObservableGrid> {
     @Override
     public void undoLastMove(boolean updatePossibilities) {
         grid.undoLastMove(updatePossibilities);
-        listener.onGridChange(this.getGrid().getInnerGrid());
+        listener.onGridChange(this.getInner().getInnerGrid());
     }
 }

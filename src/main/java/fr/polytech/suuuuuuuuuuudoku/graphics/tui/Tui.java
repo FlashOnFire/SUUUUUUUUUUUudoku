@@ -508,7 +508,7 @@ public class Tui {
 
             if (grid instanceof MultiGrid) {
                 displayMultiGrid((MultiGrid) grid);
-                if (((MultiGrid) grid).isNotInGrid(lastPosition)) {
+                if (!grid.isInGrid(lastPosition)) {
                     // Clear the last position
                     textGraphics.setBackgroundColor(TextColor.ANSI.DEFAULT);
                     textGraphics.putString(lastPosition.getX() * (spacing + 1), lastPosition.getY() + line,

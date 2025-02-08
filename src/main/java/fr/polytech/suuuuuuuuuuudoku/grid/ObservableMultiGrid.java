@@ -19,18 +19,18 @@ public class ObservableMultiGrid extends Solvable<ObservableMultiGrid> {
     /**
      * The grid to observe.
      */
-    private MultiGrid grid;
+    private MultiGrid multiGrid;
 
     /**
-     * Constructs an ObservableGrid with the specified grid and listener.
+     * Constructs an ObservableGrid with the specified MultiGrid and listener.
      *
-     * @param grid     the grid to observe
-     * @param listener the listener to notify on changes
+     * @param multiGrid the MultiGrid to observe
+     * @param listener  the listener to notify on changes
      */
-    public ObservableMultiGrid(MultiGrid grid, MultiGridListener listener) {
-        super(Objects.requireNonNull(grid.symbols));
+    public ObservableMultiGrid(MultiGrid multiGrid, MultiGridListener listener) {
+        super(Objects.requireNonNull(multiGrid.symbols));
         assert listener != null;
-        this.grid = grid;
+        this.multiGrid = multiGrid;
         this.listener = listener;
     }
 
@@ -41,25 +41,25 @@ public class ObservableMultiGrid extends Solvable<ObservableMultiGrid> {
      */
     @Override
     public Vec2i getSize() {
-        return grid.getSize();
+        return multiGrid.getSize();
     }
 
     /**
-     * Gets the current grid.
+     * Gets the observed MultiGrid.
      *
-     * @return the current grid
+     * @return the observed MultiGrid
      */
-    public MultiGrid getGrid() {
-        return grid;
+    public MultiGrid getInner() {
+        return multiGrid;
     }
 
     /**
      * Sets a new grid.
      *
-     * @param grid the new grid to set
+     * @param multiGrid the new MultiGrid to set
      */
-    public void setGrid(MultiGrid grid) {
-        this.grid = grid;
+    public void setMultiGrid(MultiGrid multiGrid) {
+        this.multiGrid = multiGrid;
     }
 
     /**
@@ -70,7 +70,7 @@ public class ObservableMultiGrid extends Solvable<ObservableMultiGrid> {
      */
     @Override
     public boolean areConstraintsSatisfied(boolean skip_not_empty) {
-        return grid.areConstraintsSatisfied(skip_not_empty);
+        return multiGrid.areConstraintsSatisfied(skip_not_empty);
     }
 
     /**
@@ -81,7 +81,7 @@ public class ObservableMultiGrid extends Solvable<ObservableMultiGrid> {
      */
     @Override
     public Integer getSymbolAt(Vec2i pos) {
-        return grid.getSymbolAt(pos);
+        return multiGrid.getSymbolAt(pos);
     }
 
     /**
@@ -89,7 +89,7 @@ public class ObservableMultiGrid extends Solvable<ObservableMultiGrid> {
      */
     @Override
     public void computeAllEmptyCellsPossibilities() {
-        grid.computeAllEmptyCellsPossibilities();
+        multiGrid.computeAllEmptyCellsPossibilities();
     }
 
     /**
@@ -102,9 +102,9 @@ public class ObservableMultiGrid extends Solvable<ObservableMultiGrid> {
      */
     @Override
     public void placeUnchecked(Vec2i pos, Integer value, boolean updatePossibilities, boolean store_move) {
-        int index = grid.getGridFor(pos.getX(), pos.getY()).getFirst();
-        grid.placeUnchecked(pos, value, updatePossibilities, store_move);
-        listener.onGridChange(index, this.getGrid().getGridFor(pos.getX(), pos.getY()).getSecond().getInnerGrid());
+        int index = multiGrid.getGridFor(pos.getX(), pos.getY()).getFirst();
+        multiGrid.placeUnchecked(pos, value, updatePossibilities, store_move);
+        listener.onGridChange(index, this.getInner().getGridFor(pos.getX(), pos.getY()).getSecond().getInnerGrid());
     }
 
     /**
@@ -114,7 +114,7 @@ public class ObservableMultiGrid extends Solvable<ObservableMultiGrid> {
      */
     @Override
     public Map<Vec2i, Set<Integer>> getEmptyCellsPossibilities() {
-        return grid.getEmptyCellsPossibilities();
+        return multiGrid.getEmptyCellsPossibilities();
     }
 
     /**
@@ -124,7 +124,7 @@ public class ObservableMultiGrid extends Solvable<ObservableMultiGrid> {
      */
     @Override
     public ObservableMultiGrid shallowCopy() {
-        return new ObservableMultiGrid(grid.shallowCopy(), listener);
+        return new ObservableMultiGrid(multiGrid.shallowCopy(), listener);
     }
 
     /**
@@ -134,7 +134,7 @@ public class ObservableMultiGrid extends Solvable<ObservableMultiGrid> {
      */
     @Override
     public List<Move2i> getMoves() {
-        return grid.getMoves();
+        return multiGrid.getMoves();
     }
 
     /**
@@ -142,7 +142,7 @@ public class ObservableMultiGrid extends Solvable<ObservableMultiGrid> {
      */
     @Override
     public void cleanMoves() {
-        grid.cleanMoves();
+        multiGrid.cleanMoves();
     }
 
     /**
@@ -152,7 +152,7 @@ public class ObservableMultiGrid extends Solvable<ObservableMultiGrid> {
      */
     @Override
     public boolean isInGrid(Vec2i pos) {
-        return grid.isInGrid(pos);
+        return multiGrid.isInGrid(pos);
     }
 
     /**
@@ -162,9 +162,9 @@ public class ObservableMultiGrid extends Solvable<ObservableMultiGrid> {
      */
     @Override
     public void undoLastMove(boolean updatePossibilities) {
-        var pos = grid.getMoves().getLast().position();
-        int index = grid.getGridFor(pos.getX(), pos.getY()).getFirst();
-        grid.undoLastMove(updatePossibilities);
-        listener.onGridChange(index, this.getGrid().getGridFor(pos.getX(), pos.getY()).getSecond().getInnerGrid());
+        var pos = multiGrid.getMoves().getLast().position();
+        int index = multiGrid.getGridFor(pos.getX(), pos.getY()).getFirst();
+        multiGrid.undoLastMove(updatePossibilities);
+        listener.onGridChange(index, this.getInner().getGridFor(pos.getX(), pos.getY()).getSecond().getInnerGrid());
     }
 }

@@ -16,6 +16,7 @@ import imgui.app.Application;
 import imgui.app.Configuration;
 import imgui.flag.*;
 
+ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -109,13 +110,6 @@ public class ImGUIFrame extends Application {
     }
 
     /**
-     * The pre-run method of the application.
-     */
-    @Override
-    protected void preRun() {
-    }
-
-    /**
      * The post-run method of the application.
      */
     @Override
@@ -153,19 +147,7 @@ public class ImGUIFrame extends Application {
         ImGui.sliderInt("Block Height", selectedGeneratorGridSizeHeight, 2, 6, ImGuiSliderFlags.None);
 
         if (ImGui.button("Generate##Basic")) {
-            var oldPace = SudokuSolver.solvePace[0];
-            SudokuSolver.solvePace[0] = 1.0f;
-
-            var pair = Generator.generateSudokuWithBlockConstraints(
-                    selectedGeneratorGridSizeWidth[0],
-                    selectedGeneratorGridSizeHeight[0],
-                    selectedDifficulty
-            );
-            solvedSolvable = pair.getFirst();
-            solvable = pair.getSecond();
-
-            originalSolvable = ((Grid) solvable).shallowCopy();
-            SudokuSolver.solvePace[0] = oldPace;
+            generateBasic();
         }
 
         insertSeparator();
@@ -179,34 +161,14 @@ public class ImGUIFrame extends Application {
         ImGui.sliderInt("Grid Height##randomblocks", selectedRandomGeneratorHeight, 3, 6);
 
         if (ImGui.button("Generate##randomblocks")) {
-            var oldPace = SudokuSolver.solvePace[0];
-            SudokuSolver.solvePace[0] = 1.0f;
-
-            var pair = Generator.generateSudokuWithRandomBlockConstraint(
-                    selectedRandomGeneratorWidth[0],
-                    selectedRandomGeneratorHeight[0],
-                    selectedDifficulty
-            );
-            solvedSolvable = pair.getFirst();
-            solvable = pair.getSecond();
-
-            originalSolvable = ((Grid) solvable).shallowCopy();
-            SudokuSolver.solvePace[0] = oldPace;
+            generateRandomBlocks();
         }
 
         insertSeparator();
 
         ImGui.text("MultiGrid Generator");
         if (ImGui.button("Generate MultiGrid")) {
-            var oldPace = SudokuSolver.solvePace[0];
-            SudokuSolver.solvePace[0] = 1.0f;
-
-            var pair = Generator.generateMultigridSudoku(selectedDifficulty);
-            solvedSolvable = pair.getFirst();
-            solvable = pair.getSecond();
-
-            originalSolvable = ((MultiGrid) solvable).shallowCopy();
-            SudokuSolver.solvePace[0] = oldPace;
+            generateMultiGrid();
         }
 
         insertSeparator();
@@ -214,15 +176,7 @@ public class ImGUIFrame extends Application {
         ImGui.text("Test Grids");
 
         if (ImGui.button("Import 100x100 grid")) {
-            Integer[][] innerGrid;
-            innerGrid = CsvUtils.importGrid("exemples/100x100.csv");
-            var symbolSet = SymbolSets.generateSymbols(innerGrid.length);
-            solvable = new Grid(innerGrid, symbolSet);
-            originalSolvable = ((Grid) solvable).shallowCopy();
-
-            Integer[][] solvedInnerGrid;
-            solvedInnerGrid = CsvUtils.importGrid("exemples/100x100Solved.csv");
-            solvedSolvable = new Grid(solvedInnerGrid, symbolSet);
+            importGrid("100x100");
         }
 
         insertSeparator();
@@ -239,8 +193,8 @@ public class ImGUIFrame extends Application {
                 solveBacktracking = true;
             }
         }
-        ImGui.sameLine();
 
+        ImGui.sameLine();
         if (ImGui.checkbox("Backtracking", solveBacktracking)) {
             solveBacktracking = !solveBacktracking;
             if (!solveBacktracking) {
@@ -249,11 +203,7 @@ public class ImGUIFrame extends Application {
         }
 
         if (ImGui.button("Instant Solve")) {
-            if (solvable instanceof Grid) {
-                solvable = ((Grid) solvedSolvable).shallowCopy();
-            } else if (solvable instanceof MultiGrid) {
-                solvable = ((MultiGrid) solvedSolvable).shallowCopy();
-            }
+            instantSolve();
         }
         if (ImGui.isItemHovered()) {
             ImGui.setTooltip("Instant solve the grid by showing the solution to the original generated grid (not taking into account the current state of the grid).");
@@ -262,60 +212,14 @@ public class ImGUIFrame extends Application {
         ImGui.sameLine();
 
         if (ImGui.button("Visual Solve")) {
-            Thread thread = null;
-            if (solvable instanceof Grid) {
-                thread = new Thread(() -> {
-                    solving.set(true);
-                    var solve = SudokuSolver.solve(
-                            new ObservableGrid(
-                                    (Grid) solvable,
-                                    innerGrid -> ((Grid) solvable).setInnerGrid(innerGrid)
-                            ), solveDeducing, solveBacktracking, true
-                    );
-
-                    if (solve.getFirst() != SolvingState.UNSOLVABLE) {
-                        solvable = solve.getSecond().getGrid();
-                    } else {
-                        unsolvablePopup.set(true);
-                    }
-
-                    solving.set(false);
-                });
-            } else if (solvable instanceof MultiGrid) {
-                thread = new Thread(() -> {
-                    solving.set(true);
-                    var solve = SudokuSolver.solve(
-                            new ObservableMultiGrid(
-                                    (MultiGrid) solvable,
-                                    (index, innerGrid) -> ((MultiGrid) solvable)
-                                            .getGrids()[index].setInnerGrid(innerGrid)
-                            ), solveDeducing, solveBacktracking, true
-                    );
-
-                    if (solve.getFirst() != SolvingState.UNSOLVABLE) {
-                        solvable = solve.getSecond().getGrid();
-                    } else {
-                        unsolvablePopup.set(true);
-                    }
-
-                    solving.set(false);
-                });
-            }
-
-            assert thread != null;
-            thread.setDaemon(true);
-            thread.start();
+            visualSolve();
         }
         if (ImGui.isItemHovered()) {
             ImGui.setTooltip("Visually solve the grid by showing the solution step by step. The pace of the solving can be adjusted with the slider below.");
         }
 
         if (ImGui.button("Reset")) {
-            if (originalSolvable instanceof Grid) {
-                solvable = ((Grid) originalSolvable).shallowCopy();
-            } else if (originalSolvable instanceof MultiGrid) {
-                solvable = ((MultiGrid) originalSolvable).shallowCopy();
-            }
+            reset();
         }
 
         if (hintMode) {
@@ -437,11 +341,6 @@ public class ImGUIFrame extends Application {
             );
 
             drawSolvable(solvable, gridSize, gridPixelSize);
-            /*if (solvable instanceof Grid) {
-                drawGrid((Grid) solvable, gridSize, gridPixelSize);
-            } else if (solvable instanceof MultiGrid) {
-                drawMultiGrid((MultiGrid) solvable, gridSize, gridPixelSize);
-            }*/
 
             ImGui.popStyleColor();
             ImGui.popStyleVar();
@@ -480,8 +379,10 @@ public class ImGUIFrame extends Application {
         ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, 0, 0);
         for (int y = 0; y < gridSize.getY(); y++) {
             for (int x = 0; x < gridSize.getX(); x++) {
+                var position = new Vec2i(x, y);
+
                 // Add spacing when needed for multigrids
-                if (!solvable.isInGrid(new Vec2i(x, y))) {
+                if (!solvable.isInGrid(position)) {
                     ImGui.dummy(gridPixelSize.x, gridPixelSize.y);
                     ImGui.sameLine();
                     continue;
@@ -493,10 +394,10 @@ public class ImGUIFrame extends Application {
                 Vec2i computedPosition;
                 if (solvable instanceof Grid) {
                     grid = (Grid) solvable;
-                    computedPosition = new Vec2i(x, y);
+                    computedPosition = position;
                 } else if (solvable instanceof MultiGrid) {
                     grid = ((MultiGrid) solvable).getGridFor(x, y).getSecond();
-                    computedPosition = new Vec2i(x, y).substract(((MultiGrid) solvable).getOffsets()[((MultiGrid) solvable).getGridFor(x, y).getFirst()]);
+                    computedPosition = new Vec2i(position).substract(((MultiGrid) solvable).getOffsets()[((MultiGrid) solvable).getGridFor(x, y).getFirst()]);
                 } else {
                     computedPosition = null;
                 }
@@ -552,18 +453,15 @@ public class ImGUIFrame extends Application {
                     );
                 } else {
                     if (ImGui.button(
-                            (solvable.getSymbolAt(new Vec2i(x, y)) == null ? " " : solvable.getSymbolAt(new Vec2i(
-                                    x,
-                                    y
-                            )).toString()) + "##" + y + ":" + x,
+                            (solvable.getSymbolAt(position) == null ? " " : solvable.getSymbolAt(position).toString()) + "##" + y + ":" + x,
                             gridPixelSize
                     ) && !solving.get()) {
                         if (hintMode) {
-                            if (solvable.getSymbolAt(new Vec2i(x, y)) == null || !solvable.getSymbolAt(new Vec2i(x, y)).equals(solvedSolvable.getSymbolAt(new Vec2i(x, y)))) {
-                                solvable.placeUnchecked(new Vec2i(x, y), solvedSolvable.getSymbolAt(new Vec2i(x, y)), true, true);
+                            if (solvable.getSymbolAt(position) == null || !solvable.getSymbolAt(position).equals(solvedSolvable.getSymbolAt(position))) {
+                                solvable.placeUnchecked(position, solvedSolvable.getSymbolAt(position), true, true);
                             }
                         } else {
-                            setSelection(x, y);
+                            setSelection(position);
                         }
                     }
                 }
@@ -591,13 +489,21 @@ public class ImGUIFrame extends Application {
             }
         }
         if (ImGui.isKeyPressed(ImGuiKey.UpArrow)) {
-            setSelection(selectedPos.getX(), selectedPos.getY() - 1);
+            if (selectedPos != null) {
+                setSelection(new Vec2i(selectedPos).substract(new Vec2i(0, 1)));
+            }
         } else if (ImGui.isKeyPressed(ImGuiKey.DownArrow)) {
-            setSelection(selectedPos.getX(), selectedPos.getY() + 1);
+            if (selectedPos != null) {
+                setSelection(new Vec2i(selectedPos).add(new Vec2i(0, 1)));
+            }
         } else if (ImGui.isKeyPressed(ImGuiKey.LeftArrow)) {
-            setSelection(selectedPos.getX() - 1, selectedPos.getY());
+            if (selectedPos != null) {
+                setSelection(new Vec2i(selectedPos).substract(new Vec2i(1, 0)));
+            }
         } else if (ImGui.isKeyPressed(ImGuiKey.RightArrow)) {
-            setSelection(selectedPos.getX() + 1, selectedPos.getY());
+            if (selectedPos != null) {
+                setSelection(new Vec2i(selectedPos).add(new Vec2i(1, 0)));
+            }
         } else if (ImGui.isKeyPressed(ImGuiKey.Keypad0)) {
             keyPress(0);
         } else if (ImGui.isKeyPressed(ImGuiKey.Keypad1)) {
@@ -623,26 +529,24 @@ public class ImGUIFrame extends Application {
         }
     }
 
-    private void setSelection(int x, int y) {
-        if (x >= 0 && x < solvable.getSize().getX() && y >= 0 && y < solvable.getSize().getY()) {
+    private void setSelection(Vec2i position) {
+        if (solvable.isInGrid(position)) {
             applyEnteredSymbol();
-            selectedPos = new Vec2i(x, y);
-            currentSymbol = solvable.getSymbolAt(new Vec2i(x, y)) == null ? null : solvable.getSymbolAt(new Vec2i(
-                    x,
-                    y
-            )).toString();
+
+            selectedPos = position;
+            currentSymbol = solvable.getSymbolAt(selectedPos) == null ? null : solvable.getSymbolAt(selectedPos).toString();
         }
     }
 
     private void applyEnteredSymbol() {
         if (selectedPos != null) {
-            var int_current_symbol = getCurrentSymbol();
-            if (solvable.getSymbols().contains(int_current_symbol) || int_current_symbol == null) {
-                solvable.placeUnchecked(selectedPos, int_current_symbol, true, true);
-                selectedPos = null;
-            } else {
-                currentSymbol = null;
+            var intCurrentSymbol = getCurrentSymbol();
+            if ((solvable.getSymbols().contains(intCurrentSymbol) || intCurrentSymbol == null) && !Objects.equals(solvable.getSymbolAt(selectedPos), intCurrentSymbol)) {
+                solvable.placeUnchecked(selectedPos, intCurrentSymbol, true, true);
             }
+
+            selectedPos = null;
+            currentSymbol = null;
         }
     }
 
@@ -658,4 +562,107 @@ public class ImGUIFrame extends Application {
         }
     }
 
+    private void generateBasic() {
+        var oldPace = SudokuSolver.solvePace[0];
+        SudokuSolver.solvePace[0] = 1.0f;
+
+        var pair = Generator.generateSudokuWithBlockConstraints(
+                selectedGeneratorGridSizeWidth[0],
+                selectedGeneratorGridSizeHeight[0],
+                selectedDifficulty
+        );
+        solvedSolvable = pair.getFirst();
+        solvable = pair.getSecond();
+
+        originalSolvable = ((Grid) solvable).shallowCopy();
+        SudokuSolver.solvePace[0] = oldPace;
+    }
+
+    private void generateRandomBlocks() {
+        var oldPace = SudokuSolver.solvePace[0];
+        SudokuSolver.solvePace[0] = 1.0f;
+
+        var pair = Generator.generateSudokuWithRandomBlockConstraint(
+                selectedRandomGeneratorWidth[0],
+                selectedRandomGeneratorHeight[0],
+                selectedDifficulty
+        );
+        solvedSolvable = pair.getFirst();
+        solvable = pair.getSecond();
+
+        originalSolvable = ((Grid) solvable).shallowCopy();
+        SudokuSolver.solvePace[0] = oldPace;
+    }
+
+    private void generateMultiGrid() {
+        var oldPace = SudokuSolver.solvePace[0];
+        SudokuSolver.solvePace[0] = 1.0f;
+
+        var pair = Generator.generateMultigridSudoku(selectedDifficulty);
+        solvedSolvable = pair.getFirst();
+        solvable = pair.getSecond();
+
+        originalSolvable = ((MultiGrid) solvable).shallowCopy();
+        SudokuSolver.solvePace[0] = oldPace;
+    }
+
+    private void importGrid(String name) {
+        Integer[][] innerGrid;
+        innerGrid = CsvUtils.importGrid("exemples/" + name + ".csv");
+        var symbolSet = SymbolSets.generateSymbols(innerGrid.length);
+        solvable = new Grid(innerGrid, symbolSet);
+        originalSolvable = ((Grid) solvable).shallowCopy();
+
+        Integer[][] solvedInnerGrid;
+        solvedInnerGrid = CsvUtils.importGrid("exemples/" + name + "Solved.csv");
+        solvedSolvable = new Grid(solvedInnerGrid, symbolSet);
+    }
+
+    private void instantSolve() {
+        solvable = (Solvable<?>) solvedSolvable.shallowCopy();
+    }
+
+    private void visualSolve() {
+        Thread thread = new Thread(() -> {
+            solving.set(true);
+
+            if (solvable instanceof Grid) {
+                var solve = SudokuSolver.solve(
+                        new ObservableGrid(
+                                (Grid) solvable,
+                                innerGrid -> ((Grid) solvable).setInnerGrid(innerGrid)
+                        ), solveDeducing, solveBacktracking, true
+                );
+
+                if (solve.getFirst() != SolvingState.UNSOLVABLE) {
+                    solvable = solve.getSecond().getInner();
+                } else {
+                    unsolvablePopup.set(true);
+                }
+            } else if (solvable instanceof MultiGrid) {
+                var solve = SudokuSolver.solve(
+                        new ObservableMultiGrid(
+                                (MultiGrid) solvable,
+                                (index, innerGrid) -> ((MultiGrid) solvable)
+                                        .getGrids()[index].setInnerGrid(innerGrid)
+                        ), solveDeducing, solveBacktracking, true
+                );
+
+                if (solve.getFirst() != SolvingState.UNSOLVABLE) {
+                    solvable = solve.getSecond().getInner();
+                } else {
+                    unsolvablePopup.set(true);
+                }
+            }
+
+            solving.set(false);
+        });
+
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    private void reset() {
+        solvable = (Solvable<?>) originalSolvable.shallowCopy();
+    }
 }

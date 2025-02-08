@@ -114,16 +114,6 @@ public class MultiGrid extends Solvable<MultiGrid> {
     }
 
     /**
-     * Checks if the position is not in the multi-grid Sudoku.
-     *
-     * @param pos the position to check
-     * @return true if the position is not in the multi-grid Sudoku, false otherwise
-     */
-    public boolean isNotInGrid(Vec2i pos) {
-        return !isInGrid(pos);
-    }
-
-    /**
      * Checks if the position is in the multi-grid Sudoku.
      *
      * @param pos the position to check
@@ -139,6 +129,7 @@ public class MultiGrid extends Solvable<MultiGrid> {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -244,7 +235,7 @@ public class MultiGrid extends Solvable<MultiGrid> {
             Vec2i size = grids[i].getSize();
             if (pos.getX() >= offset.getX() && pos.getX() < offset.getX() + size.getX()
                     && pos.getY() >= offset.getY() && pos.getY() < offset.getY() + size.getY()) {
-                return grids[i].getSymbolAt(pos.substract(offset));
+                return grids[i].getSymbolAt(new Vec2i(pos).substract(offset));
             }
         }
         return null;

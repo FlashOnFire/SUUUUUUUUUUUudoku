@@ -1,6 +1,7 @@
 package fr.polytech.suuuuuuuuuuudoku.graphics;
 
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
+import fr.polytech.suuuuuuuuuuudoku.algorithm.SolvingState;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.PositionListConstraint;
@@ -25,6 +26,12 @@ public class ImGUIFrame extends Application {
      * A boolean indicating if the game is currently solving.
      */
     final AtomicBoolean solving = new AtomicBoolean(false);
+
+    /**
+     * A boolean set by the solving thread to signal we need to show the grid unsolvable popup.
+     */
+    final AtomicBoolean unsolvablePopup = new AtomicBoolean(false);
+
     /**
      * The width of the grid for the generator.
      */
@@ -168,25 +175,37 @@ public class ImGUIFrame extends Application {
             if (solvable instanceof Grid) {
                 new Thread(() -> {
                     solving.set(true);
-                    solvable = SudokuSolver.solve(
+                    var solve = SudokuSolver.solve(
                             new ObservableGrid(
                                     (Grid) solvable,
                                     innerGrid -> ((Grid) solvable).setInnerGrid(innerGrid)
                             ), solveDeducing, solveBacktracking, true
-                    ).getSecond().getGrid();
+                    );
+
+                    if (solve.getFirst() != SolvingState.UNSOLVABLE) {
+                        solvable = solve.getSecond().getGrid();
+                    } else {
+                        unsolvablePopup.set(true);
+                    }
+
                     solving.set(false);
                 }).start();
             } else if (solvable instanceof MultiGrid) {
                 new Thread(() -> {
                     solving.set(true);
-                    solvable = SudokuSolver.solve(
+                    var solve = SudokuSolver.solve(
                             new ObservableMultiGrid(
                                     (MultiGrid) solvable,
                                     (index, innerGrid) -> ((MultiGrid) solvable)
                                             .getGrids()[index].setInnerGrid(innerGrid)
                             ), solveDeducing, solveBacktracking, true
-                    ).getSecond().getGrid();
-                    solving.set(false);
+                    );
+
+                    if (solve.getFirst() != SolvingState.UNSOLVABLE) {
+                        solvable = solve.getSecond().getGrid();
+                    } else {
+                        unsolvablePopup.set(true);
+                    }
                 }).start();
             }
         }
@@ -322,7 +341,18 @@ public class ImGUIFrame extends Application {
             ImGui.end();
         }
 
-        //ImGui.showDemoWindow();
+        if (unsolvablePopup.get()) {
+            ImGui.openPopup("Unsolvable");
+            unsolvablePopup.set(false);
+        }
+
+        if (ImGui.beginPopupModal("Unsolvable", null, ImGuiWindowFlags.AlwaysAutoResize)) {
+            ImGui.text("This grid is unsolvable with the currently filled cells.");
+            if (ImGui.button("OK")) {
+                ImGui.closeCurrentPopup();
+            }
+            ImGui.endPopup();
+        }
     }
 
     private void drawGrid(Grid grid, Vec2i gridSize, ImVec2 gridPixelSize) {
@@ -338,9 +368,9 @@ public class ImGUIFrame extends Application {
                 AtomicInteger hashcode = new AtomicInteger(1);
 
                 grid.getConstraints().stream()
-                    .filter(c -> c instanceof BlockConstraint || c instanceof PositionListConstraint)
-                    .filter(c -> c.isPosAffected(new Vec2i(finalX, finalY)))
-                    .forEach(c -> hashcode.updateAndGet(v -> 17 * v + c.hashCode()));
+                        .filter(c -> c instanceof BlockConstraint || c instanceof PositionListConstraint)
+                        .filter(c -> c.isPosAffected(new Vec2i(finalX, finalY)))
+                        .forEach(c -> hashcode.updateAndGet(v -> 17 * v + c.hashCode()));
 
                 if (hashcode.get() != 1) {
                     int color = hashcode.get() % 360;
@@ -428,9 +458,9 @@ public class ImGUIFrame extends Application {
                 AtomicInteger hashcode = new AtomicInteger(1);
 
                 pair.getSecond().getConstraints().stream()
-                    .filter(c -> c instanceof BlockConstraint || c instanceof PositionListConstraint)
-                    .filter(c -> c.isPosAffected(new Vec2i(withoutPaddingX, withoutPaddingY)))
-                    .forEach(c -> hashcode.updateAndGet(v -> 17 * v + c.hashCode()));
+                        .filter(c -> c instanceof BlockConstraint || c instanceof PositionListConstraint)
+                        .filter(c -> c.isPosAffected(new Vec2i(withoutPaddingX, withoutPaddingY)))
+                        .forEach(c -> hashcode.updateAndGet(v -> 17 * v + c.hashCode()));
 
                 if (hashcode.get() != 1) {
                     int color = hashcode.get() % 360;

@@ -201,9 +201,9 @@ public class Tui {
                             Arrays.stream(files).map(Path::getFileName).map(Path::toString).toArray(String[]::new);
                     int selected = selectMode(options);
                     if (Files.isDirectory(files[selected])) {
-                        grid = CsvUtils.importMultiGrid(files[selected]);
+                        grid = CsvUtils.importMultiGrid("exemples/" + files[selected].getFileName());
                     } else {
-                        Integer[][] t = CsvUtils.importGrid(files[selected]);
+                        Integer[][] t = CsvUtils.importGrid("exemples/" + files[selected].getFileName());
                         var symbols = SymbolSets.generateSymbols(t.length);
                         grid = new Grid(t, symbols);
                     }

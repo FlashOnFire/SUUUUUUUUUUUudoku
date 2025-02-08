@@ -4,10 +4,17 @@ import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.grid.MultiGrid;
 import fr.polytech.suuuuuuuuuuudoku.grid.SymbolSets;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URISyntaxException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 /**
@@ -16,19 +23,25 @@ import java.util.stream.Collectors;
 public class CsvUtils {
 
     /**
-     * Creates a Grid from a CSV string.
+     * Reads a grid from a CSV file.
      *
-     * @param file the CSV file representing the grid
-     * @return the created Grid
-     * @throws FileNotFoundException if the file is not found
+     * @param fileName the name of the CSV file
+     * @return the grid read from the CSV file
      */
-    static public Integer[][] importGrid(Path file) throws FileNotFoundException {
-        return new BufferedReader(new FileReader(file.toFile()))
-                .lines()
-                .map(line -> Arrays.stream(line.split(",(?<!\\r)")).map(cell -> cell.equals(".") ? null :
-                                           Integer.parseInt(cell))
-                                   .toArray(Integer[]::new))
-                .toArray(Integer[][]::new);
+    static public Integer[][] importGrid(String fileName) {
+        try (var inputStream = ClassLoader.getSystemResourceAsStream(fileName)) {
+            if (inputStream == null) {
+                throw new FileNotFoundException("Resource not found: " + fileName);
+            }
+            return new BufferedReader(new InputStreamReader(inputStream))
+                    .lines()
+                    .map(line -> Arrays.stream(line.split(",(?<!\\r)")).map(cell -> cell.equals(".") ? null :
+                                               Integer.parseInt(cell))
+                                       .toArray(Integer[]::new))
+                    .toArray(Integer[][]::new);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -38,83 +51,57 @@ public class CsvUtils {
      * @return the created Grid
      * @throws FileNotFoundException if the folder is not found
      */
-    static public MultiGrid importMultiGrid(Path folder) throws FileNotFoundException {
+    static public MultiGrid importMultiGrid(String folder) throws IOException, URISyntaxException {
         // list the files
-        var files = folder.toFile().listFiles();
-        if (files == null) {
-            throw new FileNotFoundException("Folder not found");
-        }
-        files = Arrays.stream(files).sorted().toArray(File[]::new);
+        var resourceUrl = ClassLoader.getSystemResource(folder);
+        Path path;
+        if (resourceUrl.getProtocol().equals("jar")) {
 
-        // load the grids
-        ArrayList<Grid> grids = Arrays.stream(files).filter(file -> !file.getName().equals("offset.csv")).map(file -> {
-            try {
-                var gridValue = importGrid(file.toPath());
-                var symbols = SymbolSets.generateSymbols(gridValue.length);
-                return new Grid(gridValue, symbols);
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
+            var uri = resourceUrl.toURI();
+            var fileSystem = FileSystems.getFileSystem(uri);
+            if (!fileSystem.isOpen()) {
+                fileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap());
             }
-        }).collect(Collectors.toCollection(ArrayList::new));
-
-        // load the offset
-        ArrayList<Vec2i> offsets = new BufferedReader(new FileReader(
-                Arrays.stream(files).filter(file -> file.getName().equals("offset.csv")).findFirst().orElseThrow(FileNotFoundException::new)))
-                .lines()
-                .map(line -> {
-                    String[] parts = line.split(",(?<!\\r)");
-                    return new Vec2i(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
-                })
-                .collect(Collectors.toCollection(ArrayList::new));
-
-        assert offsets.size() == grids.size();
-        // merge the grids
-        var mergedGrids = grids.stream()
-                               .map(grid -> new Pair<>(offsets.removeFirst(), grid))
-                               .collect(Collectors.toList());
-        return new MultiGrid(mergedGrids);
-    }
-
-    /**
-     * Converts the grid to a CSV string.
-     *
-     * @param path the path to save the CSV file to
-     * @param grid the grid to convert
-     */
-    static public void exportGrid(Path path, Grid grid) {
-        var csvData = Arrays.stream(grid.getInnerGrid().get())
-                            .map(line -> Arrays.stream(line)
-                                               .map(cell -> cell == null ? "." : cell.toString())
-                                               .collect(Collectors.joining(",")))
-                            .collect(Collectors.joining("\n"));
-
-        try (var writer = new BufferedWriter(new FileWriter(path.toFile()))) {
-            writer.write(csvData);
-        } catch (IOException e) {
-            e.printStackTrace(System.err);
-        }
-    }
-
-    /**
-     * Converts the MultiGrid to a folder of CSVs.
-     *
-     * @param folder the folder to save the CSV files to
-     * @param grid   the MultiGrid to convert
-     */
-    static public void exportMultiGrid(Path folder, MultiGrid grid) {
-        // save the grids
-        for (int i = 0; i < grid.getGrids().length; i++) {
-            exportGrid(folder.resolve(i + ".csv"), grid.getGrids()[i]);
+            path = fileSystem.getPath(folder);
+        } else {
+            path = Path.of(resourceUrl.toURI());
         }
 
-        // save the offset
-        var offset = grid.getOffsets();
-        try (var writer = new BufferedWriter(new FileWriter(folder.resolve("offset.csv").toFile()))) {
-            for (Vec2i vec2i : offset) {
-                writer.write(vec2i.getX() + "," + vec2i.getY() + "\n");
+        try (var stream = Files.list(path)) {
+            System.out.println();
+            System.out.println(path);
+            Path[] files = stream.toArray(Path[]::new);
+            System.out.println();
+            System.out.println(files[0].getFileName());
+
+            // load the grids
+            ArrayList<Grid> grids =
+                    Arrays.stream(files).filter(file -> !file.getFileName().toString().equals("offset.csv")).map(file -> {
+                        var gridValue = importGrid(folder + "/" + file.getFileName());
+                        var symbols = SymbolSets.generateSymbols(gridValue.length);
+                        return new Grid(gridValue, symbols);
+                    }).collect(Collectors.toCollection(ArrayList::new));
+
+            // load the offset
+            try (var linesStream = Files.lines(
+                    Arrays.stream(files)
+                          .filter(file -> file.getFileName().toString().equals("offset.csv"))
+                          .findFirst()
+                          .orElseThrow(FileNotFoundException::new))) {
+                ArrayList<Vec2i> offsets = linesStream
+                        .map(line -> {
+                            String[] parts = line.split(",(?<!\\r)");
+                            return new Vec2i(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
+                        })
+                        .collect(Collectors.toCollection(ArrayList::new));
+
+                assert offsets.size() == grids.size();
+                // merge the grids
+                var mergedGrids = grids.stream()
+                                       .map(grid -> new Pair<>(offsets.removeFirst(), grid))
+                                       .collect(Collectors.toList());
+                return new MultiGrid(mergedGrids);
             }
-        } catch (IOException e) {
-            e.printStackTrace(System.err);
         }
     }
 }

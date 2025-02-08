@@ -14,8 +14,6 @@ import imgui.app.Application;
 import imgui.app.Configuration;
 import imgui.flag.*;
 
-import java.io.FileNotFoundException;
-import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -153,15 +151,11 @@ public class ImGUIFrame extends Application {
         ImGui.separator();
 
         if (ImGui.button("MaxiGrid")) {
-            try {
-                var innergrid =
-                        CsvUtils.importGrid(Path.of(ClassLoader.getSystemResource("exemples/100x100.csv").getFile()));
-                var symbolSet = SymbolSets.generateSymbols(innergrid.length);
-                solvable = new Grid(innergrid, symbolSet);
-                originalSolvable = ((Grid) solvable).shallowCopy();
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+            Integer[][] innergrid;
+            innergrid = CsvUtils.importGrid("exemples/100x100.csv");
+            var symbolSet = SymbolSets.generateSymbols(innergrid.length);
+            solvable = new Grid(innergrid, symbolSet);
+            originalSolvable = ((Grid) solvable).shallowCopy();
         }
 
         ImGui.separator();

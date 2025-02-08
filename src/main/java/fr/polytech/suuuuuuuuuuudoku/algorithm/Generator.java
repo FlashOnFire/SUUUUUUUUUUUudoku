@@ -11,7 +11,6 @@ import fr.polytech.suuuuuuuuuuudoku.utils.Difficulty;
 import fr.polytech.suuuuuuuuuuudoku.utils.Pair;
 import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 
-import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -232,11 +231,10 @@ public class Generator {
      */
     public static Grid fastSolvedGridCreation(int blockRows, int blockColumns) {
         try {
-            Path gridPath = Path.of(ClassLoader.getSystemResource(
-                    "presolved/" + blockColumns * blockRows + "x" + blockColumns * blockRows + "(constraint" + blockRows + "x" + blockColumns + ").csv"
-            ).getFile());
+            Integer[][] gridValues =
+                    CsvUtils.importGrid("presolved/" + blockColumns * blockRows + "x" + blockColumns * blockRows +
+                            "(constraint" + blockRows + "x" + blockColumns + ").csv");
 
-            Integer[][] gridValues = CsvUtils.importGrid(gridPath);
             var symbols = SymbolSets.generateSymbols(blockRows * blockColumns);
 
             Grid grid = new Grid(gridValues, symbols, blockRows, blockColumns);
@@ -256,15 +254,9 @@ public class Generator {
             grid = new Grid(gridValues, symbols, blockRows, blockColumns);
             assert grid.isSolved();
             return grid;
-        } catch (Exception e) {
-            var grid = createSolvedSudoku(blockRows, blockColumns);
 
-            if (!ClassLoader.getSystemResource("exemples").getProtocol().equals("jar")) {
-                Path path =
-                        Path.of("src/main/resources/presolved/" + blockColumns * blockRows + "x" + blockColumns * blockRows + "(constraint" + blockRows + "x" + blockColumns + ").csv");
-                CsvUtils.exportGrid(path, grid);
-            }
-            return grid;
+        } catch (Exception e) {
+            return createSolvedSudoku(blockRows, blockColumns);
         }
     }
 

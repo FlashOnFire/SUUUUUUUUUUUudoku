@@ -11,7 +11,8 @@ import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
-import java.nio.file.Path;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,9 +24,9 @@ public class ResolveTest {
 
     @Test
     public void testSolveDeduce() throws FileNotFoundException {
-        var gridValue = CsvUtils.importGrid(Path.of(ClassLoader.getSystemResource("exemples/deduce.csv").getFile()));
+        var gridValue = CsvUtils.importGrid("exemples/deduce.csv");
         var resGrid =
-                CsvUtils.importGrid(Path.of(ClassLoader.getSystemResource("exemples/deduceSolved.csv").getFile()));
+                CsvUtils.importGrid("exemples/deduceSolved.csv");
         var symbol = SymbolSets.generateSymbols(gridValue.length);
         Grid grid = new Grid(gridValue, symbol);
         Grid res = new Grid(resGrid, symbol);
@@ -45,9 +46,9 @@ public class ResolveTest {
 
     @Test
     public void testSolveWithBackTrack() throws FileNotFoundException {
-        var gridValue = CsvUtils.importGrid(Path.of(ClassLoader.getSystemResource("exemples/backtrack.csv").getFile()));
+        var gridValue = CsvUtils.importGrid("exemples/backtrack.csv");
         var resGrid =
-                CsvUtils.importGrid(Path.of(ClassLoader.getSystemResource("exemples/backtrackSolved.csv").getFile()));
+                CsvUtils.importGrid("exemples/backtrackSolved.csv");
         var symbol = SymbolSets.generateSymbols(gridValue.length);
         Grid grid = new Grid(gridValue, symbol);
         Grid res = new Grid(resGrid, symbol);
@@ -62,9 +63,9 @@ public class ResolveTest {
     @Test
     public void testSolveWithBackTrackAndDeduce() throws FileNotFoundException {
         var gridValue =
-                CsvUtils.importGrid(Path.of(ClassLoader.getSystemResource("exemples/backtrackAndDeduce.csv").getFile()));
-        var resGrid = CsvUtils.importGrid(Path.of(ClassLoader.getSystemResource("exemples/backtrackAndDeduceSolved" +
-                ".csv").getFile()));
+                CsvUtils.importGrid("exemples/backtrackAndDeduce.csv");
+        var resGrid = CsvUtils.importGrid("exemples/backtrackAndDeduceSolved" +
+                ".csv");
         var symbol = SymbolSets.generateSymbols(gridValue.length);
         Grid grid = new Grid(gridValue, symbol);
         Grid res = new Grid(resGrid, symbol);
@@ -109,9 +110,9 @@ public class ResolveTest {
 
     @Test
     public void testSolveBig() throws FileNotFoundException {
-        var gridValue = CsvUtils.importGrid(Path.of(ClassLoader.getSystemResource("exemples/100x100.csv").getFile()));
+        var gridValue = CsvUtils.importGrid("exemples/100x100.csv");
         var resGrid =
-                CsvUtils.importGrid(Path.of(ClassLoader.getSystemResource("exemples/100x100Solved.csv").getFile()));
+                CsvUtils.importGrid("exemples/100x100Solved.csv");
         var symbol = SymbolSets.generateSymbols(gridValue.length);
         Grid grid = new Grid(gridValue, symbol);
         Grid res = new Grid(resGrid, symbol);
@@ -128,8 +129,8 @@ public class ResolveTest {
     }
 
     @Test
-    public void testMultiDokuSolve() throws FileNotFoundException {
-        var grid = CsvUtils.importMultiGrid(Path.of(ClassLoader.getSystemResource("exemples/multigrid_1").getFile()));
+    public void testMultiDokuSolve() throws IOException, URISyntaxException {
+        var grid = CsvUtils.importMultiGrid("exemples/multigrid_1");
 
         for (var g : grid.getGrids()) {
             assertTrue(g.isSolved());
@@ -149,8 +150,8 @@ public class ResolveTest {
 
 
     @Test
-    public void testMultiDokuSolve2() throws FileNotFoundException {
-        var grid = CsvUtils.importMultiGrid(Path.of(ClassLoader.getSystemResource("exemples/multigrid_2").getFile()));
+    public void testMultiDokuSolve2() throws IOException, URISyntaxException {
+        var grid = CsvUtils.importMultiGrid("exemples/multigrid_2");
 
         for (var g : grid.getGrids()) {
             assertTrue(g.isSolved());

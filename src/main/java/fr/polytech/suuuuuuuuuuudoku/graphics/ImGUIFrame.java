@@ -81,12 +81,12 @@ public class ImGUIFrame extends Application {
     /**
      * The currently selected position in the grid.
      */
-    Vec2i selected_pos = null;
+    Vec2i selectedPos = null;
 
     /**
      * The current symbol selected for placement in the grid.
      */
-    String current_symbol = null;
+    String currentSymbol = null;
 
     /**
      * The main method of the application.
@@ -329,7 +329,7 @@ public class ImGUIFrame extends Application {
         if (ImGui.button("Hint")) {
             hintMode = !hintMode;
             if (hintMode) {
-                selected_pos = null;
+                selectedPos = null;
             }
         }
         if (ImGui.isItemHovered()) {
@@ -486,7 +486,7 @@ public class ImGUIFrame extends Application {
                     continue;
                 }
 
-                var isSelected = selected_pos != null && selected_pos.equals(x, y);
+                var isSelected = selectedPos != null && selectedPos.equals(x, y);
 
                 Grid grid = null;
                 Vec2i computedPosition;
@@ -546,7 +546,7 @@ public class ImGUIFrame extends Application {
 
                 if (isSelected) {
                     ImGui.button(
-                            (current_symbol == null ? " " : current_symbol) + "##" + y + ":" + x,
+                            (currentSymbol == null ? " " : currentSymbol) + "##" + y + ":" + x,
                             gridPixelSize
                     );
                 } else {
@@ -580,23 +580,23 @@ public class ImGUIFrame extends Application {
 
     private void handleInput() {
         if (ImGui.isKeyPressed(ImGuiKey.Delete)) {
-            current_symbol = null;
+            currentSymbol = null;
         } else if (ImGui.isKeyPressed(ImGuiKey.Backspace)) {
-            if (current_symbol != null && !current_symbol.isEmpty()) {
-                current_symbol = current_symbol.substring(0, current_symbol.length() - 1);
-                if (current_symbol.isEmpty()) {
-                    current_symbol = null;
+            if (currentSymbol != null && !currentSymbol.isEmpty()) {
+                currentSymbol = currentSymbol.substring(0, currentSymbol.length() - 1);
+                if (currentSymbol.isEmpty()) {
+                    currentSymbol = null;
                 }
             }
         }
         if (ImGui.isKeyPressed(ImGuiKey.UpArrow)) {
-            setSelection(selected_pos.getX(), selected_pos.getY() - 1);
+            setSelection(selectedPos.getX(), selectedPos.getY() - 1);
         } else if (ImGui.isKeyPressed(ImGuiKey.DownArrow)) {
-            setSelection(selected_pos.getX(), selected_pos.getY() + 1);
+            setSelection(selectedPos.getX(), selectedPos.getY() + 1);
         } else if (ImGui.isKeyPressed(ImGuiKey.LeftArrow)) {
-            setSelection(selected_pos.getX() - 1, selected_pos.getY());
+            setSelection(selectedPos.getX() - 1, selectedPos.getY());
         } else if (ImGui.isKeyPressed(ImGuiKey.RightArrow)) {
-            setSelection(selected_pos.getX() + 1, selected_pos.getY());
+            setSelection(selectedPos.getX() + 1, selectedPos.getY());
         } else if (ImGui.isKeyPressed(ImGuiKey.Keypad0)) {
             keyPress(0);
         } else if (ImGui.isKeyPressed(ImGuiKey.Keypad1)) {
@@ -625,8 +625,8 @@ public class ImGUIFrame extends Application {
     private void setSelection(int x, int y) {
         if (x >= 0 && x < solvable.getSize().getX() && y >= 0 && y < solvable.getSize().getY()) {
             applyEnteredSymbol();
-            selected_pos = new Vec2i(x, y);
-            current_symbol = solvable.getSymbolAt(new Vec2i(x, y)) == null ? null : solvable.getSymbolAt(new Vec2i(
+            selectedPos = new Vec2i(x, y);
+            currentSymbol = solvable.getSymbolAt(new Vec2i(x, y)) == null ? null : solvable.getSymbolAt(new Vec2i(
                     x,
                     y
             )).toString();
@@ -634,26 +634,26 @@ public class ImGUIFrame extends Application {
     }
 
     private void applyEnteredSymbol() {
-        if (selected_pos != null) {
+        if (selectedPos != null) {
             var int_current_symbol = getCurrentSymbol();
             if (solvable.getSymbols().contains(int_current_symbol) || int_current_symbol == null) {
-                solvable.placeUnchecked(selected_pos, int_current_symbol, true, true);
-                selected_pos = null;
+                solvable.placeUnchecked(selectedPos, int_current_symbol, true, true);
+                selectedPos = null;
             } else {
-                current_symbol = null;
+                currentSymbol = null;
             }
         }
     }
 
     private Integer getCurrentSymbol() {
-        return current_symbol == null ? null : Integer.parseInt(current_symbol);
+        return currentSymbol == null ? null : Integer.parseInt(currentSymbol);
     }
 
     private void keyPress(int key) {
-        if (current_symbol == null) {
-            current_symbol = String.valueOf(key);
+        if (currentSymbol == null) {
+            currentSymbol = String.valueOf(key);
         } else {
-            current_symbol += key;
+            currentSymbol += key;
         }
     }
 

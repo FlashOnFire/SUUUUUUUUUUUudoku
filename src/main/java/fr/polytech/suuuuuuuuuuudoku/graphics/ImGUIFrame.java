@@ -48,8 +48,21 @@ public class ImGUIFrame extends Application {
      */
     Difficulty selectedDifficulty = Difficulty.EXPERT;
 
+    /**
+     * A boolean indicating if the solver should use deducing.
+     */
     boolean solveDeducing = true;
+
+    /**
+     * A boolean indicating if the solver should use backtracking.
+     */
     boolean solveBacktracking = true;
+
+    /**
+     * A boolean indicating if the hint mode is enabled (next clicked cell will be filled with the correct value).
+     */
+    boolean hintMode = false;
+
     /**
      * The original solvable before any modifications.
      */
@@ -242,6 +255,8 @@ public class ImGUIFrame extends Application {
             }
         }
 
+        ImGui.sameLine();
+
         if (ImGui.button("Visual Solve")) {
             if (solvable instanceof Grid) {
                 new Thread(() -> {
@@ -283,7 +298,6 @@ public class ImGUIFrame extends Application {
             }
         }
 
-        ImGui.sameLine();
         if (ImGui.button("Reset")) {
             if (originalSolvable instanceof Grid) {
                 solvable = ((Grid) originalSolvable).shallowCopy();
@@ -292,6 +306,26 @@ public class ImGUIFrame extends Application {
             }
         }
 
+        if (hintMode) {
+            ImGui.pushStyleColor(ImGuiCol.Button, 0.0f, 0.8f, 0.0f, 1.0f); // Lighter green color for active state
+            ImGui.pushStyleColor(ImGuiCol.ButtonHovered, 0.0f, 0.9f, 0.0f, 1.0f); // Even lighter green for hover state
+            ImGui.pushStyleColor(ImGuiCol.ButtonActive, 0.0f, 1.0f, 0.0f, 1.0f); // Bright green for active state
+        } else {
+            ImGui.pushStyleColor(ImGuiCol.Button, 0.8f, 0.0f, 0.0f, 1.0f); // Lighter red color for inactive state
+            ImGui.pushStyleColor(ImGuiCol.ButtonHovered, 0.9f, 0.0f, 0.0f, 1.0f); // Even lighter red for hover state
+            ImGui.pushStyleColor(ImGuiCol.ButtonActive, 1.0f, 0.0f, 0.0f, 1.0f); // Bright red for active state
+        }
+        if (ImGui.button("Hint")) {
+            hintMode = !hintMode;
+            if (hintMode) {
+                selected_pos = null;
+            }
+        }
+        if (ImGui.isItemHovered()) {
+            ImGui.setTooltip("When activated, the hint mode will reveal the correct answer for clicking cells.");
+        }
+
+        ImGui.popStyleColor(3);
 
         if (solvable == null) {
             ImGui.endDisabled();
@@ -491,8 +525,13 @@ public class ImGUIFrame extends Application {
                             ).toString()) + "##" + y + ":" + x,
                             gridPixelSize
                     ) && !solving.get()) {
-                        setSelection(x, y);
-                        System.out.println("Selected: " + selected_pos);
+                        if (hintMode) {
+                            if (grid.getSymbolAt(new Vec2i(x, y)) == null || !grid.getSymbolAt(new Vec2i(x, y)).equals(solvedSolvable.getSymbolAt(new Vec2i(x, y)))) {
+                                grid.placeUnchecked(new Vec2i(x, y), solvedSolvable.getSymbolAt(new Vec2i(x, y)), true, true);
+                            }
+                        } else {
+                            setSelection(x, y);
+                        }
                     }
                 }
 
@@ -581,8 +620,13 @@ public class ImGUIFrame extends Application {
                             )).toString()) + "##" + y + ":" + x,
                             gridPixelSize
                     ) && !solving.get()) {
-                        setSelection(x, y);
-                        System.out.println("Selected: " + selected_pos);
+                        if (hintMode) {
+                            if (mg.getSymbolAt(new Vec2i(x, y)) == null || !mg.getSymbolAt(new Vec2i(x, y)).equals(solvedSolvable.getSymbolAt(new Vec2i(x, y)))) {
+                                mg.placeUnchecked(new Vec2i(x, y), solvedSolvable.getSymbolAt(new Vec2i(x, y)), true, true);
+                            }
+                        } else {
+                            setSelection(x, y);
+                        }
                     }
                 }
 

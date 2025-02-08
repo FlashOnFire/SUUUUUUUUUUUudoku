@@ -78,6 +78,19 @@ Cela nous a permis d'aborder sereinement notre diagramme de classe pour anticipe
 
 ![](diagram/utilisation.png)
 
+- **Afficher** : Le Client peut afficher une grille de sudoku ou une étape de résolution.
+- **Résoudre Grille** : Le Client peut résoudre une grille de sudoku, de type Solvable. il peut choisir de résoudre
+  manuellement ou automatiquement.
+- **Résoudre Automatiquement** : Le Client peut résoudre automatiquement une grille de sudoku, de type Solvable directement en
+  utilisant le solveur.
+- **Résoudre Manuellement** : Le Client peut résoudre manuellement une grille de sudoku, de type Solvable, via l'interface graphique.
+- **Générer Grille** : Le Client peut générer une grille de sudoku, de type Solvable, via le générateur, en fonction de la
+  difficulté et du type de grille désiré.
+- **Ajouter Grille** : Le Client peut ajouter une grille de sudoku, de type Solvable, à la liste des grilles.
+- **Créer Grille** : Le Client peut créer une grille de sudoku, de type Solvable, en fonction de la taille et des symboles
+  désirés.
+- **Étape De Resolution** : Le Client peut afficher une étape de résolution de la grille de sudoku, de type Solvable.
+
 #### Diagramme de classe
 
 Nous avons préféré garder un diagramme de classe le plus minimaliste possible au début, car nous savons par expérience
@@ -503,7 +516,11 @@ C'est dans cet objectif que nous avons créé la fonction `removeRandomCells` qu
 aléatoirement dans une grille résolue, tout en gardant l'unicité de la solution.
 
 Cette fonction est très importante pour la génération, car au cœur du processus de génération, et est la fonction qui va
-couter le plus de temps à s'exécuter.
+couter le plus de temps à s'exécuter. 
+
+Pour l'optimiser, nous avons également fait en sorte de placer plusieurs cellules à la fois avant de tenter de le résoudre.
+Lorsque la solution n'est pas unique, nous rajoutons les cellules une par une et abaissons le nombre de cellules à la fois
+(Cette optimisation n'est pas présente dans le diagramme de séquence).
 
 *Voici le diagramme de séquence de cette fonction pour mieux comprendre ce qu'il se passe :*
 
@@ -576,8 +593,43 @@ sequenceDiagram
     Generator ->> .: .
     deactivate Generator
 ```
+----- 
 
-# Benchmark ??????????????????
+## Comparaison des performances de génération de début de projet → fin de projet
+
+### Résultat de la vitesse de génération de début de projet
+Les résultats sont en fonction de la taille de la grille (Échantillon de 50 générations).
+
+| Taille | Moyenne | Minimum | Maximum | Médiane |
+|--------|---------|---------|---------|---------|
+| 4x4    | 5ms     | 2ms     | 40ms    | 4ms     |
+| 9x9    | 38ms    | 32ms    | 62ms    | 37ms    |
+| 16x16  | 767ms   | 636ms   | 960ms   | 763ms   |
+| 25x25  | 19937ms | 6738ms  | 63256ms | 8238ms  |
+
+![img_5.png](img_5.png)
+
+### Résultat de la vitesse de génération rapide actuelle
+Les résultats sont en fonction de la taille de la grille (Échantillon de 50 générations)
+
+| Taille | Moyenne | Minimum | Maximum | Médiane |
+|--------|---------|---------|---------|---------|
+| 4x4    | 4ms     | 2ms     | 32ms    | 4ms     |
+| 9x9    | 25ms    | 8ms     | 53ms    | 25ms    |
+| 16x16  | 460ms   | 199ms   | 604ms   | 462ms   |
+| 25x25  | 4794ms  | 2255ms  | 6448ms  | 5005ms  |
+| 36x36  | 31666ms | 17667ms | 43032ms | 33661ms |
+
+![img_4.png](img_4.png)
+
+-----
+
+**On remarque dès lors que la génération actuelle est plus rapide, 
+mais surtout bien plus constantes, ce qui est un avantage non négligeable pour l'utilisateur.** 
+
+En effet, on peut voir que la génération de grille de taille plus élevée entrainait 
+une grande différence Min/Max dans la manière précédente de générer nos grilles avec 
+la méthode conventionnelle, ce qui n'est plus le cas avec la génération actuelle.
 
 -----
 

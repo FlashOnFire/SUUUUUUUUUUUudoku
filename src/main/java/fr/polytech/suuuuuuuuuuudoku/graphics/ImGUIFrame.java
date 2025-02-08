@@ -261,8 +261,9 @@ public class ImGUIFrame extends Application {
         ImGui.sameLine();
 
         if (ImGui.button("Visual Solve")) {
+            Thread thread = null;
             if (solvable instanceof Grid) {
-                new Thread(() -> {
+                thread = new Thread(() -> {
                     solving.set(true);
                     var solve = SudokuSolver.solve(
                             new ObservableGrid(
@@ -278,9 +279,9 @@ public class ImGUIFrame extends Application {
                     }
 
                     solving.set(false);
-                }).start();
+                });
             } else if (solvable instanceof MultiGrid) {
-                new Thread(() -> {
+                thread = new Thread(() -> {
                     solving.set(true);
                     var solve = SudokuSolver.solve(
                             new ObservableMultiGrid(
@@ -297,8 +298,12 @@ public class ImGUIFrame extends Application {
                     }
 
                     solving.set(false);
-                }).start();
+                });
             }
+
+            assert thread != null;
+            thread.setDaemon(true);
+            thread.start();
         }
         if (ImGui.isItemHovered()) {
             ImGui.setTooltip("Visual solve the grid by showing the solution step by step. The pace of the solving can be adjusted with the slider below.");

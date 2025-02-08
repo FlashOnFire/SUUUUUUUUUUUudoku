@@ -54,6 +54,11 @@ Vous pouvez lancer la compilation avec la commande suivante :
 
 ```bash
 ./gradlew buildAllJars
+
+# pour compiler un seul jar
+./gradlew guiImGUIJar
+./gradlew guiSwingJar
+./gradlew tuiJar
 ```
 
 Vous pouvez ensuite lancer les différents exécutables avec les commandes suivantes :
@@ -64,7 +69,17 @@ java -jar ./build/libs/tui-1.0.jar # Interface en ligne de commande
 java -jar ./build/libs/swing-1.0.jar # Interface graphique avec swing
 ```
 
------
+#### Lancer sans compilation par un jar
+
+Vous pouvez également lancer le programme directement via gradle avec ces commandes:
+
+```bash
+./gradlew runTui # Interface en ligne de commande
+./gradlew runImGUI # Interface graphique avec imGUI
+./gradlew runSwing # Interface graphique avec swing
+```
+
+---
 
 # Méthodologie
 
@@ -73,7 +88,7 @@ java -jar ./build/libs/swing-1.0.jar # Interface graphique avec swing
 Pour aborder ce projet, nous avons commencé, après avoir lu attentivement le cahier des charges, par réaliser un diagramme de cas d'utilisation afin de s'assurer que chaque membre du groupe a parfaitement compris les objectifs requis de l'application.
 Cela nous a permis d'aborder sereinement notre diagramme de classe pour anticiper au mieux l'architecture de notre code.
 
-*Voici le diagramme de cas d'utilisation réalisé au début du projet :*
+_Voici le diagramme de cas d'utilisation réalisé au début du projet :_
 
 ```mermaid
 flowchart LR
@@ -113,11 +128,11 @@ Nous avons préféré garder un diagramme de classe le plus minimaliste possible
 Éviter de trop architecturer le projet permet de rester agile et de l'adapter au fur et à mesure.
 Nous avons ensuite actualisé ce diagramme au fur et à mesure du projet afin d'avoir une vue d'ensemble des notre organisation et de voir simplement les points améliorables et les répétitions dans notre code.
 
-*Voici le diagramme de classe final mis à jour le 09/02/2025 :*
+_Voici le diagramme de classe final mis à jour le 09/02/2025 :_
 
 ![](diagram/class.png)
 
-*Voici les diagrammes de classe finaux par package mis à jour le 09/02/2025 :*
+_Voici les diagrammes de classe finaux par package mis à jour le 09/02/2025 :_
 
 ![](diagram/algorithm.png)
 ![](diagram/constraints.png)
@@ -125,7 +140,7 @@ Nous avons ensuite actualisé ce diagramme au fur et à mesure du projet afin d'
 ![](diagram/grid.png)
 ![](diagram/utils.png)
 
------
+---
 
 # Conception
 
@@ -138,7 +153,7 @@ Nos sudokus sont représentés pas une classe abstraite Solvable, qui peut être
 
 Chaque Solvable possède une liste de contraintes qui lui est propre, ainsi qu'une liste de mouvements qui ont été effectués par le solveur ou l'utilisateur pour permettre le suivi de la résolution. Les symboles sont les valeurs pouvant être stocké dans le Solvable.
 
-*Voici un exemple de ce que peut être une grille de type Solvable, à travers un diagramme d'objet :*
+_Voici un exemple de ce que peut être une grille de type Solvable, à travers un diagramme d'objet :_
 
 ```mermaid
 ---
@@ -190,7 +205,7 @@ classDiagram
 C'est ainsi que nous pouvons obtenir des grilles de sudoku comme celle-ci :
 ![img.png](img.png)
 
------
+---
 
 # Solveur :
 
@@ -204,7 +219,7 @@ Une amélioration majeure pourra être apportée dans le futur en utilisant le m
 
 La méthode solve() permet de résoudre n'importe quel Solvable, en se basant les contraintes de la grille, et/ou en utilisant le backtracking pour les grilles plus complexes.
 
-*Voici un diagramme d'activité de cette méthode essentielle au bon fonctionnement de notre application :*
+_Voici un diagramme d'activité de cette méthode essentielle au bon fonctionnement de notre application :_
 
 ```mermaid
 ---
@@ -261,7 +276,7 @@ partial --> [*]
 }
 ```
 
-*On peut également observer cette même méthode de résolution à travers un diagramme de séquence :*
+_On peut également observer cette même méthode de résolution à travers un diagramme de séquence :_
 
 ```mermaid
 sequenceDiagram
@@ -304,7 +319,7 @@ sequenceDiagram
     deactivate S
 ```
 
------
+---
 
 # Générateur :
 
@@ -359,9 +374,9 @@ Nous présenterons ici deux fonctions importantes pour la génération de sudoku
 
 ### Génération rapide de sudokus avec des contraintes de blocs de taille NxM
 
-Notre approche se base sur des sudokus déjà résolus et stocké dans un fichier conforme. 
+Notre approche se base sur des sudokus déjà résolus et stocké dans un fichier conforme.
 Le cas échéant, nous effectuons une génération traditionnelle.
-Si un tel fichier existe et est conforme pour le type de sudoku demandé, nous allons mélanger astucieusement pour obtenir une grille de sudoku résolu, mais totalement aléatoire. 
+Si un tel fichier existe et est conforme pour le type de sudoku demandé, nous allons mélanger astucieusement pour obtenir une grille de sudoku résolu, mais totalement aléatoire.
 Pour une grille de sudoku avec des contraintes de blocs
 de taille NxM déjà résolu :
 
@@ -371,11 +386,11 @@ de taille NxM déjà résolu :
 - On mélange les colonnes au sein de chaque bloc de contraintes, ce qui nous ajoute `M!` possibilités
 - On mélange tous les symboles, ce qui nous ajoute `(NxM)!` possibilités
 
------
+---
 
 **Ainsi, nous obtenons un nombre de possibilités de `M!² * N!² * (NxM)!` pour une grille de sudoku de taille NxM, ce qui représenterait plus de [470 millions de possibilités]{.underline} de grilles résolus avec [une unique solution]{.underline} à partir d'une unique grille de sudoku pré résolu de taille 9x9.**
 
------
+---
 
 Voici le diagramme d'activité illustrant le processus de génération rapide de sudoku :
 
@@ -444,17 +459,17 @@ Puisse avoir des contraintes de blocs "mélangées" comme ceci :
 
 Pour ce faire, il suffit de respecter un principe simple :
 
-----
+---
 
 **Si un case d'un bloc des contraintes contient un symbole équivalent à un symbole d'un autre bloc de contraintes, alors les cases de ces deux blocs de contraintes peuvent s'interchanger.**
 
-----
+---
 
-*Exemple :*
+_Exemple :_
 
 ![img_3.png](img_3.png)
 
-*Voici le diagramme d'activité représentant le fonctionnement de la fonction :*
+_Voici le diagramme d'activité représentant le fonctionnement de la fonction :_
 
 ```mermaid
 ---
@@ -515,11 +530,11 @@ Dans l'objectif de générer des grilles à faire résoudre par l'utilisateur, n
 
 C'est dans cet objectif que nous avons créé la fonction `removeRandomCells` qui permet de supprimer des cellules aléatoirement dans une grille résolue, tout en gardant l'unicité de la solution.
 
-Cette fonction est très importante pour la génération, car au cœur du processus de génération, et est la fonction qui va couter le plus de temps à s'exécuter. 
+Cette fonction est très importante pour la génération, car au cœur du processus de génération, et est la fonction qui va couter le plus de temps à s'exécuter.
 
 Nous avons optimisé le processus en plaçant plusieurs cellules simultanément avant de tenter de résoudre le Sudoku. Initialement, nous plaçons un lot de cellules de taille égale à $sqrt(n)$ (où $n$ est la taille du Sudoku). Si la solution n'est pas unique, nous annulons le dernier lot et réduisons de moitié la taille du lot suivant, jusqu'à poser les cellules une par une si nécessaire. (Cette optimisation n'est pas représentée dans le diagramme de séquence.)
 
-*Voici le diagramme de séquence de cette fonction pour mieux comprendre ce qu'il se passe :*
+_Voici le diagramme de séquence de cette fonction pour mieux comprendre ce qu'il se passe :_
 
 ```mermaid
 ---
@@ -590,47 +605,49 @@ sequenceDiagram
     Generator ->> .: .
     deactivate Generator
 ```
------ 
+
+---
 
 # Comparaison des performances de génération de début de projet → fin de projet
 
 ## Résultat de la vitesse de génération de début de projet
+
 Les résultats sont en fonction de la taille de la grille (Échantillon de 50 générations).
 
 | Taille | Moyenne | Minimum | Maximum | Médiane |
-|:------:|:-------:|:-------:|:-------:|:-------:|
-| 4x4    | 4ms     | 1ms     | 33ms    | 3ms     |
-| 9x9    | 474ms   | 13ms    | 14324ms | 117ms   |
-
+| :----: | :-----: | :-----: | :-----: | :-----: |
+|  4x4   |   4ms   |   1ms   |  33ms   |   3ms   |
+|  9x9   |  474ms  |  13ms   | 14324ms |  117ms  |
 
 ![img_5.png](img_5.png)
 
 ## Résultat de la vitesse de génération rapide actuelle
+
 Les résultats sont en fonction de la taille de la grille (Échantillon de 50 générations)
 
 | Taille | Moyenne | Minimum | Maximum | Médiane |
-|:------:|:-------:|:-------:|:-------:|:-------:|
-| 4x4    | 5ms     | 2ms     | 79ms    | 3ms     |
-| 9x9    | 31ms    | 20ms    | 77ms    | 28ms    |
-| 16x16  | 472ms   | 390ms   | 676ms   | 465ms   |
+| :----: | :-----: | :-----: | :-----: | :-----: |
+|  4x4   |   5ms   |   2ms   |  79ms   |   3ms   |
+|  9x9   |  31ms   |  20ms   |  77ms   |  28ms   |
+| 16x16  |  472ms  |  390ms  |  676ms  |  465ms  |
 | 25x25  | 5380ms  | 4490ms  | 6144ms  | 5368ms  |
 | 36x36  | 38224ms | 34740ms | 41455ms | 38309ms |
 
 ![img_4.png](img_4.png)
 
------
+---
 
-**On remarque dès lors que la génération actuelle est plus rapide, mais surtout bien plus constantes, ce qui est un avantage non négligeable pour l'utilisateur.** 
+**On remarque dès lors que la génération actuelle est plus rapide, mais surtout bien plus constantes, ce qui est un avantage non négligeable pour l'utilisateur.**
 
-En effet, on peut voir que la génération de grille de taille plus élevée entrainait  une grande différence Min/Max dans la manière précédente de générer nos grilles avec la méthode conventionnelle, ce qui n'est plus le cas avec la génération actuelle.
+En effet, on peut voir que la génération de grille de taille plus élevée entrainait une grande différence Min/Max dans la manière précédente de générer nos grilles avec la méthode conventionnelle, ce qui n'est plus le cas avec la génération actuelle.
 
------
+---
 
 # Répartition
 
 Pour ce projet, nous nous sommes repartis les tâches en tirant parti des compétences de chacun.
 
-- Guillaume s'est occupé de concevoir et d'implémenter la résolution de sudoku. Il a également réalisé l'interface  graphique avec ImGUI et a grandement participé aux différentes réorganisations du code.
+- Guillaume s'est occupé de concevoir et d'implémenter la résolution de sudoku. Il a également réalisé l'interface graphique avec ImGUI et a grandement participé aux différentes réorganisations du code.
 - Thibaut s'est quant à lui occupé de l'interface graphique via swing qui a ensuite été abandonné, car non adapté pour l'affichage de multi-doku. Il a également mis au propre la conception élaborée par l'équipe sous forme de diagramme mermaid.
   Il s'est de plus occupé en collaboration avec Eymeric de la génération de sudoku, et plus particulièrement de la génération des contraintes de blocs déstructurés ainsi que la génération accélérée via des grilles préremplies.
 - Eymeric de son côté, s'est occupé de l'interface en console ainsi que de la génération des sudokus. Il a par ailleurs réalisé plusieurs réorganisations afin de simplifier le code, la grande majorité des tests unitaires, et la pipeline GitHub actions pour vérifier ces tests à chaque push.
@@ -638,46 +655,49 @@ Pour ce projet, nous nous sommes repartis les tâches en tirant parti des compé
 # Extensions
 
 - Environnement de travail : [github](https://github.com/FlashOnFire/SUUUUUUUUUUUudoku)
-    + Nous avons pris soin de respecter le [nommage conventionnel des commits](https://www.conventionalcommits.org)
+  - Nous avons pris soin de respecter le [nommage conventionnel des commits](https://www.conventionalcommits.org)
 - Tests unitaires
-    + Toutes les fonctions importantes du projet sont testées à l'aide de plusieurs tests unitaires afin d'éviter toute régression
+  - Toutes les fonctions importantes du projet sont testées à l'aide de plusieurs tests unitaires afin d'éviter toute régression
 - Pipeline de test automatique avec GitHub, actions et nix
-    + Nous avons réalisé des configurations nix (flake + package) afin d'avoir un environnement de développement identique entre tous les développeurs.
-    + Cela nous a permis de simplement créer un pipeline GitHub action qui lance la compilation du projet ainsi que les tests (dans le même environnement que les développeurs) et envoie un e-mail en cas de problème.
+  - Nous avons réalisé des configurations nix (flake + package) afin d'avoir un environnement de développement identique entre tous les développeurs.
+  - Cela nous a permis de simplement créer un pipeline GitHub action qui lance la compilation du projet ainsi que les tests (dans le même environnement que les développeurs) et envoie un e-mail en cas de problème.
 - Interface graphique
-    + Nous avons réalisé deux interfaces graphiques.
-        * Une première avec Swing, abandonnée à mi-projet par la découverte d'un autre outil plus puissant
-        * Une seconde avec imGUI une librairie C++ à l'origine avec des bindings Java.
-          C'est cette interface qui est privilégiée à ce jour.
-          Elle a permis d'intégrer les multi-doku plus simplement
+
+  - Nous avons réalisé deux interfaces graphiques.
+    - Une première avec Swing, abandonnée à mi-projet par la découverte d'un autre outil plus puissant
+    - Une seconde avec imGUI une librairie C++ à l'origine avec des bindings Java.
+      C'est cette interface qui est privilégiée à ce jour.
+      Elle a permis d'intégrer les multi-doku plus simplement
 
 - Fichier de config et sauvegarde
-    + Nous avons créé des méthodes permettant d'importer et d'exporter des sudokus ainsi que des multi-doku dans des fichiers `.csv`. Cela nous sert pour les tests ainsi que pour accélérer la génération.
-      Cependant, ces fichiers sont intégrés dans le fichier .jar ce qui ne permet pas facilement de les modifier. Et, par manque de temps, nous n'avons pas intégré la possibilité de les charger depuis un autre endroit que les ressources du jar.
+
+  - Nous avons créé des méthodes permettant d'importer et d'exporter des sudokus ainsi que des multi-doku dans des fichiers `.csv`. Cela nous sert pour les tests ainsi que pour accélérer la génération.
+    Cependant, ces fichiers sont intégrés dans le fichier .jar ce qui ne permet pas facilement de les modifier. Et, par manque de temps, nous n'avons pas intégré la possibilité de les charger depuis un autre endroit que les ressources du jar.
 
 - Grilles avec multiples solutions :
-    + La fonction permettant de trouver toutes les solutions existe et est testé et fonctionnelle, cependant, elle n'est pas utilisée, car cela aurait demandé de lourdes modifications dans les interfaces d'affichage.
+
+  - La fonction permettant de trouver toutes les solutions existe et est testé et fonctionnelle, cependant, elle n'est pas utilisée, car cela aurait demandé de lourdes modifications dans les interfaces d'affichage.
 
 - Rajout de contraintes :
-    + L'architecture de l'application est pensée pour pouvoir ajouter des contraintes simplement.
-    + Cela nous a permis d'ajouter une contrainte sur une liste de position qui est, en quelque sorte une contrainte de bloc déstructuré (les éléments du bloc sont éclatés à travers la grille).
+  - L'architecture de l'application est pensée pour pouvoir ajouter des contraintes simplement.
+  - Cela nous a permis d'ajouter une contrainte sur une liste de position qui est, en quelque sorte une contrainte de bloc déstructuré (les éléments du bloc sont éclatés à travers la grille).
 
 # - Résolution par l'humain FAUT VOIR !!!!
 
 - Génération de grille optimal
-    + Vous pouvez générer une grille de sudoku de taille avec des performances raisonnables (6 s) jusqu'à 25x25.
-    + Voir les diagrammes de générateur pour les détails sur la méthode utilisée
+
+  - Vous pouvez générer une grille de sudoku de taille avec des performances raisonnables (6 s) jusqu'à 25x25.
+  - Voir les diagrammes de générateur pour les détails sur la méthode utilisée
 
 - Résolution de grille
-    + Vous pouvez résoudre une grille de sudoku de taille avec des performances raisonnables jusqu'à 100x100.
-    + Vous pouvez également résoudre des multi-grilles efficacement
+
+  - Vous pouvez résoudre une grille de sudoku de taille avec des performances raisonnables jusqu'à 100x100.
+  - Vous pouvez également résoudre des multi-grilles efficacement
 
 - Consulter l'historique des modifications
-    + Vous pouvez consulter l'historique des modifications de la grille.
-      Particulièrement utile pour les résolutions automatiques.
-  
+  - Vous pouvez consulter l'historique des modifications de la grille.
+    Particulièrement utile pour les résolutions automatiques.
 - Résolution manuelle
-    + Vous pouvez résoudre une grille de sudoku de manière manuelle
-  
+  - Vous pouvez résoudre une grille de sudoku de manière manuelle
 - Interface en ligne de commande ergonomique
-    + Vous pouvez utiliser une interface en ligne de commande pour jouer au sudoku avec une ergonomie proche de l'interface graphique
+  - Vous pouvez utiliser une interface en ligne de commande pour jouer au sudoku avec une ergonomie proche de l'interface graphique

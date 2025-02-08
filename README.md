@@ -56,26 +56,35 @@ Vous pouvez ensuite lancer les différents executables avec les commandes suivan
 ./result/bin/swing # Interface graphique avec swing
 ```
 
-#### Utilisateur linux classique
+#### Utilisateur Linux classique
 
-Il vous faudra installer les dépendances suivantes :
-
-- `openjdk-23`
-- `gradle`
-- `libGL`
-
-Vous pouvez ensuite lancer la compilation avec la commande suivante :
+Vous pouvez lancer la compilation avec la commande suivante :
 
 ```bash
 ./gradlew buildAllJars
+
+# pour compiler un seul jar
+./gradlew guiImGUIJar
+./gradlew guiSwingJar
+./gradlew tuiJar
 ```
 
-Vous pouvez ensuite lancer les différents executables avec les commandes suivantes :
+Vous pouvez ensuite lancer les différents exécutables avec les commandes suivantes :
 
 ```bash
-java -jar ./build/libs/imGUI-1.0-SNAPSHOT.jar # Interface en ligne de commande
-java -jar ./build/libs/tui-1.0-SNAPSHOT.jar # Interface graphique avec imGUI
-java -jar ./build/libs/swing-1.0-SNAPSHOT.jar # Interface graphique avec swing
+java -jar ./build/libs/imGUI-1.0.jar # Interface graphique avec imGUI
+java -jar ./build/libs/tui-1.0.jar # Interface en ligne de commande
+java -jar ./build/libs/swing-1.0.jar # Interface graphique avec swing
+```
+
+##### Lancer sans compilation par un jar
+
+Vous pouvez également lancer le programme directement via gradle avec ces commandes:
+
+```bash
+./gradlew runTui # Interface en ligne de commande
+./gradlew runImGUI # Interface graphique avec imGUI
+./gradlew runSwing # Interface graphique avec swing
 ```
 
 ### Diagramme de cas d'utilisation :
@@ -663,9 +672,9 @@ List(Vec2i) -->> Generator: a = toTestRemove.removeFirst()
 deactivate List(Vec2i)
 Generator ->> Solvable: solvedGrid.placeUnchecked(a, null, null, true)
 activate Solvable
-Solvable -->> Generator: 
+Solvable -->> Generator:
 Generator->>Solvable: solvedGrid.computeAllEmptyCellsPossibilities()
-Solvable -->> Generator: 
+Solvable -->> Generator:
 deactivate Solvable
 Generator ->> SudokuSolver: bool = SudokuSolver.solve(solvedGrid).getFirst()
 activate SudokuSolver
@@ -675,7 +684,7 @@ alt if b != SOLVED
 Generator->>Solvable: undoLastMove()
 activate Solvable
 deactivate Solvable
-Solvable -->> Generator: 
+Solvable -->> Generator:
 end
 end
 SudokuSolver->>Generator: c = hasMoreThanOneSolution()
@@ -692,8 +701,8 @@ end
 Generator->>Solvable: solvedGrid.cleanMoves()
 activate Solvable
 deactivate Solvable
-Solvable -->> Generator: 
-Generator ->> .: 
+Solvable -->> Generator:
+Generator ->> .:
 deactivate Generator
 ```
 

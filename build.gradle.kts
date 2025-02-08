@@ -37,8 +37,22 @@ tasks.register("buildAllJars") {
     dependsOn("tuiJar", "guiSwingJar", "guiImGUIJar")
 }
 
-tasks.named<JavaExec>("run") {
-    classpath += files("src/test/resources")
+tasks.register<JavaExec>("runTui") {
+    mainClass.set("fr.polytech.suuuuuuuuuuudoku.graphics.Tui")
+    classpath = sourceSets.main.get().runtimeClasspath
+    args = listOf()
+}
+
+tasks.register<JavaExec>("runSwing") {
+    mainClass.set("fr.polytech.suuuuuuuuuuudoku.graphics.SudokuFrame")
+    classpath = sourceSets.main.get().runtimeClasspath
+    args = listOf()
+}
+
+tasks.register<JavaExec>("runImGUI") {
+    mainClass.set("fr.polytech.suuuuuuuuuuudoku.graphics.ImGUIFrame")
+    classpath = sourceSets.main.get().runtimeClasspath
+    args = listOf()
 }
 
 tasks.register<Jar>("tuiJar") {
@@ -75,4 +89,8 @@ tasks.register<Jar>("guiImGUIJar") {
     from("src/main/resources")
     from("src/test/resources")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.named<JavaExec>("run") {
+    enabled = false
 }

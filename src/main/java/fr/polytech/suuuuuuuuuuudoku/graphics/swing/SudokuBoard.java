@@ -1,4 +1,4 @@
-package fr.polytech.suuuuuuuuuuudoku.graphics;
+package fr.polytech.suuuuuuuuuuudoku.graphics.swing;
 
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
 import fr.polytech.suuuuuuuuuuudoku.constraints.PositionListConstraint;

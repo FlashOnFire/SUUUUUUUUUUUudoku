@@ -50,7 +50,6 @@ public class Utils {
         return rgb;
     }
 
-
     /**
      * Applies a mapping from the original 2D array to the mapped 2D array using the provided mapping.
      *
@@ -72,5 +71,4 @@ public class Utils {
         }
 
     }
-
 }

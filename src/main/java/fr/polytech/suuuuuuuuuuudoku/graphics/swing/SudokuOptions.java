@@ -1,4 +1,4 @@
-package fr.polytech.suuuuuuuuuuudoku.graphics;
+package fr.polytech.suuuuuuuuuuudoku.graphics.swing;
 
 import javax.swing.*;
 import java.awt.*;

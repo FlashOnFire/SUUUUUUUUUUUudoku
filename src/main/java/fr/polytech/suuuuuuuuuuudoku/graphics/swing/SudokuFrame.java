@@ -1,4 +1,4 @@
-package fr.polytech.suuuuuuuuuuudoku.graphics;
+package fr.polytech.suuuuuuuuuuudoku.graphics.swing;
 
 import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;

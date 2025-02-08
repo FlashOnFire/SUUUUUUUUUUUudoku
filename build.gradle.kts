@@ -38,19 +38,19 @@ tasks.register("buildAllJars") {
 }
 
 tasks.register<JavaExec>("runTui") {
-    mainClass.set("fr.polytech.suuuuuuuuuuudoku.graphics.Tui")
+    mainClass.set("fr.polytech.suuuuuuuuuuudoku.graphics.tui.Tui")
     classpath = sourceSets.main.get().runtimeClasspath + files("src/test/resources")
     args = listOf()
 }
 
 tasks.register<JavaExec>("runSwing") {
-    mainClass.set("fr.polytech.suuuuuuuuuuudoku.graphics.SudokuFrame")
+    mainClass.set("fr.polytech.suuuuuuuuuuudoku.graphics.swing.SudokuFrame")
     classpath = sourceSets.main.get().runtimeClasspath + files("src/test/resources")
     args = listOf()
 }
 
 tasks.register<JavaExec>("runImGUI") {
-    mainClass.set("fr.polytech.suuuuuuuuuuudoku.graphics.ImGUIFrame")
+    mainClass.set("fr.polytech.suuuuuuuuuuudoku.graphics.imgui.ImGUIFrame")
     classpath = sourceSets.main.get().runtimeClasspath + files("src/test/resources")
     args = listOf()
 }
@@ -58,7 +58,7 @@ tasks.register<JavaExec>("runImGUI") {
 tasks.register<Jar>("tuiJar") {
     archiveBaseName.set("tui")
     manifest {
-        attributes["Main-Class"] = "fr.polytech.suuuuuuuuuuudoku.graphics.Tui"
+        attributes["Main-Class"] = "fr.polytech.suuuuuuuuuuudoku.graphics.tui.Tui"
     }
     from(sourceSets.main.get().output)
     from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
@@ -70,7 +70,7 @@ tasks.register<Jar>("tuiJar") {
 tasks.register<Jar>("guiSwingJar") {
     archiveBaseName.set("swing")
     manifest {
-        attributes["Main-Class"] = "fr.polytech.suuuuuuuuuuudoku.graphics.SudokuFrame"
+        attributes["Main-Class"] = "fr.polytech.suuuuuuuuuuudoku.graphics.swing.SudokuFrame"
     }
     from(sourceSets.main.get().output)
     from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
@@ -82,7 +82,7 @@ tasks.register<Jar>("guiSwingJar") {
 tasks.register<Jar>("guiImGUIJar") {
     archiveBaseName.set("imGUI")
     manifest {
-        attributes["Main-Class"] = "fr.polytech.suuuuuuuuuuudoku.graphics.ImGUIFrame"
+        attributes["Main-Class"] = "fr.polytech.suuuuuuuuuuudoku.graphics.imgui.ImGUIFrame"
     }
     from(sourceSets.main.get().output)
     from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })

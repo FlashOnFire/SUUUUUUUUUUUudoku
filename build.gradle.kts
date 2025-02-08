@@ -39,19 +39,19 @@ tasks.register("buildAllJars") {
 
 tasks.register<JavaExec>("runTui") {
     mainClass.set("fr.polytech.suuuuuuuuuuudoku.graphics.Tui")
-    classpath = sourceSets.main.get().runtimeClasspath
+    classpath = sourceSets.main.get().runtimeClasspath + files("src/test/resources")
     args = listOf()
 }
 
 tasks.register<JavaExec>("runSwing") {
     mainClass.set("fr.polytech.suuuuuuuuuuudoku.graphics.SudokuFrame")
-    classpath = sourceSets.main.get().runtimeClasspath
+    classpath = sourceSets.main.get().runtimeClasspath + files("src/test/resources")
     args = listOf()
 }
 
 tasks.register<JavaExec>("runImGUI") {
     mainClass.set("fr.polytech.suuuuuuuuuuudoku.graphics.ImGUIFrame")
-    classpath = sourceSets.main.get().runtimeClasspath
+    classpath = sourceSets.main.get().runtimeClasspath + files("src/test/resources")
     args = listOf()
 }
 

@@ -131,11 +131,11 @@ public class Generator {
             solvedGrid.computeAllEmptyCellsPossibilities();
             if (SudokuSolver.solve(solvedGrid, true, false, false).getFirst() != SolvingState.SOLVED) {
                 if (nCellToRemove > 1) {
-                    nCellToRemove = Math.max(nCellToRemove / 2, 1);
                     for (int i = 0; i < nCellToRemove; i++) {
                         removableCells.add(solvedGrid.getMoves().getLast().position());
                         solvedGrid.undoLastMove(true);
                     }
+                    nCellToRemove = Math.max(nCellToRemove / 2, 1);
                 } else {
                     solvedGrid.undoLastMove(true);
                 }

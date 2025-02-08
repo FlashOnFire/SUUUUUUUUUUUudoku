@@ -59,4 +59,22 @@ public enum Difficulty {
             case EXPERT -> 6;
         };
     }
+
+    /**
+     * Returns the string representation of the Difficulty enum.
+     *
+     * @return the string representation of the difficulty level
+     */
+    @Override
+    public String toString() {
+        return switch (this) {
+            case EASY -> "Easy";
+            case MEDIUM -> "Medium";
+            case HARD -> "Hard";
+            case VERY_HARD -> "Very Hard";
+            case IMPOSSIBLE -> "Impossible";
+            case INSANE -> "Insane";
+            case EXPERT -> "Expert";
+        };
+    }
 }

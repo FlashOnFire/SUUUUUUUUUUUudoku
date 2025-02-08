@@ -42,6 +42,12 @@ public class ImGUIFrame extends Application {
     final int[] selectedGeneratorGridSizeHeight = {2};
     final int[] selectedRandomGeneratorHeight = {3};
     final int[] selectedRandomGeneratorWidth = {3};
+
+    /**
+     * The difficulty of the grid to generate (affects all generators).
+     */
+    Difficulty selectedDifficulty = Difficulty.EXPERT;
+
     boolean solveDeducing = true;
     boolean solveBacktracking = true;
     /**
@@ -95,69 +101,94 @@ public class ImGUIFrame extends Application {
      */
     @Override
     public void process() {
-        ImGui.begin("Suuuuuuuuuuudoku");
+        ImGui.begin("Suuuuuuuuuuudoku", ImGuiWindowFlags.AlwaysAutoResize);
 
         boolean disable = solving.get();
         if (disable) {
             ImGui.beginDisabled();
         }
 
-        ImGui.sameLine();
+        ImGui.text("Global Generators Difficulty");
+        ImGui.setNextItemWidth(100);
+        if (ImGui.beginCombo("##difficulty", selectedDifficulty.toString())) {
+            for (Difficulty difficulty : Difficulty.values()) {
+                boolean isSelected = selectedDifficulty == difficulty;
+                if (ImGui.selectable(difficulty.toString(), isSelected)) {
+                    selectedDifficulty = difficulty;
+                }
+                if (isSelected) {
+                    ImGui.setItemDefaultFocus();
+                }
+            }
+            ImGui.endCombo();
+        }
+
+        insertSeparator();
+
+        ImGui.text("Basic Grid Generator");
+
         ImGui.setNextItemWidth(100);
         ImGui.sliderInt("Block Width", selectedGeneratorGridSizeWidth, 2, 6, ImGuiSliderFlags.None);
         ImGui.sameLine();
         ImGui.setNextItemWidth(100);
         ImGui.sliderInt("Block Height", selectedGeneratorGridSizeHeight, 2, 6, ImGuiSliderFlags.None);
 
-        if (ImGui.button("Generate")) {
+        if (ImGui.button("Generate##Basic")) {
             var oldPace = SudokuSolver.solvePace[0];
             SudokuSolver.solvePace[0] = 1.0f;
 
             solvable = Generator.generateSudokuWithBlockConstraints(
                     selectedGeneratorGridSizeWidth[0],
                     selectedGeneratorGridSizeHeight[0],
-                    Difficulty.EXPERT
+                    selectedDifficulty
             ).getSecond();
 
             originalSolvable = ((Grid) solvable).shallowCopy();
             SudokuSolver.solvePace[0] = oldPace;
         }
-        ImGui.separator();
+
+        insertSeparator();
+
+        ImGui.text("Random Blocks Grid Generator");
 
         ImGui.setNextItemWidth(100);
-        ImGui.sliderInt("Grid Width##Randomblocks", selectedRandomGeneratorWidth, 3, 6);
+        ImGui.sliderInt("Grid Width##randomblocks", selectedRandomGeneratorWidth, 3, 6);
         ImGui.setNextItemWidth(100);
         ImGui.sameLine();
-        ImGui.sliderInt("Grid Height##Randombloks", selectedRandomGeneratorHeight, 3, 6);
+        ImGui.sliderInt("Grid Height##randomblocks", selectedRandomGeneratorHeight, 3, 6);
 
-        if (ImGui.button("Generate Random Blocks Grid")) {
+        if (ImGui.button("Generate##randomblocks")) {
             var oldPace = SudokuSolver.solvePace[0];
             SudokuSolver.solvePace[0] = 1.0f;
 
             solvable = Generator.generateSudokuWithRandomBlockConstraint(
                     selectedRandomGeneratorWidth[0],
                     selectedRandomGeneratorHeight[0],
-                    Difficulty.EXPERT
+                    selectedDifficulty
             ).getSecond();
 
             originalSolvable = ((Grid) solvable).shallowCopy();
             SudokuSolver.solvePace[0] = oldPace;
         }
-        ImGui.separator();
 
+        insertSeparator();
+
+        ImGui.text("MultiGrid Generator");
         if (ImGui.button("Generate MultiGrid")) {
             var oldPace = SudokuSolver.solvePace[0];
             SudokuSolver.solvePace[0] = 1.0f;
 
-            solvable = Generator.generateMultigridSudoku(Difficulty.EXPERT).getSecond();
+            solvable = Generator.generateMultigridSudoku(selectedDifficulty).getSecond();
 
             originalSolvable = ((MultiGrid) solvable).shallowCopy();
             SudokuSolver.solvePace[0] = oldPace;
         }
 
-        ImGui.separator();
+        insertSeparator();
 
-        if (ImGui.button("MaxiGrid")) {
+        ImGui.text("Test Grids");
+
+        if (ImGui.button("Import 100x100 grid")) {
             Integer[][] innergrid;
             innergrid = CsvUtils.importGrid("exemples/100x100.csv");
             var symbolSet = SymbolSets.generateSymbols(innergrid.length);
@@ -165,12 +196,29 @@ public class ImGUIFrame extends Application {
             originalSolvable = ((Grid) solvable).shallowCopy();
         }
 
-        ImGui.separator();
+        insertSeparator();
+
+        ImGui.text("Solver");
 
         if (solvable == null) {
             ImGui.beginDisabled();
         }
+
+        if (ImGui.checkbox("Deducing", solveDeducing)) {
+            solveDeducing = !solveDeducing;
+            if (!solveDeducing) {
+                solveBacktracking = true;
+            }
+        }
         ImGui.sameLine();
+
+        if (ImGui.checkbox("Backtracking", solveBacktracking)) {
+            solveBacktracking = !solveBacktracking;
+            if (!solveBacktracking) {
+                solveDeducing = true;
+            }
+        }
+
         if (ImGui.button("Solve")) {
             if (solvable instanceof Grid) {
                 new Thread(() -> {
@@ -206,25 +254,13 @@ public class ImGUIFrame extends Application {
                     } else {
                         unsolvablePopup.set(true);
                     }
+
+                    solving.set(false);
                 }).start();
             }
         }
 
-        if (ImGui.checkbox("Deducing", solveDeducing)) {
-            solveDeducing = !solveDeducing;
-            if (!solveDeducing) {
-                solveBacktracking = true;
-            }
-        }
         ImGui.sameLine();
-
-        if (ImGui.checkbox("Backtracking", solveBacktracking)) {
-            solveBacktracking = !solveBacktracking;
-            if (!solveBacktracking) {
-                solveDeducing = true;
-            }
-        }
-
         if (ImGui.button("Reset")) {
             if (originalSolvable instanceof Grid) {
                 solvable = ((Grid) originalSolvable).shallowCopy();
@@ -255,7 +291,7 @@ public class ImGUIFrame extends Application {
         );
         ImGui.text("Size: " + ((solvable != null) ? (solvable.getSize().getX() + "x" + solvable.getSize().getY()) :
                 "No grid loaded"));
-        ImGui.text("Solve pace :" + SudokuSolver.solvePace[0]);
+        ImGui.text("Solve pace : " + SudokuSolver.solvePace[0]);
         ImGui.end();
 
         if (solvable != null) {
@@ -324,7 +360,7 @@ public class ImGUIFrame extends Application {
             ImGui.begin(
                     "Grid",
                     null,
-                    ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoTitleBar
+                    ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoBringToFrontOnFocus
             );
 
             if (solvable instanceof Grid) {
@@ -353,6 +389,17 @@ public class ImGUIFrame extends Application {
             }
             ImGui.endPopup();
         }
+    }
+
+    /**
+     * Inserts a separator in the ImGui window.
+     * This method adds padding before and after the separator to create space
+     * between UI elements.
+     */
+    private void insertSeparator() {
+        ImGui.dummy(new ImVec2(0.0f, 5.0f));
+        ImGui.separator();
+        ImGui.dummy(new ImVec2(0.0f, 5.0f));
     }
 
     private void drawGrid(Grid grid, Vec2i gridSize, ImVec2 gridPixelSize) {

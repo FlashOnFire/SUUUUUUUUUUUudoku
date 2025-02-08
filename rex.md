@@ -598,7 +598,7 @@ sequenceDiagram
 Les résultats sont en fonction de la taille de la grille (Échantillon de 50 générations).
 
 | Taille | Moyenne | Minimum | Maximum | Médiane |
-|--:-:---|--:-:----|--:-:----|--:-:----|--:-:----|
+|:------:|:-------:|:-------:|:-------:|:-------:|
 | 4x4    | 4ms     | 1ms     | 33ms    | 3ms     |
 | 9x9    | 474ms   | 13ms    | 14324ms | 117ms   |
 
@@ -609,7 +609,7 @@ Les résultats sont en fonction de la taille de la grille (Échantillon de 50 g�
 Les résultats sont en fonction de la taille de la grille (Échantillon de 50 générations)
 
 | Taille | Moyenne | Minimum | Maximum | Médiane |
-|-:-:----|--:-:----|--:-:----|--:-:----|--:-:----|
+|:------:|:-------:|:-------:|:-------:|:-------:|
 | 4x4    | 5ms     | 2ms     | 79ms    | 3ms     |
 | 9x9    | 31ms    | 20ms    | 77ms    | 28ms    |
 | 16x16  | 472ms   | 390ms   | 676ms   | 465ms   |

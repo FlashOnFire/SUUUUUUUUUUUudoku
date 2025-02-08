@@ -306,7 +306,7 @@ public class ImGUIFrame extends Application {
             thread.start();
         }
         if (ImGui.isItemHovered()) {
-            ImGui.setTooltip("Visual solve the grid by showing the solution step by step. The pace of the solving can be adjusted with the slider below.");
+            ImGui.setTooltip("Visually solve the grid by showing the solution step by step. The pace of the solving can be adjusted with the slider below.");
         }
 
         if (ImGui.button("Reset")) {
@@ -435,11 +435,12 @@ public class ImGUIFrame extends Application {
                     ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoBringToFrontOnFocus
             );
 
-            if (solvable instanceof Grid) {
+            drawSolvable(solvable, gridSize, gridPixelSize);
+            /*if (solvable instanceof Grid) {
                 drawGrid((Grid) solvable, gridSize, gridPixelSize);
             } else if (solvable instanceof MultiGrid) {
                 drawMultiGrid((MultiGrid) solvable, gridSize, gridPixelSize);
-            }
+            }*/
 
             ImGui.popStyleColor();
             ImGui.popStyleVar();
@@ -474,116 +475,38 @@ public class ImGUIFrame extends Application {
         ImGui.dummy(new ImVec2(0.0f, 5.0f));
     }
 
-    private void drawGrid(Grid grid, Vec2i gridSize, ImVec2 gridPixelSize) {
+    private void drawSolvable(Solvable<?> solvable, Vec2i gridSize, ImVec2 gridPixelSize) {
         ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, 0, 0);
         for (int y = 0; y < gridSize.getY(); y++) {
             for (int x = 0; x < gridSize.getX(); x++) {
-
-                var isSelected = selected_pos != null && selected_pos.equals(x, y);
-
-                int finalY = y;
-                int finalX = x;
-
-                AtomicInteger hashcode = new AtomicInteger(1);
-
-                grid.getConstraints().stream()
-                        .filter(c -> c instanceof BlockConstraint || c instanceof PositionListConstraint)
-                        .filter(c -> c.isPosAffected(new Vec2i(finalX, finalY)))
-                        .forEach(c -> hashcode.updateAndGet(v -> 17 * v + c.hashCode()));
-
-                if (hashcode.get() != 1) {
-                    int color = hashcode.get() % 360;
-
-                    int[] rgb;
-                    int[] rgbDarker;
-                    if (isSelected) {
-                        rgb = Utils.hslToRgb(color % 360, 0.45f, 0.3f);
-                        rgbDarker = Utils.hslToRgb(color % 360, 0.45f, 0.25f);
-
-                    } else {
-                        rgb = Utils.hslToRgb(color % 360, 0.45f, 0.45f);
-                        rgbDarker = Utils.hslToRgb(color % 360, 0.45f, 0.35f);
-                    }
-
-                    int[] rgbEvenDarker = Utils.hslToRgb(color % 360, 0.45f, 0.2f);
-
-                    ImGui.pushStyleColor(ImGuiCol.Button, rgb[0] / 255f, rgb[1] / 255f, rgb[2] / 255f, 1);
-                    ImGui.pushStyleColor(
-                            ImGuiCol.ButtonHovered,
-                            rgbDarker[0] / 255f,
-                            rgbDarker[1] / 255f,
-                            rgbDarker[2] / 255f,
-                            1
-                    );
-
-                    ImGui.pushStyleColor(
-                            ImGuiCol.ButtonActive,
-                            rgbEvenDarker[0] / 255f,
-                            rgbEvenDarker[1] / 255f,
-                            rgbEvenDarker[2] / 255f,
-                            1
-                    );
-
-                }
-
-                if (isSelected) {
-                    ImGui.button(
-                            (current_symbol == null ? " " : current_symbol) + "##" + y + ":" + x,
-                            gridPixelSize
-                    );
-                } else {
-                    if (ImGui.button(
-                            (grid.getSymbolAt(x, y) == null ? " " : grid.getSymbolAt(
-                                    x,
-                                    y
-                            ).toString()) + "##" + y + ":" + x,
-                            gridPixelSize
-                    ) && !solving.get()) {
-                        if (hintMode) {
-                            if (grid.getSymbolAt(new Vec2i(x, y)) == null || !grid.getSymbolAt(new Vec2i(x, y)).equals(solvedSolvable.getSymbolAt(new Vec2i(x, y)))) {
-                                grid.placeUnchecked(new Vec2i(x, y), solvedSolvable.getSymbolAt(new Vec2i(x, y)), true, true);
-                            }
-                        } else {
-                            setSelection(x, y);
-                        }
-                    }
-                }
-
-                if (hashcode.get() != 1) {
-                    ImGui.popStyleColor(3);
-                }
-
-                ImGui.sameLine();
-            }
-            ImGui.newLine();
-        }
-        ImGui.popStyleVar();
-    }
-
-    private void drawMultiGrid(MultiGrid mg, Vec2i gridSize, ImVec2 gridPixelSize) {
-        ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, 0, 0);
-        for (int y = 0; y < gridSize.getY(); y++) {
-            for (int x = 0; x < gridSize.getX(); x++) {
-                if (mg.isNotInGrid(new Vec2i(x, y))) {
-                    ImGui.invisibleButton("##" + y + ":" + x, gridPixelSize.x, gridPixelSize.y);
+                // Add spacing when needed for multigrids
+                if (!solvable.isInGrid(new Vec2i(x, y))) {
+                    ImGui.dummy(gridPixelSize.x, gridPixelSize.y);
                     ImGui.sameLine();
                     continue;
                 }
 
                 var isSelected = selected_pos != null && selected_pos.equals(x, y);
 
-                var pair = mg.getGridFor(x, y);
+                Grid grid = null;
+                Vec2i computedPosition;
+                if (solvable instanceof Grid) {
+                    grid = (Grid) solvable;
+                    computedPosition = new Vec2i(x, y);
+                } else if (solvable instanceof MultiGrid) {
+                    grid = ((MultiGrid) solvable).getGridFor(x, y).getSecond();
+                    computedPosition = new Vec2i(x, y).substract(((MultiGrid) solvable).getOffsets()[((MultiGrid) solvable).getGridFor(x, y).getFirst()]);
+                } else {
+                    computedPosition = null;
+                }
 
-                var padding = mg.getOffsets()[pair.getFirst()];
-                int withoutPaddingX = x - padding.getX();
-                int withoutPaddingY = y - padding.getY();
-
+                assert computedPosition != null;
 
                 AtomicInteger hashcode = new AtomicInteger(1);
 
-                pair.getSecond().getConstraints().stream()
+                grid.getConstraints().stream()
                         .filter(c -> c instanceof BlockConstraint || c instanceof PositionListConstraint)
-                        .filter(c -> c.isPosAffected(new Vec2i(withoutPaddingX, withoutPaddingY)))
+                        .filter(c -> c.isPosAffected(computedPosition))
                         .forEach(c -> hashcode.updateAndGet(v -> 17 * v + c.hashCode()));
 
                 if (hashcode.get() != 1) {
@@ -628,15 +551,15 @@ public class ImGUIFrame extends Application {
                     );
                 } else {
                     if (ImGui.button(
-                            (mg.getSymbolAt(new Vec2i(x, y)) == null ? " " : mg.getSymbolAt(new Vec2i(
+                            (solvable.getSymbolAt(new Vec2i(x, y)) == null ? " " : solvable.getSymbolAt(new Vec2i(
                                     x,
                                     y
                             )).toString()) + "##" + y + ":" + x,
                             gridPixelSize
                     ) && !solving.get()) {
                         if (hintMode) {
-                            if (mg.getSymbolAt(new Vec2i(x, y)) == null || !mg.getSymbolAt(new Vec2i(x, y)).equals(solvedSolvable.getSymbolAt(new Vec2i(x, y)))) {
-                                mg.placeUnchecked(new Vec2i(x, y), solvedSolvable.getSymbolAt(new Vec2i(x, y)), true, true);
+                            if (solvable.getSymbolAt(new Vec2i(x, y)) == null || !solvable.getSymbolAt(new Vec2i(x, y)).equals(solvedSolvable.getSymbolAt(new Vec2i(x, y)))) {
+                                solvable.placeUnchecked(new Vec2i(x, y), solvedSolvable.getSymbolAt(new Vec2i(x, y)), true, true);
                             }
                         } else {
                             setSelection(x, y);

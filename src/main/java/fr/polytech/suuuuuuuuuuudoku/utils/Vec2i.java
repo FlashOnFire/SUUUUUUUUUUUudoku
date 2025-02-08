@@ -132,4 +132,13 @@ public class Vec2i {
     public boolean equals(int i, int j) {
         return x == i && y == j;
     }
+
+    /**
+     * Checks if the vector is the zero vector.
+     *
+     * @return true if the vector is the zero vector, false otherwise
+     */
+    public boolean isZeroVector() {
+        return x == 0 && y == 0;
+    }
 }

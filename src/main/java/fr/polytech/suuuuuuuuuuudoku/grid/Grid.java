@@ -88,9 +88,9 @@ public class Grid extends Solvable<Grid> {
     @Override
     public boolean areConstraintsSatisfied(boolean skip_not_empty) {
         return this.constraints.stream()
-                               .filter(c -> !(skip_not_empty && c instanceof NotEmptyConstraint))    // Skip
-                               // NotEmptyConstraint
-                               .allMatch(c -> c.isSatisfied(this.innerGrid));
+                .filter(c -> !(skip_not_empty && c instanceof NotEmptyConstraint))    // Skip
+                // NotEmptyConstraint
+                .allMatch(c -> c.isSatisfied(this.innerGrid));
     }
 
     /**
@@ -102,15 +102,15 @@ public class Grid extends Solvable<Grid> {
 
         for (var pos : this.innerGrid.computeEmptyCells()) {
             var list = this.constraints.stream()
-                                       .filter(c -> c.isPosAffected(pos))
-                                       .map(c -> c.getPossibilities(this.innerGrid, pos))
-                                       .filter(Optional::isPresent)
-                                       .map(Optional::get)
-                                       .reduce((acc, set) -> {
-                                           acc.retainAll(set);
-                                           return acc;
-                                       })
-                                       .orElse(new HashSet<>(this.symbols));
+                    .filter(c -> c.isPosAffected(pos))
+                    .map(c -> c.getPossibilities(this.innerGrid, pos))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .reduce((acc, set) -> {
+                        acc.retainAll(set);
+                        return acc;
+                    })
+                    .orElse(new HashSet<>(this.symbols));
 
             this.emptyCellsPossibilities.put(pos, list);
         }
@@ -143,15 +143,15 @@ public class Grid extends Solvable<Grid> {
         // Recompute possibilities for affected cells
         for (var pos : affectedCells) {
             var list = this.constraints.stream()
-                                       .filter(c -> !(skip_not_empty && c instanceof NotEmptyConstraint) && c.isPosAffected(pos))
-                                       .map(c -> c.getPossibilities(this.innerGrid, pos))
-                                       .filter(Optional::isPresent)
-                                       .map(Optional::get)
-                                       .reduce((acc, set) -> {
-                                           acc.retainAll(set);
-                                           return acc;
-                                       })
-                                       .orElse(new HashSet<>(this.symbols));
+                    .filter(c -> !(skip_not_empty && c instanceof NotEmptyConstraint) && c.isPosAffected(pos))
+                    .map(c -> c.getPossibilities(this.innerGrid, pos))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .reduce((acc, set) -> {
+                        acc.retainAll(set);
+                        return acc;
+                    })
+                    .orElse(new HashSet<>(this.symbols));
 
             this.emptyCellsPossibilities.put(pos, list);
         }
@@ -260,6 +260,16 @@ public class Grid extends Solvable<Grid> {
     @Override
     public void cleanMoves() {
         this.moves.clear();
+    }
+
+    @Override
+    public boolean isInGrid(Vec2i pos) {
+        if (this.getSize().isZeroVector()) {
+            return false;
+        }
+
+        return pos.getX() >= 0 && pos.getX() < this.innerGrid.get().length &&
+                pos.getY() >= 0 && pos.getY() < this.innerGrid.get()[0].length;
     }
 
     /**

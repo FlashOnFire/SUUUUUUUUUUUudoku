@@ -129,6 +129,7 @@ public class MultiGrid extends Solvable<MultiGrid> {
      * @param pos the position to check
      * @return true if the position is in the multi-grid Sudoku, false otherwise
      */
+    @Override
     public boolean isInGrid(Vec2i pos) {
         for (int i = 0; i < offsets.length; i++) {
             Vec2i offset = offsets[i];

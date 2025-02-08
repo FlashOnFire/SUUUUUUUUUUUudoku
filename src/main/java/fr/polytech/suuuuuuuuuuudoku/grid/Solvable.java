@@ -112,4 +112,12 @@ public abstract class Solvable<T> {
      * Cleans the list of moves.
      */
     public abstract void cleanMoves();
+
+    /**
+     * Checks if the specified position is in the grid.
+     *
+     * @param pos the position to check
+     * @return true if the position is in the grid, false otherwise
+     */
+    public abstract boolean isInGrid(Vec2i pos);
 }

@@ -146,6 +146,16 @@ public class ObservableMultiGrid extends Solvable<ObservableMultiGrid> {
     }
 
     /**
+     * Checks if the specified position is in the grid.
+     * @param pos the position to check
+     * @return true if the position is in the grid, false otherwise
+     */
+    @Override
+    public boolean isInGrid(Vec2i pos) {
+        return grid.isInGrid(pos);
+    }
+
+    /**
      * Undoes the last move made on the grid.
      *
      * @param updatePossibilities whether to update possibilities

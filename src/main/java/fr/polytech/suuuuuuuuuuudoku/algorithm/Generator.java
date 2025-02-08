@@ -124,7 +124,7 @@ public class Generator {
         int nCellToRemove = Math.min((int) Math.sqrt(gridSize), removableCells.size());
 
         do {
-            for (int i = 0; i < nCellToRemove; i++) {
+            for (int i = 0; i < nCellToRemove && i < removableCells.size(); i++) {
                 solvedGrid.placeUnchecked(removableCells.removeFirst(), null, false, true);
             }
             solvedGrid.computeAllEmptyCellsPossibilities();

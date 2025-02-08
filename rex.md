@@ -598,11 +598,10 @@ sequenceDiagram
 Les résultats sont en fonction de la taille de la grille (Échantillon de 50 générations).
 
 | Taille | Moyenne | Minimum | Maximum | Médiane |
-|--------|---------|---------|---------|---------|
-| 4x4    | 5ms     | 2ms     | 40ms    | 4ms     |
-| 9x9    | 38ms    | 32ms    | 62ms    | 37ms    |
-| 16x16  | 767ms   | 636ms   | 960ms   | 763ms   |
-| 25x25  | 19937ms | 6738ms  | 63256ms | 8238ms  |
+|--:-:---|--:-:----|--:-:----|--:-:----|--:-:----|
+| 4x4    | 4ms     | 1ms     | 33ms    | 3ms     |
+| 9x9    | 474ms   | 13ms    | 14324ms | 117ms   |
+
 
 ![img_5.png](img_5.png)
 
@@ -610,12 +609,12 @@ Les résultats sont en fonction de la taille de la grille (Échantillon de 50 g�
 Les résultats sont en fonction de la taille de la grille (Échantillon de 50 générations)
 
 | Taille | Moyenne | Minimum | Maximum | Médiane |
-|--------|---------|---------|---------|---------|
-| 4x4    | 4ms     | 2ms     | 32ms    | 4ms     |
-| 9x9    | 25ms    | 8ms     | 53ms    | 25ms    |
-| 16x16  | 460ms   | 199ms   | 604ms   | 462ms   |
-| 25x25  | 4794ms  | 2255ms  | 6448ms  | 5005ms  |
-| 36x36  | 31666ms | 17667ms | 43032ms | 33661ms |
+|-:-:----|--:-:----|--:-:----|--:-:----|--:-:----|
+| 4x4    | 5ms     | 2ms     | 79ms    | 3ms     |
+| 9x9    | 31ms    | 20ms    | 77ms    | 28ms    |
+| 16x16  | 472ms   | 390ms   | 676ms   | 465ms   |
+| 25x25  | 5380ms  | 4490ms  | 6144ms  | 5368ms  |
+| 36x36  | 38224ms | 34740ms | 41455ms | 38309ms |
 
 ![img_4.png](img_4.png)
 

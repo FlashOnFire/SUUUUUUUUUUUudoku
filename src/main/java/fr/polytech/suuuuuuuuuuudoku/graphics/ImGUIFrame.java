@@ -51,14 +51,19 @@ public class ImGUIFrame extends Application {
     boolean solveDeducing = true;
     boolean solveBacktracking = true;
     /**
-     * The original solvable grid before any modifications.
+     * The original solvable before any modifications.
      */
     Solvable<?> originalSolvable;
 
     /**
-     * The current solvable grid.
+     * The current solvable.
      */
     Solvable<?> solvable;
+
+    /**
+     * The solved current solvable.
+     */
+    Solvable<?> solvedSolvable;
 
     /**
      * The currently selected position in the grid.
@@ -137,11 +142,13 @@ public class ImGUIFrame extends Application {
             var oldPace = SudokuSolver.solvePace[0];
             SudokuSolver.solvePace[0] = 1.0f;
 
-            solvable = Generator.generateSudokuWithBlockConstraints(
+            var pair = Generator.generateSudokuWithBlockConstraints(
                     selectedGeneratorGridSizeWidth[0],
                     selectedGeneratorGridSizeHeight[0],
                     selectedDifficulty
-            ).getSecond();
+            );
+            solvedSolvable = pair.getFirst();
+            solvable = pair.getSecond();
 
             originalSolvable = ((Grid) solvable).shallowCopy();
             SudokuSolver.solvePace[0] = oldPace;
@@ -161,11 +168,13 @@ public class ImGUIFrame extends Application {
             var oldPace = SudokuSolver.solvePace[0];
             SudokuSolver.solvePace[0] = 1.0f;
 
-            solvable = Generator.generateSudokuWithRandomBlockConstraint(
+            var pair = Generator.generateSudokuWithRandomBlockConstraint(
                     selectedRandomGeneratorWidth[0],
                     selectedRandomGeneratorHeight[0],
                     selectedDifficulty
-            ).getSecond();
+            );
+            solvedSolvable = pair.getFirst();
+            solvable = pair.getSecond();
 
             originalSolvable = ((Grid) solvable).shallowCopy();
             SudokuSolver.solvePace[0] = oldPace;
@@ -178,7 +187,9 @@ public class ImGUIFrame extends Application {
             var oldPace = SudokuSolver.solvePace[0];
             SudokuSolver.solvePace[0] = 1.0f;
 
-            solvable = Generator.generateMultigridSudoku(selectedDifficulty).getSecond();
+            var pair = Generator.generateMultigridSudoku(selectedDifficulty);
+            solvedSolvable = pair.getFirst();
+            solvable = pair.getSecond();
 
             originalSolvable = ((MultiGrid) solvable).shallowCopy();
             SudokuSolver.solvePace[0] = oldPace;
@@ -189,11 +200,15 @@ public class ImGUIFrame extends Application {
         ImGui.text("Test Grids");
 
         if (ImGui.button("Import 100x100 grid")) {
-            Integer[][] innergrid;
-            innergrid = CsvUtils.importGrid("exemples/100x100.csv");
-            var symbolSet = SymbolSets.generateSymbols(innergrid.length);
-            solvable = new Grid(innergrid, symbolSet);
+            Integer[][] innerGrid;
+            innerGrid = CsvUtils.importGrid("exemples/100x100.csv");
+            var symbolSet = SymbolSets.generateSymbols(innerGrid.length);
+            solvable = new Grid(innerGrid, symbolSet);
             originalSolvable = ((Grid) solvable).shallowCopy();
+
+            Integer[][] solvedInnerGrid;
+            solvedInnerGrid = CsvUtils.importGrid("exemples/100x100Solved.csv");
+            solvedSolvable = new Grid(solvedInnerGrid, symbolSet);
         }
 
         insertSeparator();
@@ -219,7 +234,15 @@ public class ImGUIFrame extends Application {
             }
         }
 
-        if (ImGui.button("Solve")) {
+        if (ImGui.button("Instant Solve")) {
+            if (solvable instanceof Grid) {
+                solvable = ((Grid) solvedSolvable).shallowCopy();
+            } else if (solvable instanceof MultiGrid) {
+                solvable = ((MultiGrid) solvedSolvable).shallowCopy();
+            }
+        }
+
+        if (ImGui.button("Visual Solve")) {
             if (solvable instanceof Grid) {
                 new Thread(() -> {
                     solving.set(true);
@@ -268,6 +291,7 @@ public class ImGUIFrame extends Application {
                 solvable = ((MultiGrid) originalSolvable).shallowCopy();
             }
         }
+
 
         if (solvable == null) {
             ImGui.endDisabled();

@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ImGUIFrame extends Application {
     /**
-     * A boolean indicating if the game is currently solving.
+     * A boolean indicating if the solving thread is running.
      */
     final AtomicBoolean solving = new AtomicBoolean(false);
 
@@ -38,8 +38,9 @@ public class ImGUIFrame extends Application {
      * The width of the grid for the generator.
      */
     final int[] selectedGeneratorGridSizeWidth = {2};
+
     /**
-     * The height of the grid for the generator.
+     * Generator options
      */
     final int[] selectedGeneratorGridSizeHeight = {2};
     final int[] selectedRandomGeneratorHeight = {3};

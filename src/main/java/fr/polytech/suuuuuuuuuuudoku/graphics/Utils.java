@@ -3,7 +3,7 @@ package fr.polytech.suuuuuuuuuuudoku.graphics;
 import java.util.HashMap;
 
 /**
- * Utility class containing various utility methods.
+ * Utility class containing various utility methods for graphical tools.
  */
 public class Utils {
     /**

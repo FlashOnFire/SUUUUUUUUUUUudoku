@@ -16,7 +16,7 @@ import imgui.app.Application;
 import imgui.app.Configuration;
 import imgui.flag.*;
 
- import java.util.Objects;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -324,8 +324,8 @@ public class ImGUIFrame extends Application {
             var minSize = Math.min(size.x, size.y);
 
             var gridPixelSize = new ImVec2(minSize / gridSize.getX(), minSize / gridSize.getY());
-            gridPixelSize.x = Math.min(gridPixelSize.x, 50);
-            gridPixelSize.y = Math.min(gridPixelSize.y, 50);
+            gridPixelSize.x = Math.min(gridPixelSize.x, 70);
+            gridPixelSize.y = Math.min(gridPixelSize.y, 70);
 
             var fullGridPixelSize = new ImVec2(gridPixelSize.x * gridSize.getX(), gridPixelSize.y * gridSize.getY());
 
@@ -384,6 +384,8 @@ public class ImGUIFrame extends Application {
      */
     private void drawSolvable(Solvable<?> solvable, Vec2i gridSize, ImVec2 gridPixelSize) {
         ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, 0, 0);
+        ImGui.setWindowFontScale((gridPixelSize.y * 0.5f) / (ImGui.getFont().getFontSize()));
+
         for (int y = 0; y < gridSize.getY(); y++) {
             for (int x = 0; x < gridSize.getX(); x++) {
                 var position = new Vec2i(x, y);
@@ -418,39 +420,70 @@ public class ImGUIFrame extends Application {
                         .filter(c -> c.isPosAffected(computedPosition))
                         .forEach(c -> hashcode.updateAndGet(v -> 17 * v + c.hashCode()));
 
+                // If the cell is prefilled, we will have a slightly different behavior :
+                // - The color will be different
+                // - The button which represents the cell will be disabled
+                boolean prefilledCell = originalSolvable.getSymbolAt(position) != null;
+
                 if (hashcode.get() != 1) {
                     int color = hashcode.get() % 360;
 
-                    int[] rgb;
-                    int[] rgbDarker;
-                    if (isSelected) {
-                        rgb = Utils.hslToRgb(color, 0.45f, 0.3f);
-                        rgbDarker = Utils.hslToRgb(color, 0.45f, 0.25f);
+                    if (!prefilledCell) {
+                        int[] rgbNormal;
+                        int[] rgbHovered;
+                        int[] rgbActive;
 
+                        if (isSelected) {
+                            rgbNormal = Utils.hslToRgb(color, 0.45f, 0.3f);
+                            rgbHovered = Utils.hslToRgb(color, 0.45f, 0.25f);
+                        } else {
+                            rgbNormal = Utils.hslToRgb(color, 0.45f, 0.45f);
+                            rgbHovered = Utils.hslToRgb(color, 0.45f, 0.35f);
+                        }
+
+                        rgbActive = Utils.hslToRgb(color, 0.45f, 0.2f);
+
+                        ImGui.pushStyleColor(ImGuiCol.Button,
+                                rgbNormal[0] / 255f,
+                                rgbNormal[1] / 255f,
+                                rgbNormal[2] / 255f,
+                                1);
+                        ImGui.pushStyleColor(
+                                ImGuiCol.ButtonHovered,
+                                rgbHovered[0] / 255f,
+                                rgbHovered[1] / 255f,
+                                rgbHovered[2] / 255f,
+                                1
+                        );
+
+                        ImGui.pushStyleColor(
+                                ImGuiCol.ButtonActive,
+                                rgbActive[0] / 255f,
+                                rgbActive[1] / 255f,
+                                rgbActive[2] / 255f,
+                                1
+                        );
                     } else {
-                        rgb = Utils.hslToRgb(color, 0.45f, 0.45f);
-                        rgbDarker = Utils.hslToRgb(color, 0.45f, 0.35f);
+                        // if the cell was prefilled, we use a different darker color to indicate this cell is not editable
+                        int[] rgbNormal = Utils.hslToRgb(color, 0.35f, 0.45f);
+
+                        ImGui.pushStyleColor(ImGuiCol.Button,
+                                rgbNormal[0] / 255f,
+                                rgbNormal[1] / 255f,
+                                rgbNormal[2] / 255f,
+                                1);
                     }
+                }
 
-                    int[] rgbEvenDarker = Utils.hslToRgb(color, 0.45f, 0.2f);
+                float oldDisabledAlpha = ImGui.getStyle().getDisabledAlpha();
+                if (prefilledCell) {
+                    // We set the disabled alpha to 1.0f to avoid ImGUI to change button appearance
+                    ImGui.getStyle().setDisabledAlpha(1.0f);
+                    ImGui.beginDisabled();
 
-                    ImGui.pushStyleColor(ImGuiCol.Button, rgb[0] / 255f, rgb[1] / 255f, rgb[2] / 255f, 1);
-                    ImGui.pushStyleColor(
-                            ImGuiCol.ButtonHovered,
-                            rgbDarker[0] / 255f,
-                            rgbDarker[1] / 255f,
-                            rgbDarker[2] / 255f,
-                            1
-                    );
-
-                    ImGui.pushStyleColor(
-                            ImGuiCol.ButtonActive,
-                            rgbEvenDarker[0] / 255f,
-                            rgbEvenDarker[1] / 255f,
-                            rgbEvenDarker[2] / 255f,
-                            1
-                    );
-
+                    ImGui.pushStyleColor(ImGuiCol.Text, 0.0f, 0.f, 0.0f, 1.0f);
+                } else {
+                    ImGui.pushStyleColor(ImGuiCol.Text, 1.0f, 1.f, 1.0f, 1.0f);
                 }
 
                 if (isSelected) {
@@ -474,8 +507,20 @@ public class ImGUIFrame extends Application {
                 }
 
                 if (hashcode.get() != 1) {
-                    ImGui.popStyleColor(3);
+                    if (prefilledCell) {
+                        ImGui.popStyleColor(1);
+                    } else {
+                        ImGui.popStyleColor(3);
+                    }
                 }
+
+                if (prefilledCell) {
+                    ImGui.endDisabled();
+                    ImGui.getStyle().setDisabledAlpha(oldDisabledAlpha);
+                }
+
+                // Reset text color override
+                ImGui.popStyleColor(1);
 
                 ImGui.sameLine();
             }

@@ -10,32 +10,33 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Represents a constraint that checks for the presence of specific symbols at specific positions in a grid.
- * Like a block constraint but destructured.
+ * Represents a destructured block constraint. It checks for the presence of specific symbols within a defined set of positions in the grid
  */
-public class PositionListConstraint implements AbstractConstraint {
+public class PositionSetConstraint implements AbstractConstraint {
     /**
-     * The set of symbols to be checked within the constraints.
+     * The set of symbols
      */
     private final Set<Integer> symbols;
 
     /**
-     * The list of position which define value to check.
+     * The list of positions which defines the constraint
      */
-    private final HashSet<Vec2i> positionList;
+    private final HashSet<Vec2i> positionSet;
 
     /**
-     * Constructs a GeneralSymbolConstraint with the specified symbols and positions.
+     * Constructs a PositionListConstraint with the specified symbols and positions.
      *
      * @param symbols      the set of symbols to be checked within the constraints
-     * @param positionList the list of position which define value to check
+     * @param positionSet  the set of position which define value to check
+     * @throws IllegalArgumentException if the position list is empty or has a different size than the symbols
      */
-    public PositionListConstraint(Set<Integer> symbols, HashSet<Vec2i> positionList) {
-        assert !positionList.isEmpty();
-        assert positionList.size() == symbols.size();
+    public PositionSetConstraint(Set<Integer> symbols, HashSet<Vec2i> positionSet) {
+        if (positionSet.isEmpty() || positionSet.size() != symbols.size()) {
+            throw new IllegalArgumentException("Position list must not be empty and must have the same size as symbols.");
+        }
 
         this.symbols = symbols;
-        this.positionList = positionList;
+        this.positionSet = positionSet;
     }
 
     /**
@@ -48,7 +49,7 @@ public class PositionListConstraint implements AbstractConstraint {
     public boolean isSatisfied(InnerGrid grid) {
         HashSet<Integer> set = new HashSet<>();
 
-        for (var pos : positionList) {
+        for (var pos : positionSet) {
             // Ignore empty cells
             if (grid.at(pos) != null) {
                 // Check for duplicates
@@ -66,10 +67,10 @@ public class PositionListConstraint implements AbstractConstraint {
     }
 
     /**
-     * Gets the possible values for a given position in the grid.
+     * Gets the possible values for a given position in the grid with respect to the constraint.
      *
-     * @param grid the Sudoku grid
-     * @param pos  the position in the grid
+     * @param grid the grid
+     * @param pos  the position
      * @return the possible values for the given position in the grid
      */
     @Override
@@ -78,7 +79,7 @@ public class PositionListConstraint implements AbstractConstraint {
         assert pos.getY() < grid.length();
         assert grid.get()[pos.getY()][pos.getX()] == null;
 
-        if (!isInPositionList(pos)) {
+        if (!isPosAffected(pos)) {
             return Optional.empty();
         }
 
@@ -87,8 +88,8 @@ public class PositionListConstraint implements AbstractConstraint {
 
         // Return the symbols that are not present in the block
         var possibilities = symbols.stream()
-                                   .filter(c -> !set.contains(c))
-                                   .collect(Collectors.toSet());
+                .filter(c -> !set.contains(c))
+                .collect(Collectors.toSet());
 
         return Optional.of(possibilities);
     }
@@ -102,7 +103,7 @@ public class PositionListConstraint implements AbstractConstraint {
      */
     @Override
     public boolean isAffectedBy(Vec2i pos1, Vec2i pos2) {
-        return isInPositionList(pos1) && isInPositionList(pos2);
+        return isPosAffected(pos1) && isPosAffected(pos2);
     }
 
     /**
@@ -113,28 +114,18 @@ public class PositionListConstraint implements AbstractConstraint {
      */
     @Override
     public boolean isPosAffected(Vec2i pos) {
-        return isInPositionList(pos);
+        return positionSet.contains(pos);
     }
 
     /**
-     * Checks if the given position is within the block.
-     *
-     * @param pos the position to check
-     * @return true if the position is within the block, false otherwise
-     */
-    private boolean isInPositionList(Vec2i pos) {
-        return positionList.contains(pos);
-    }
-
-    /**
-     * Extracts the block of characters from the grid based on the defined coordinates.
+     * Extracts the values from the grid at the positions defined by the constraint.
      *
      * @param grid the grid from which to extract the block
-     * @return a set of characters within the block, excluding empty cells
+     * @return the set of values extracted from the grid
      */
     private Set<Integer> extractValues(InnerGrid grid) {
         HashSet<Integer> set = new HashSet<>();
-        for (Vec2i vec2i : positionList) {
+        for (Vec2i vec2i : positionSet) {
             set.add(grid.at(vec2i));
         }
         set.removeIf(Objects::isNull);
@@ -148,6 +139,6 @@ public class PositionListConstraint implements AbstractConstraint {
      * @return the set of positions which define the values to check
      */
     public HashSet<Vec2i> getPositionSet() {
-        return positionList;
+        return positionSet;
     }
 }

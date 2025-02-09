@@ -193,11 +193,11 @@ public class SudokuSolver {
     }
 
     /**
-     * Solves the Sudoku grid using deduction.
+     * Tries to solve the provided solvable grid using deduction.
      *
-     * @param <T>         the type of the Sudoku grid should implement the Solvable interface
-     * @param grid        the Sudoku grid to solve
-     * @param store_moves whether to store the moves
+     * @param <T>         a type that implements the Solvable interface
+     * @param grid        the grid to solve
+     * @param store_moves whether to store the moves in the grid
      * @return the solving state of the Sudoku grid
      */
     private static <T extends Solvable<T>> SolvingState solveDeduction(T grid, boolean store_moves) {
@@ -238,7 +238,7 @@ public class SudokuSolver {
             }
         }
 
-        // Return the solving state based on whether the grid is solved
+        // Return the solving state
         return grid.isSolved() ? SolvingState.SOLVED : SolvingState.PARTIALLY_SOLVED;
     }
 }

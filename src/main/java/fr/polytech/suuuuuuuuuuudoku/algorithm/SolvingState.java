@@ -10,7 +10,7 @@ public enum SolvingState {
     SOLVED,
 
     /**
-     * Indicates that the Sudoku puzzle is partially solved.
+     * Indicates that the Sudoku puzzle is partially solved (needs backtracking).
      */
     PARTIALLY_SOLVED,
 

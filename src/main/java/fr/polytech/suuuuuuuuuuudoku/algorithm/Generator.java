@@ -190,7 +190,7 @@ public class Generator {
                 constraintPositions.add(position);
             }
 
-            constraints.add(new PositionListConstraint(SymbolSets.generateSymbols(gridSize),
+            constraints.add(new PositionSetConstraint(SymbolSets.generateSymbols(gridSize),
                     constraintPositions));
         }
         constraints.add(new LineConstraint(solvedGrid.getSymbols()));

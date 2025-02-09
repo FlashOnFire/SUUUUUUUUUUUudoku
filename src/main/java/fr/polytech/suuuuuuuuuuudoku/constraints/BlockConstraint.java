@@ -26,7 +26,6 @@ public class BlockConstraint implements AbstractConstraint {
      *
      * @param symbols the set of symbols to be checked within the block
      * @param box     the box that defines the block in the grid
-     * @throws IllegalArgumentException if dx is less than or equal to x or dy is less than or equal to y
      */
     public BlockConstraint(Set<Integer> symbols, Box2D box) {
         this.symbols = symbols;
@@ -65,7 +64,7 @@ public class BlockConstraint implements AbstractConstraint {
     }
 
     /**
-     * Returns the possible symbols that can be placed at the given position in the grid.
+     * Returns the possible symbols that can be placed at the given position in the grid with respect to the constraint.
      *
      * @param grid the grid to check the possibilities against
      * @param pos  the position to check the possibilities for
@@ -95,6 +94,10 @@ public class BlockConstraint implements AbstractConstraint {
 
     /**
      * Checks if the two given positions have an effect on each other with respect to the constraint.
+     *
+     * @param pos1 the first position
+     * @param pos2 the second position
+     * @return true if the two positions have an effect on each other, false otherwise
      */
     public boolean isAffectedBy(Vec2i pos1, Vec2i pos2) {
         return isInBlock(pos1) && isInBlock(pos2);
@@ -102,6 +105,9 @@ public class BlockConstraint implements AbstractConstraint {
 
     /**
      * Checks if the given position is affected by the constraint.
+     *
+     * @param pos the position to check
+     * @return true if the position is affected by the constraint, false otherwise
      */
     public boolean isPosAffected(Vec2i pos) {
         return isInBlock(pos);

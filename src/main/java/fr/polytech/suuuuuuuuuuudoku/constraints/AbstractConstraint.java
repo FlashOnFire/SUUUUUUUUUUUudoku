@@ -16,6 +16,7 @@ public interface AbstractConstraint {
 
     /**
      * Generates the classic constraints for a Sudoku grid.
+     * ( line, column, blocks and NotEmpty constraints)
      *
      * @param size    the size of the grid
      * @param symbols the set of symbols used in the grid
@@ -28,7 +29,7 @@ public interface AbstractConstraint {
 
     /**
      * Generates the rectangular constraints for a Sudoku grid.
-     * These are the line, column, block and not empty constraints.
+     * (line, column, blocks and NotEmpty constraints)
      *
      * @param width:   the width of the block
      * @param height:  the height  of the block
@@ -60,7 +61,7 @@ public interface AbstractConstraint {
     boolean isSatisfied(InnerGrid grid);
 
     /**
-     * Gets the possible values for a given position in the grid.
+     * Gets the possible values for a given position in the grid with respect to the constraint.
      *
      * @param grid the Sudoku grid
      * @param pos  the position in the grid

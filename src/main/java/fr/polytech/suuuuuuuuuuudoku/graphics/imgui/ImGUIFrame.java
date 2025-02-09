@@ -4,7 +4,7 @@ import fr.polytech.suuuuuuuuuuudoku.algorithm.Generator;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.SolvingState;
 import fr.polytech.suuuuuuuuuuudoku.algorithm.SudokuSolver;
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
-import fr.polytech.suuuuuuuuuuudoku.constraints.PositionListConstraint;
+import fr.polytech.suuuuuuuuuuudoku.constraints.PositionSetConstraint;
 import fr.polytech.suuuuuuuuuuudoku.graphics.Utils;
 import fr.polytech.suuuuuuuuuuudoku.grid.*;
 import fr.polytech.suuuuuuuuuuudoku.utils.CsvUtils;
@@ -426,7 +426,7 @@ public class ImGUIFrame extends Application {
                 AtomicInteger hashcode = new AtomicInteger(1);
 
                 grid.getConstraints().stream()
-                    .filter(c -> c instanceof BlockConstraint || c instanceof PositionListConstraint)
+                    .filter(c -> c instanceof BlockConstraint || c instanceof PositionSetConstraint)
                     .filter(c -> c.isPosAffected(computedPosition))
                     .forEach(c -> hashcode.updateAndGet(v -> 17 * v + c.hashCode()));
 

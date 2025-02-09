@@ -23,7 +23,7 @@ public class NotEmptyConstraint implements AbstractConstraint {
      * Checks if the constraint is satisfied for the given grid.
      *
      * @param grid the Sudoku grid to check
-     * @return true if no cell in the grid is empty, false otherwise
+     * @return true if there are no empty cells in the grid, false otherwise
      */
     @Override
     public boolean isSatisfied(InnerGrid grid) {
@@ -44,6 +44,10 @@ public class NotEmptyConstraint implements AbstractConstraint {
 
     /**
      * Checks if the two given positions have an effect on each other with respect to the constraint.
+     *
+     * @param pos1 the first position
+     * @param pos2 the second position
+     * @return false because changing one position does not affect the other
      */
     public boolean isAffectedBy(Vec2i pos1, Vec2i pos2) {
         return false;
@@ -53,7 +57,7 @@ public class NotEmptyConstraint implements AbstractConstraint {
      * Checks if the given position is affected by the constraint.
      *
      * @param pos the position to check
-     * @return true if the position is affected by the constraint, false otherwise
+     * @return true because all positions are affected by this constraint
      */
     public boolean isPosAffected(Vec2i pos) {
         return true;

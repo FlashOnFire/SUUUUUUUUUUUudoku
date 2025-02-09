@@ -1,7 +1,7 @@
 package fr.polytech.suuuuuuuuuuudoku.graphics.swing;
 
 import fr.polytech.suuuuuuuuuuudoku.constraints.BlockConstraint;
-import fr.polytech.suuuuuuuuuuudoku.constraints.PositionListConstraint;
+import fr.polytech.suuuuuuuuuuudoku.constraints.PositionSetConstraint;
 import fr.polytech.suuuuuuuuuuudoku.grid.Grid;
 import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 
@@ -86,9 +86,9 @@ public class SudokuBoard extends JPanel {
                         .ifPresent(blockConstraint -> c.setBackground(new Color((grid.getConstraints().indexOf(blockConstraint) * 1234567) % 0x888888 + 0x777777)));
 
                     grid.getConstraints().stream()
-                        .filter(PositionListConstraint.class::isInstance)
-                        .map(PositionListConstraint.class::cast)
-                        .filter(positionListConstraint -> positionListConstraint.getPositionSet().stream().anyMatch(pos -> pos.getX() == column && pos.getY() == row))
+                        .filter(PositionSetConstraint.class::isInstance)
+                        .map(PositionSetConstraint.class::cast)
+                        .filter(positionSetConstraint -> positionSetConstraint.getPositionSet().stream().anyMatch(pos -> pos.getX() == column && pos.getY() == row))
                         .findFirst()
                         .ifPresent(blockConstraint -> c.setBackground(new Color((grid.getConstraints().indexOf(blockConstraint) * 1234567) % 0x888888 + 0x777777)));
 

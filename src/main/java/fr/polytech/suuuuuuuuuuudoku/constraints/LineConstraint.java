@@ -18,7 +18,7 @@ public class LineConstraint implements AbstractConstraint {
     /**
      * Constructs a LineConstraint with the specified set of symbols.
      *
-     * @param symbols the set of symbols that must be present in each line
+     * @param symbols the symbols that each line must contain
      */
     public LineConstraint(Set<Integer> symbols) {
         this.symbols = symbols;
@@ -47,7 +47,7 @@ public class LineConstraint implements AbstractConstraint {
      *
      * @param grid the grid to check
      * @param pos  the position to check
-     * @return an Optional containing a list of possible symbols, or an empty Optional if no symbols are possible
+     * @return an Optional containing a list of possible symbols that can be placed at the specified position with respect to the constraint
      */
     @Override
     public Optional<Set<Integer>> getPossibilities(InnerGrid grid, Vec2i pos) {
@@ -69,6 +69,10 @@ public class LineConstraint implements AbstractConstraint {
 
     /**
      * Checks if the two given positions have an effect on each other with respect to the constraint.
+     *
+     * @param pos1 the first position
+     * @param pos2 the second position
+     * @return true if the two positions have an effect on each other, false otherwise
      */
     public boolean isAffectedBy(Vec2i pos1, Vec2i pos2) {
         return pos1.getY() == pos2.getY();

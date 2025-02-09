@@ -84,6 +84,10 @@ public class ColumnConstraint implements AbstractConstraint {
 
     /**
      * Checks if the two given positions have an effect on each other with respect to the constraint.
+     *
+     * @param pos1 the first position
+     * @param pos2 the second position
+     * @return true if the two positions have an effect on each other, false otherwise
      */
     public boolean isAffectedBy(Vec2i pos1, Vec2i pos2) {
         return pos1.getX() == pos2.getX();

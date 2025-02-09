@@ -7,7 +7,7 @@ toccolor: black
 toc-title: Table des matières
 ---
 
-Lien du Git : [GitHub](https://github.com/FlashOnFire/SUUUUUUUUUUUudoku)
+### Lien du Git : [GitHub](https://github.com/FlashOnFire/SUUUUUUUUUUUudoku)
 
 # Tutoriel utilisation
 

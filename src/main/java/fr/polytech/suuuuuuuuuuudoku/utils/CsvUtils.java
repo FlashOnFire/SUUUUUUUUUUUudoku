@@ -24,6 +24,12 @@ import java.util.stream.Collectors;
 public class CsvUtils {
 
     /**
+     * Private constructor to prevent instantiation of the CsvUtils class.
+     */
+    private CsvUtils() {
+    }
+
+    /**
      * Reads a grid from a CSV file.
      *
      * @param fileName the name of the CSV file
@@ -50,7 +56,8 @@ public class CsvUtils {
      *
      * @param folder the CSV folder representing the grids
      * @return the created Grid
-     * @throws FileNotFoundException if the folder is not found
+     * @throws IOException        if an I/O error occurs
+     * @throws URISyntaxException if the URI is invalid
      */
     static public MultiGrid importMultiGrid(String folder) throws IOException, URISyntaxException {
         // list the files

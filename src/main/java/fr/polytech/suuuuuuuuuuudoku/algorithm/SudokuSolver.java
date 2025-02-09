@@ -19,6 +19,12 @@ public class SudokuSolver {
     public static final float[] solvePace = new float[]{1.0f};
 
     /**
+     * Private constructor to prevent instantiation of the SudokuSolver class.
+     */
+    private SudokuSolver() {
+    }
+
+    /**
      * Solves the given Sudoku grid.
      *
      * @param <T>          the type of the Sudoku grid should implement the Solvable interface
@@ -119,10 +125,11 @@ public class SudokuSolver {
     /**
      * Finds all solutions to the given Sudoku grid.
      *
-     * @param grid:         the Sudoku grid to solve
-     * @param deducing:     whether to use deduction
-     * @param backtracking: whether to use backtracking
-     * @param store_moves:  whether to store the moves
+     * @param <T>          the type of the Sudoku grid should implement the Solvable interface
+     * @param grid         the Sudoku grid to solve
+     * @param deducing     whether to use deduction
+     * @param backtracking whether to use backtracking
+     * @param store_moves  whether to store the moves
      * @return a list of all solutions to the Sudoku grid
      */
     public static <T extends Solvable<T>> List<T> findAllSolutions(T grid, boolean deducing,

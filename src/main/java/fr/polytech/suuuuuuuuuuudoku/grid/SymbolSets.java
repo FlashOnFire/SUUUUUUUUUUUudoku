@@ -8,6 +8,12 @@ import java.util.stream.IntStream;
  */
 public class SymbolSets {
     /**
+     * Constructs a new SymbolSets.
+     */
+    public SymbolSets() {
+    }
+
+    /**
      * Generates a set of symbols from 1 to the specified length.
      *
      * @param length the maximum number to include in the set

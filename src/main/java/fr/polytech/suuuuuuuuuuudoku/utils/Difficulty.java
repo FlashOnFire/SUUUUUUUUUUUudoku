@@ -4,7 +4,40 @@ package fr.polytech.suuuuuuuuuuudoku.utils;
  * Enum representing the difficulty levels for the Sudoku game.
  */
 public enum Difficulty {
-    EASY, MEDIUM, HARD, VERY_HARD, IMPOSSIBLE, INSANE, EXPERT;
+    /**
+     * Easy difficulty level.
+     */
+    EASY,
+
+    /**
+     * Medium difficulty level.
+     */
+    MEDIUM,
+
+    /**
+     * Hard difficulty level.
+     */
+    HARD,
+
+    /**
+     * Very hard difficulty level.
+     */
+    VERY_HARD,
+
+    /**
+     * Impossible difficulty level.
+     */
+    IMPOSSIBLE,
+
+    /**
+     * Insane difficulty level.
+     */
+    INSANE,
+
+    /**
+     * Expert difficulty level.
+     */
+    EXPERT;
 
     /**
      * Returns an array of difficulty level names as strings.

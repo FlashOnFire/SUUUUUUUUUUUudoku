@@ -19,6 +19,13 @@ import java.util.stream.IntStream;
  * A class to generate Sudoku grids
  */
 public class Generator {
+
+    /**
+     * Private constructor to prevent instantiation of the Generator class.
+     */
+    private Generator() {
+    }
+
     /**
      * Generates a multigrid with block constraints of size NxM
      *

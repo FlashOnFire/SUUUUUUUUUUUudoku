@@ -14,6 +14,12 @@ import java.util.Set;
 public class NotEmptyConstraint implements AbstractConstraint {
 
     /**
+     * Constructs a new NotEmptyConstraint.
+     */
+    public NotEmptyConstraint() {
+    }
+
+    /**
      * Checks if the constraint is satisfied for the given grid.
      *
      * @param grid the Sudoku grid to check

@@ -2,7 +2,16 @@ package fr.polytech.suuuuuuuuuuudoku.graphics;
 
 import java.util.HashMap;
 
+/**
+ * Utility class containing various utility methods.
+ */
 public class Utils {
+    /**
+     * Private constructor to prevent instantiation of the Utils class.
+     */
+    private Utils() {
+    }
+
     /**
      * Converts HSL (Hue, Saturation, Lightness) color values to RGB (Red, Green, Blue) color values.
      *

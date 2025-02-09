@@ -92,6 +92,12 @@ public class ImGUIFrame extends Application {
     String currentSymbol = null;
 
     /**
+     * Private constructor to prevent instantiation of the Generator class.
+     */
+    private ImGUIFrame() {
+    }
+
+    /**
      * The main method of the application.
      *
      * @param args the command line arguments
@@ -207,7 +213,8 @@ public class ImGUIFrame extends Application {
             instantSolve();
         }
         if (ImGui.isItemHovered()) {
-            ImGui.setTooltip("Instant solve the grid by showing the solution to the original generated grid (not taking into account the current state of the grid).");
+            ImGui.setTooltip("Instant solve the grid by showing the solution to the original generated grid (not " +
+                    "taking into account the current state of the grid).");
         }
 
         ImGui.sameLine();
@@ -216,7 +223,8 @@ public class ImGUIFrame extends Application {
             visualSolve();
         }
         if (ImGui.isItemHovered()) {
-            ImGui.setTooltip("Visually solve the grid by showing the solution step by step. The pace of the solving can be adjusted with the slider below.");
+            ImGui.setTooltip("Visually solve the grid by showing the solution step by step. The pace of the solving " +
+                    "can be adjusted with the slider below.");
         }
 
         if (ImGui.button("Reset")) {
@@ -255,7 +263,8 @@ public class ImGUIFrame extends Application {
         ImGui.setNextItemWidth(100);
         ImGui.sliderFloat("Solve Pace", SudokuSolver.solvePace, 0.0f, 1.0f);
         if (ImGui.isItemHovered()) {
-            ImGui.setTooltip("Adjust the pace of the solving. The lower the value, the slower the solving. (Only affects visual solving)");
+            ImGui.setTooltip("Adjust the pace of the solving. The lower the value, the slower the solving. (Only " +
+                    "affects visual solving)");
         }
 
         ImGui.end();
@@ -378,8 +387,9 @@ public class ImGUIFrame extends Application {
 
     /**
      * Draws the solvable grid in the ImGui window.
-     * @param solvable the solvable to draw
-     * @param gridSize the size of the grid
+     *
+     * @param solvable      the solvable to draw
+     * @param gridSize      the size of the grid
      * @param gridPixelSize the size of a cell in the grid
      */
     private void drawSolvable(Solvable<?> solvable, Vec2i gridSize, ImVec2 gridPixelSize) {
@@ -406,7 +416,8 @@ public class ImGUIFrame extends Application {
                     computedPosition = position;
                 } else if (solvable instanceof MultiGrid) {
                     grid = ((MultiGrid) solvable).getGridFor(x, y).getSecond();
-                    computedPosition = new Vec2i(position).substract(((MultiGrid) solvable).getOffsets()[((MultiGrid) solvable).getGridFor(x, y).getFirst()]);
+                    computedPosition =
+                            new Vec2i(position).substract(((MultiGrid) solvable).getOffsets()[((MultiGrid) solvable).getGridFor(x, y).getFirst()]);
                 } else {
                     computedPosition = null;
                 }
@@ -416,9 +427,9 @@ public class ImGUIFrame extends Application {
                 AtomicInteger hashcode = new AtomicInteger(1);
 
                 grid.getConstraints().stream()
-                        .filter(c -> c instanceof BlockConstraint || c instanceof PositionListConstraint)
-                        .filter(c -> c.isPosAffected(computedPosition))
-                        .forEach(c -> hashcode.updateAndGet(v -> 17 * v + c.hashCode()));
+                    .filter(c -> c instanceof BlockConstraint || c instanceof PositionListConstraint)
+                    .filter(c -> c.isPosAffected(computedPosition))
+                    .forEach(c -> hashcode.updateAndGet(v -> 17 * v + c.hashCode()));
 
                 // If the cell is prefilled, we will have a slightly different behavior :
                 // - The color will be different
@@ -464,7 +475,8 @@ public class ImGUIFrame extends Application {
                                 1
                         );
                     } else {
-                        // if the cell was prefilled, we use a different darker color to indicate this cell is not editable
+                        // if the cell was prefilled, we use a different darker color to indicate this cell is not
+                        // editable
                         int[] rgbNormal = Utils.hslToRgb(color, 0.35f, 0.45f);
 
                         ImGui.pushStyleColor(ImGuiCol.Button,
@@ -536,8 +548,10 @@ public class ImGUIFrame extends Application {
      * - Delete: clears the current symbol
      * - Backspace: removes the last character of the current symbol
      * - Arrow keys: moves the selected position in the grid
-     * - Keypad keys: adds the key pressed to the current symbol variable (which represents the symbol to place when the changes will be applied)
+     * - Keypad keys: adds the key pressed to the current symbol variable (which represents the symbol to place when
+     * the changes will be applied)
      * - Enter or KeypadEnter: applies the current symbol to the selected position
+     *
      * @see #setSelection(Vec2i)
      * @see #keyPress(int)
      * @see #applyEnteredSymbol()
@@ -598,16 +612,17 @@ public class ImGUIFrame extends Application {
      * Sets or replace the current selected position in the grid.
      * If the position is not in the grid, the selection will not be set.
      * If another position is already selected, the changes will be applied.
-     * @see #applyEnteredSymbol()
      *
      * @param position the position
+     * @see #applyEnteredSymbol()
      */
     private void setSelection(Vec2i position) {
         if (solvable.isInGrid(position)) {
             applyEnteredSymbol();
 
             selectedPos = position;
-            currentSymbol = solvable.getSymbolAt(selectedPos) == null ? null : solvable.getSymbolAt(selectedPos).toString();
+            currentSymbol = solvable.getSymbolAt(selectedPos) == null ? null :
+                    solvable.getSymbolAt(selectedPos).toString();
         }
     }
 
@@ -630,6 +645,7 @@ public class ImGUIFrame extends Application {
 
     /**
      * Returns the current symbol as an integer.
+     *
      * @return the current symbol as an integer (or null)
      */
     private Integer getCurrentSymbol() {

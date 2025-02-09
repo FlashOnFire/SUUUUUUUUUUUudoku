@@ -38,7 +38,6 @@ public class SudokuFrame extends JFrame {
                 board.update(board.grid.getInnerGrid().get(), true);
             }
         }
-        System.out.println("Solved !");
     };
 
     /**
@@ -57,7 +56,6 @@ public class SudokuFrame extends JFrame {
                 board.update(board.grid.getInnerGrid().get(), true);
             }
         }
-        System.out.println("Hint !");
     };
 
     /**
@@ -70,7 +68,6 @@ public class SudokuFrame extends JFrame {
      */
     private final Runnable reset = () -> {
         board.recoverPreviousSudoku(grid);
-        System.out.println("Reset!");
     };
 
     /**
@@ -144,7 +141,6 @@ public class SudokuFrame extends JFrame {
         getContentPane().add(buttonPanel, BorderLayout.EAST);
 
         getContentPane().revalidate();
-        System.out.println("Generated!");
     };
 
     /**
@@ -164,7 +160,6 @@ public class SudokuFrame extends JFrame {
         getContentPane().add(buttonPanel, BorderLayout.EAST);
 
         getContentPane().revalidate();
-        System.out.println("Generated!");
     };
 
     /**
@@ -184,6 +179,5 @@ public class SudokuFrame extends JFrame {
         getContentPane().add(buttonPanel, BorderLayout.EAST);
 
         getContentPane().revalidate();
-        System.out.println("Generated!");
     };
 }

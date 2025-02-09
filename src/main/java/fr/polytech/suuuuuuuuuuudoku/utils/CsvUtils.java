@@ -69,11 +69,7 @@ public class CsvUtils {
         }
 
         try (var stream = Files.list(path)) {
-            System.out.println();
-            System.out.println(path);
             Path[] files = stream.toArray(Path[]::new);
-            System.out.println();
-            System.out.println(files[0].getFileName());
 
             // load the grids
             List<Grid> grids =

@@ -44,9 +44,6 @@ public class MultiGrid extends Solvable<MultiGrid> {
     public MultiGrid(List<Pair<Vec2i, Grid>> grids) {
         super(grids.getFirst().getSecond().getSymbols());
 
-        // Sort the grids by their position to ensure correct display
-        grids.sort(Comparator.comparing((Pair<Vec2i, Grid> pair) -> pair.getFirst().getY())
-                             .thenComparing(pair -> pair.getFirst().getX()));
         this.grids = grids.stream().map(Pair::getSecond).toArray(Grid[]::new);
         this.offsets = grids.stream().map(Pair::getFirst).toArray(Vec2i[]::new);
 

@@ -9,14 +9,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
+import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Utility class for reading and writing Grid from CSV files.
@@ -43,8 +43,8 @@ public class CsvUtils {
             return new BufferedReader(new InputStreamReader(inputStream))
                     .lines()
                     .map(line -> Arrays.stream(line.split(",(?<!\\r)")).map(cell -> cell.equals(".") ? null :
-                                               Integer.parseInt(cell))
-                                       .toArray(Integer[]::new))
+                                    Integer.parseInt(cell))
+                            .toArray(Integer[]::new))
                     .toArray(Integer[][]::new);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -63,10 +63,10 @@ public class CsvUtils {
         // list the files
         var resourceUrl = ClassLoader.getSystemResource(folder);
         Path path;
+        FileSystem fileSystem = null;
         if (resourceUrl.getProtocol().equals("jar")) {
-
             var uri = resourceUrl.toURI();
-            var fileSystem = FileSystems.getFileSystem(uri);
+            fileSystem = FileSystems.getFileSystem(uri);
             if (!fileSystem.isOpen()) {
                 fileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap());
             }
@@ -76,37 +76,39 @@ public class CsvUtils {
         }
 
         try (var stream = Files.list(path)) {
-            Path[] files = stream.toArray(Path[]::new);
+            List<Path> files = stream.toList();
 
             // load the grids
-            List<Grid> grids =
-                    Arrays.stream(files).filter(file -> !file.getFileName().toString().equals("offset.csv")).sorted()
-                          .map(file -> {
-                              var gridValue = importGrid(folder + "/" + file.getFileName());
-                              var symbols = SymbolSets.generateSymbols(gridValue.length);
-                              return new Grid(gridValue, symbols);
-                          }).toList();
+            List<Grid> grids = files.stream()
+                    .filter(file -> !file.getFileName().toString().equals("offset.csv")).sorted()
+                    .map(file -> {
+                        var gridValue = importGrid(folder + "/" + file.getFileName());
+                        var symbols = SymbolSets.generateSymbols(gridValue.length);
+                        return new Grid(gridValue, symbols);
+                    }).toList();
 
-            // load the offset
+            // load the offsets
+            List<Vec2i> offsets;
             try (var linesStream = Files.lines(
-                    Arrays.stream(files)
-                          .filter(file -> file.getFileName().toString().equals("offset.csv"))
-                          .findFirst()
-                          .orElseThrow(FileNotFoundException::new))) {
-                ArrayList<Vec2i> offsets = linesStream
+                    files.stream()
+                            .filter(file -> file.getFileName().toString().equals("offset.csv"))
+                            .findFirst()
+                            .orElseThrow(FileNotFoundException::new))) {
+                offsets = linesStream
                         .map(line -> {
                             String[] parts = line.split(",(?<!\\r)");
                             return new Vec2i(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
-                        })
-                        .collect(Collectors.toCollection(ArrayList::new));
-
-                assert offsets.size() == grids.size();
-                // merge the grids
-                var mergedGrids = grids.stream()
-                                       .map(grid -> new Pair<>(offsets.removeFirst(), grid))
-                                       .collect(Collectors.toList());
-                return new MultiGrid(mergedGrids);
+                        }).toList();
             }
+
+            assert offsets.size() == grids.size();
+
+            if (fileSystem != null) {
+                fileSystem.close();
+            }
+
+            // merge the grids
+            return new MultiGrid(IntStream.range(0, grids.size()).mapToObj((int i) -> new Pair<>(offsets.get(i), grids.get(i))).toList());
         }
     }
 }

@@ -10,7 +10,6 @@ import fr.polytech.suuuuuuuuuuudoku.utils.CsvUtils;
 import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 import org.junit.jupiter.api.Test;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -23,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ResolveTest {
 
     @Test
-    public void testSolveDeduce() throws FileNotFoundException {
+    public void testSolveDeduce() {
         var gridValue = CsvUtils.importGrid("exemples/deduce.csv");
         var resGrid =
                 CsvUtils.importGrid("exemples/deduceSolved.csv");
@@ -45,7 +44,7 @@ public class ResolveTest {
     }
 
     @Test
-    public void testSolveWithBackTrack() throws FileNotFoundException {
+    public void testSolveWithBackTrack() {
         var gridValue = CsvUtils.importGrid("exemples/backtrack.csv");
         var resGrid =
                 CsvUtils.importGrid("exemples/backtrackSolved.csv");
@@ -61,7 +60,7 @@ public class ResolveTest {
     }
 
     @Test
-    public void testSolveWithBackTrackAndDeduce() throws FileNotFoundException {
+    public void testSolveWithBackTrackAndDeduce() {
         var gridValue =
                 CsvUtils.importGrid("exemples/backtrackAndDeduce.csv");
         var resGrid = CsvUtils.importGrid("exemples/backtrackAndDeduceSolved" +
@@ -109,7 +108,7 @@ public class ResolveTest {
     }
 
     @Test
-    public void testSolveBig() throws FileNotFoundException {
+    public void testSolveBig() {
         var gridValue = CsvUtils.importGrid("exemples/100x100.csv");
         var resGrid =
                 CsvUtils.importGrid("exemples/100x100Solved.csv");

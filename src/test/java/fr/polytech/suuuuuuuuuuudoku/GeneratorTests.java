@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class GeneratorTests {
 
     @Test
-    public void benchmarkTests() throws InterruptedException {
+    public void benchmarkTests() {
         int[] gridSizes = {4, 9, 16};
         final int N = 10;
 

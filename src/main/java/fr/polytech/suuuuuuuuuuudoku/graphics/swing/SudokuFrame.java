@@ -66,9 +66,7 @@ public class SudokuFrame extends JFrame {
     /**
      * The reset action for resetting the Sudoku puzzle.
      */
-    private final Runnable reset = () -> {
-        board.recoverPreviousSudoku(grid);
-    };
+    private final Runnable reset = () -> board.recoverPreviousSudoku(grid);
 
     /**
      * The panel containing the buttons for Sudoku options.

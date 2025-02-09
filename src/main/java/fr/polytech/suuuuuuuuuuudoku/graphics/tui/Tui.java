@@ -171,10 +171,10 @@ public class Tui {
 
                 startLoader();
                 if (size == -1) {
-                    grid = Generator.generateMultigridSudoku(difficulty).getSecond();
+                    grid = Generator.generateMultigridSudoku(difficulty).second();
                 } else {
                     grid = Generator.generateSudokuWithBlockConstraints((int) Math.sqrt(size), (int) Math.sqrt(size),
-                            difficulty).getSecond();
+                            difficulty).second();
                 }
                 stopLoader();
             }
@@ -327,9 +327,9 @@ public class Tui {
         startLoader();
         grid.computeAllEmptyCellsPossibilities();
         if (grid instanceof MultiGrid) {
-            grid = SudokuSolver.solve((MultiGrid) grid, selectedOptions[0], selectedOptions[1], true).getSecond();
+            grid = SudokuSolver.solve((MultiGrid) grid, selectedOptions[0], selectedOptions[1], true).second();
         } else {
-            grid = SudokuSolver.solve((Grid) grid, selectedOptions[0], selectedOptions[1], true).getSecond();
+            grid = SudokuSolver.solve((Grid) grid, selectedOptions[0], selectedOptions[1], true).second();
         }
         stopLoader();
         line--;

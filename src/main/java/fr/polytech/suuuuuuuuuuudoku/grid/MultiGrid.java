@@ -42,18 +42,18 @@ public class MultiGrid extends Solvable<MultiGrid> {
      * @param grids the list of grids
      */
     public MultiGrid(List<Pair<Vec2i, Grid>> grids) {
-        super(grids.getFirst().getSecond().getSymbols());
+        super(grids.getFirst().second().getSymbols());
 
-        this.grids = grids.stream().map(Pair::getSecond).toArray(Grid[]::new);
-        this.offsets = grids.stream().map(Pair::getFirst).toArray(Vec2i[]::new);
+        this.grids = grids.stream().map(Pair::second).toArray(Grid[]::new);
+        this.offsets = grids.stream().map(Pair::first).toArray(Vec2i[]::new);
 
         int maxX = grids.stream()
-                        .mapToInt(pair -> pair.getFirst().getX() + pair.getSecond().length())
+                        .mapToInt(pair -> pair.first().getX() + pair.second().length())
                         .max()
                         .orElse(0);
 
         int maxY = grids.stream()
-                        .mapToInt(pair -> pair.getFirst().getY() + pair.getSecond().length())
+                        .mapToInt(pair -> pair.first().getY() + pair.second().length())
                         .max()
                         .orElse(0);
 
@@ -205,7 +205,7 @@ public class MultiGrid extends Solvable<MultiGrid> {
             Vec2i offset = offsets[i];
             if (pos.getX() >= offset.getX() && pos.getX() < offset.getX() + grids[i].length()
                     && pos.getY() >= offset.getY() && pos.getY() < offset.getY() + grids[i].length()) {
-                var subGridPosition = new Vec2i(pos).substract(offset);
+                var subGridPosition = new Vec2i(pos).subtract(offset);
                 oldValue = grids[i].getSymbolAt(subGridPosition);
                 grids[i].placeUnchecked(subGridPosition, value, updatePossibilities, store_move);
             }
@@ -232,7 +232,7 @@ public class MultiGrid extends Solvable<MultiGrid> {
             Vec2i size = grids[i].getSize();
             if (pos.getX() >= offset.getX() && pos.getX() < offset.getX() + size.getX()
                     && pos.getY() >= offset.getY() && pos.getY() < offset.getY() + size.getY()) {
-                return grids[i].getSymbolAt(new Vec2i(pos).substract(offset));
+                return grids[i].getSymbolAt(new Vec2i(pos).subtract(offset));
             }
         }
         return null;
@@ -325,15 +325,15 @@ public class MultiGrid extends Solvable<MultiGrid> {
                     for (int x = overlap.x(); x < overlap.dx(); x++) {
                         for (int y = overlap.y(); y < overlap.dy(); y++) {
                             Vec2i pos = new Vec2i(x, y);
-                            if (grids[i].getSymbolAt((new Vec2i(pos)).substract(offsets[i])) == null
-                                    && grids[j].getSymbolAt((new Vec2i(pos)).substract(offsets[j])) != null) {
-                                Integer symbol = grids[j].getSymbolAt((new Vec2i(pos)).substract(offsets[j]));
+                            if (grids[i].getSymbolAt((new Vec2i(pos)).subtract(offsets[i])) == null
+                                    && grids[j].getSymbolAt((new Vec2i(pos)).subtract(offsets[j])) != null) {
+                                Integer symbol = grids[j].getSymbolAt((new Vec2i(pos)).subtract(offsets[j]));
                                 if (symbol != null) {
                                     placeUnchecked(pos, symbol, false, false);
                                 }
-                            } else if (grids[j].getSymbolAt((new Vec2i(pos)).substract(offsets[j])) == null
-                                    && grids[i].getSymbolAt((new Vec2i(pos)).substract(offsets[i])) != null) {
-                                Integer symbol = grids[i].getSymbolAt((new Vec2i(pos)).substract(offsets[i]));
+                            } else if (grids[j].getSymbolAt((new Vec2i(pos)).subtract(offsets[j])) == null
+                                    && grids[i].getSymbolAt((new Vec2i(pos)).subtract(offsets[i])) != null) {
+                                Integer symbol = grids[i].getSymbolAt((new Vec2i(pos)).subtract(offsets[i]));
                                 if (symbol != null) {
                                     placeUnchecked(pos, symbol, false, false);
                                 }

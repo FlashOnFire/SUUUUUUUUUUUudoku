@@ -6,19 +6,14 @@ package fr.polytech.suuuuuuuuuuudoku.utils;
  * @param <K> the type of the first value
  * @param <V> the type of the second value
  */
-public class Pair<K, V> {
-    private final K first;
-    private final V second;
-
+public record Pair<K, V>(K first, V second) {
     /**
      * Constructs a new Pair with the specified values.
      *
      * @param first  the first value
      * @param second the second value
      */
-    public Pair(K first, V second) {
-        this.first = first;
-        this.second = second;
+    public Pair {
     }
 
     /**
@@ -26,7 +21,8 @@ public class Pair<K, V> {
      *
      * @return the first value
      */
-    public K getFirst() {
+    @Override
+    public K first() {
         return first;
     }
 
@@ -35,7 +31,8 @@ public class Pair<K, V> {
      *
      * @return the second value
      */
-    public V getSecond() {
+    @Override
+    public V second() {
         return second;
     }
 }

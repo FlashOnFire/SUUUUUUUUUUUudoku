@@ -55,7 +55,7 @@ public class Generator {
         }
 
         var solvedMultiGrid = new MultiGrid(gridList);
-        solvedMultiGrid = SudokuSolver.solve(solvedMultiGrid, true, true, false).getSecond();
+        solvedMultiGrid = SudokuSolver.solve(solvedMultiGrid, true, true, false).second();
         var unsolvedMultiGrid = new MultiGrid(solvedMultiGrid);
         removeRandomCells(unsolvedMultiGrid, Math.max(solvedMultiGrid.getSize().getX(),
                 solvedMultiGrid.getSize().getY()), difficulty);
@@ -135,7 +135,7 @@ public class Generator {
                 solvedGrid.placeUnchecked(removableCells.removeFirst(), null, false, true);
             }
             solvedGrid.computeAllEmptyCellsPossibilities();
-            if (SudokuSolver.solve(solvedGrid, true, false, false).getFirst() != SolvingState.SOLVED) {
+            if (SudokuSolver.solve(solvedGrid, true, false, false).first() != SolvingState.SOLVED) {
                 if (nCellToRemove > 1) {
                     for (int i = 0; i < nCellToRemove; i++) {
                         removableCells.add(solvedGrid.getMoves().getLast().position());
@@ -224,8 +224,8 @@ public class Generator {
 
         seedGrid.computeAllEmptyCellsPossibilities();
         var solvedPair = SudokuSolver.solve(seedGrid, true, true, false);
-        assert solvedPair.getFirst() == SolvingState.SOLVED;
-        return solvedPair.getSecond();
+        assert solvedPair.first() == SolvingState.SOLVED;
+        return solvedPair.second();
     }
 
     /**

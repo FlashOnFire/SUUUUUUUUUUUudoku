@@ -414,9 +414,9 @@ public class ImGUIFrame extends Application {
                     grid = (Grid) solvable;
                     computedPosition = position;
                 } else if (solvable instanceof MultiGrid) {
-                    grid = ((MultiGrid) solvable).getGridFor(x, y).getSecond();
+                    grid = ((MultiGrid) solvable).getGridFor(x, y).second();
                     computedPosition =
-                            new Vec2i(position).substract(((MultiGrid) solvable).getOffsets()[((MultiGrid) solvable).getGridFor(x, y).getFirst()]);
+                            new Vec2i(position).subtract(((MultiGrid) solvable).getOffsets()[((MultiGrid) solvable).getGridFor(x, y).first()]);
                 } else {
                     computedPosition = null;
                 }
@@ -568,7 +568,7 @@ public class ImGUIFrame extends Application {
         }
         if (ImGui.isKeyPressed(ImGuiKey.UpArrow)) {
             if (selectedPos != null) {
-                setSelection(new Vec2i(selectedPos).substract(new Vec2i(0, 1)));
+                setSelection(new Vec2i(selectedPos).subtract(new Vec2i(0, 1)));
             }
         } else if (ImGui.isKeyPressed(ImGuiKey.DownArrow)) {
             if (selectedPos != null) {
@@ -576,7 +576,7 @@ public class ImGUIFrame extends Application {
             }
         } else if (ImGui.isKeyPressed(ImGuiKey.LeftArrow)) {
             if (selectedPos != null) {
-                setSelection(new Vec2i(selectedPos).substract(new Vec2i(1, 0)));
+                setSelection(new Vec2i(selectedPos).subtract(new Vec2i(1, 0)));
             }
         } else if (ImGui.isKeyPressed(ImGuiKey.RightArrow)) {
             if (selectedPos != null) {
@@ -677,8 +677,8 @@ public class ImGUIFrame extends Application {
                 selectedGeneratorGridSizeHeight[0],
                 selectedDifficulty
         );
-        solvedSolvable = pair.getFirst();
-        solvable = pair.getSecond();
+        solvedSolvable = pair.first();
+        solvable = pair.second();
 
         originalSolvable = ((Grid) solvable).shallowCopy();
         SudokuSolver.solvePace[0] = oldPace;
@@ -693,8 +693,8 @@ public class ImGUIFrame extends Application {
                 selectedRandomGeneratorHeight[0],
                 selectedDifficulty
         );
-        solvedSolvable = pair.getFirst();
-        solvable = pair.getSecond();
+        solvedSolvable = pair.first();
+        solvable = pair.second();
 
         originalSolvable = ((Grid) solvable).shallowCopy();
         SudokuSolver.solvePace[0] = oldPace;
@@ -708,8 +708,8 @@ public class ImGUIFrame extends Application {
         SudokuSolver.solvePace[0] = 1.0f;
 
         var pair = Generator.generateMultigridSudoku(selectedDifficulty);
-        solvedSolvable = pair.getFirst();
-        solvable = pair.getSecond();
+        solvedSolvable = pair.first();
+        solvable = pair.second();
 
         originalSolvable = ((MultiGrid) solvable).shallowCopy();
         SudokuSolver.solvePace[0] = oldPace;
@@ -734,6 +734,9 @@ public class ImGUIFrame extends Application {
         solvedSolvable = new Grid(solvedInnerGrid, symbolSet);
     }
 
+    /**
+     * Instantly solves the current solvable by copying the stored solved solvable.
+     */
     private void instantSolve() {
         solvable = (Solvable<?>) solvedSolvable.shallowCopy();
     }
@@ -750,8 +753,8 @@ public class ImGUIFrame extends Application {
                         ), solveDeducing, solveBacktracking, true
                 );
 
-                if (solve.getFirst() != SolvingState.UNSOLVABLE) {
-                    solvable = solve.getSecond().getInner();
+                if (solve.first() != SolvingState.UNSOLVABLE) {
+                    solvable = solve.second().getInner();
                 } else {
                     unsolvablePopup.set(true);
                 }
@@ -767,8 +770,8 @@ public class ImGUIFrame extends Application {
                         ), solveDeducing, solveBacktracking, true
                 );
 
-                if (solve.getFirst() != SolvingState.UNSOLVABLE) {
-                    solvable = solve.getSecond().getInner();
+                if (solve.first() != SolvingState.UNSOLVABLE) {
+                    solvable = solve.second().getInner();
                 } else {
                     unsolvablePopup.set(true);
                 }

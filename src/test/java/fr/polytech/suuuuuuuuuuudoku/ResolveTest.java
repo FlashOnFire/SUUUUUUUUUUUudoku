@@ -36,9 +36,9 @@ public class ResolveTest {
         var solve = SudokuSolver.solve(grid, true, false, false);
         var end = System.nanoTime();
 
-        assertEquals(SolvingState.SOLVED, solve.getFirst());
-        assertTrue(solve.getSecond().areConstraintsSatisfied(false));
-        assertEquals(solve.getSecond().getInnerGrid(), res.getInnerGrid());
+        assertEquals(SolvingState.SOLVED, solve.first());
+        assertTrue(solve.second().areConstraintsSatisfied(false));
+        assertEquals(solve.second().getInnerGrid(), res.getInnerGrid());
 
         System.out.println("Time: " + (end - start) / 1_000_000 + "ms");
     }
@@ -54,9 +54,9 @@ public class ResolveTest {
 
         assertFalse(grid.areConstraintsSatisfied(false));
         var solve = SudokuSolver.solve(grid, false, true, false);
-        assertEquals(SolvingState.SOLVED, solve.getFirst());
-        assertTrue(solve.getSecond().areConstraintsSatisfied(false));
-        assertEquals(solve.getSecond().getInnerGrid(), res.getInnerGrid());
+        assertEquals(SolvingState.SOLVED, solve.first());
+        assertTrue(solve.second().areConstraintsSatisfied(false));
+        assertEquals(solve.second().getInnerGrid(), res.getInnerGrid());
     }
 
     @Test
@@ -72,9 +72,9 @@ public class ResolveTest {
 
         assertFalse(grid.areConstraintsSatisfied(false));
         var solve = SudokuSolver.solve(grid, true, true, false);
-        assertEquals(SolvingState.SOLVED, solve.getFirst());
-        assertTrue(solve.getSecond().areConstraintsSatisfied(true));
-        assertEquals(solve.getSecond().getInnerGrid(), res.getInnerGrid());
+        assertEquals(SolvingState.SOLVED, solve.first());
+        assertTrue(solve.second().areConstraintsSatisfied(true));
+        assertEquals(solve.second().getInnerGrid(), res.getInnerGrid());
     }
 
     @Test
@@ -121,9 +121,9 @@ public class ResolveTest {
         var start = System.nanoTime();
         var solve = SudokuSolver.solve(grid, true, true, false);
         var end = System.nanoTime();
-        assertEquals(SolvingState.SOLVED, solve.getFirst());
-        assertTrue(solve.getSecond().areConstraintsSatisfied(false));
-        assertEquals(solve.getSecond().getInnerGrid(), res.getInnerGrid());
+        assertEquals(SolvingState.SOLVED, solve.first());
+        assertTrue(solve.second().areConstraintsSatisfied(false));
+        assertEquals(solve.second().getInnerGrid(), res.getInnerGrid());
         System.out.println("Time: " + (end - start) / 1_000_000 + "ms");
     }
 
@@ -144,7 +144,7 @@ public class ResolveTest {
         grid.computeAllEmptyCellsPossibilities();
         assertFalse(grid.isSolved());
         var solve = SudokuSolver.solve(grid, true, true, false);
-        assertEquals(SolvingState.SOLVED, solve.getFirst());
+        assertEquals(SolvingState.SOLVED, solve.first());
     }
 
 
@@ -166,6 +166,6 @@ public class ResolveTest {
         grid.computeAllEmptyCellsPossibilities();
         assertFalse(grid.isSolved());
         var solve = SudokuSolver.solve(grid, true, true, false);
-        assertEquals(SolvingState.SOLVED, solve.getFirst());
+        assertEquals(SolvingState.SOLVED, solve.first());
     }
 }

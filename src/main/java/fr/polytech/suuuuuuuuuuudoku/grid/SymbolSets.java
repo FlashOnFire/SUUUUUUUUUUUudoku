@@ -1,6 +1,7 @@
 package fr.polytech.suuuuuuuuuuudoku.grid;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -8,9 +9,9 @@ import java.util.stream.IntStream;
  */
 public class SymbolSets {
     /**
-     * Constructs a new SymbolSets.
+     * Private constructor to prevent instantiation.
      */
-    public SymbolSets() {
+    private SymbolSets() {
     }
 
     /**
@@ -20,6 +21,6 @@ public class SymbolSets {
      * @return a set of Integer representing the numbers from 1 to the specified length
      */
     public static Set<Integer> generateSymbols(int length) {
-        return IntStream.rangeClosed(1, length).boxed().collect(java.util.stream.Collectors.toSet());
+        return IntStream.rangeClosed(1, length).boxed().collect(Collectors.toSet());
     }
 }

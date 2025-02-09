@@ -132,6 +132,12 @@ public class Box2D {
         return dy - y;
     }
 
+    /**
+     * Indicates whether some other object is "equal to" this one.
+     *
+     * @param o the reference object with which to compare
+     * @return true if this object is the same as the obj argument; false otherwise
+     */
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -140,6 +146,11 @@ public class Box2D {
         return x == box2D.x && y == box2D.y && dx == box2D.dx && dy == box2D.dy;
     }
 
+    /**
+     * Returns a hash code value for the object.
+     *
+     * @return a hash code value for this object
+     */
     @Override
     public int hashCode() {
         int result = 113 * x + 129 * y;

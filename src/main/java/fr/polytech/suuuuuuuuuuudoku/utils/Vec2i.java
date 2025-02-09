@@ -24,9 +24,9 @@ public class Vec2i {
     }
 
     /**
-     * Constructs a Vec2i  cloning another Vec2i.
+     * Constructs a Vec2i with the coordinates of another Vec2i.
      *
-     * @param other the Vec2i to clone
+     * @param other the Vec2i to copy
      */
     public Vec2i(Vec2i other) {
         this.x = other.x;
@@ -61,7 +61,7 @@ public class Vec2i {
      * @param other the Vec2i to subtract
      * @return this vector after subtraction
      */
-    public Vec2i substract(Vec2i other) {
+    public Vec2i subtract(Vec2i other) {
         this.x -= other.x;
         this.y -= other.y;
         return this;

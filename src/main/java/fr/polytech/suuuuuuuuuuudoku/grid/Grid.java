@@ -158,7 +158,7 @@ public class Grid extends Solvable<Grid> {
     }
 
     /**
-     * Returns the possibilities for each empty cell in the grid.
+     * Returns the precomputed possibilities for each empty cell in the grid.
      *
      * @return the possibilities for each empty cell in the grid
      */
@@ -253,9 +253,8 @@ public class Grid extends Solvable<Grid> {
         return this.symbols;
     }
 
-
     /**
-     * Clears all moves.
+     * Clears all stored moves.
      */
     @Override
     public void cleanMoves() {
@@ -302,16 +301,16 @@ public class Grid extends Solvable<Grid> {
     }
 
     /**
-     * Returns the list of moves.
+     * Returns the list of stored moves.
      *
-     * @return the list of moves
+     * @return the list of stored moves
      */
     public List<Move2i> getMoves() {
         return moves;
     }
 
     /**
-     * Undoes the last move made by the users
+     * Undoes the last stored move.
      *
      * @param updatePossibilities: whether to update the possibilities
      */

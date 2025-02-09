@@ -394,7 +394,6 @@ public class ImGUIFrame extends Application {
      */
     private void drawSolvable(Solvable<?> solvable, Vec2i gridSize, ImVec2 gridPixelSize) {
         ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, 0, 0);
-        ImGui.setWindowFontScale((gridPixelSize.y * 0.5f) / (ImGui.getFont().getFontSize()));
 
         for (int y = 0; y < gridSize.getY(); y++) {
             for (int x = 0; x < gridSize.getX(); x++) {

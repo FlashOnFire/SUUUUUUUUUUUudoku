@@ -239,7 +239,7 @@ public class ImGUIFrame extends Application {
             }
         }
         if (ImGui.isItemHovered()) {
-            ImGui.setTooltip("When activated, the hint mode will reveal the correct answer for clicking cells.");
+            ImGui.setTooltip("When activated, the hint mode will reveal the correct answer when clicking cells.");
         }
 
         ImGui.popStyleColor(3);
@@ -273,7 +273,7 @@ public class ImGUIFrame extends Application {
         ImGui.end();
 
         if (solvable != null) {
-            ImGui.setNextWindowSize(400, 800);
+            ImGui.setNextWindowSize(400, 600);
             ImGui.begin("Move History");
 
             var disabled = false;
@@ -376,6 +376,12 @@ public class ImGUIFrame extends Application {
         ImGui.dummy(new ImVec2(0.0f, 5.0f));
     }
 
+    /**
+     * Draws the solvable grid in the ImGui window.
+     * @param solvable the solvable to draw
+     * @param gridSize the size of the grid
+     * @param gridPixelSize the size of a cell in the grid
+     */
     private void drawSolvable(Solvable<?> solvable, Vec2i gridSize, ImVec2 gridPixelSize) {
         ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, 0, 0);
         for (int y = 0; y < gridSize.getY(); y++) {
@@ -478,6 +484,19 @@ public class ImGUIFrame extends Application {
         ImGui.popStyleVar();
     }
 
+    /**
+     * Handles the input of the ImGui window.
+     * This method handles the input of the ImGui window
+     * It handles the following keys:
+     * - Delete: clears the current symbol
+     * - Backspace: removes the last character of the current symbol
+     * - Arrow keys: moves the selected position in the grid
+     * - Keypad keys: adds the key pressed to the current symbol variable (which represents the symbol to place when the changes will be applied)
+     * - Enter or KeypadEnter: applies the current symbol to the selected position
+     * @see #setSelection(Vec2i)
+     * @see #keyPress(int)
+     * @see #applyEnteredSymbol()
+     */
     private void handleInput() {
         if (ImGui.isKeyPressed(ImGuiKey.Delete)) {
             currentSymbol = null;
@@ -530,6 +549,14 @@ public class ImGUIFrame extends Application {
         }
     }
 
+    /**
+     * Sets or replace the current selected position in the grid.
+     * If the position is not in the grid, the selection will not be set.
+     * If another position is already selected, the changes will be applied.
+     * @see #applyEnteredSymbol()
+     *
+     * @param position the position
+     */
     private void setSelection(Vec2i position) {
         if (solvable.isInGrid(position)) {
             applyEnteredSymbol();
@@ -539,6 +566,11 @@ public class ImGUIFrame extends Application {
         }
     }
 
+    /**
+     * Places the current symbol in the selected position in the grid.
+     * This method also clears the current symbol and selected position.
+     * If the current symbol is not valid (not in the symbols set), it will not be placed.
+     */
     private void applyEnteredSymbol() {
         if (selectedPos != null) {
             var intCurrentSymbol = getCurrentSymbol();
@@ -551,10 +583,20 @@ public class ImGUIFrame extends Application {
         }
     }
 
+    /**
+     * Returns the current symbol as an integer.
+     * @return the current symbol as an integer (or null)
+     */
     private Integer getCurrentSymbol() {
         return currentSymbol == null ? null : Integer.parseInt(currentSymbol);
     }
 
+    /**
+     * Handles the pressing of a number key.
+     * This method updates the `currentSymbol` field with the pressed key.
+     *
+     * @param key the int value of the key pressed
+     */
     private void keyPress(int key) {
         if (currentSymbol == null) {
             currentSymbol = String.valueOf(key);
@@ -563,6 +605,9 @@ public class ImGUIFrame extends Application {
         }
     }
 
+    /**
+     * Generates a basic Sudoku grid and update the original, solved, and current solvable fields.
+     */
     private void generateBasic() {
         var oldPace = SudokuSolver.solvePace[0];
         SudokuSolver.solvePace[0] = 1.0f;
@@ -595,6 +640,9 @@ public class ImGUIFrame extends Application {
         SudokuSolver.solvePace[0] = oldPace;
     }
 
+    /**
+     * Generates a MultiGrid Sudoku grid and update the original, solved, and current solvable fields.
+     */
     private void generateMultiGrid() {
         var oldPace = SudokuSolver.solvePace[0];
         SudokuSolver.solvePace[0] = 1.0f;
@@ -607,7 +655,14 @@ public class ImGUIFrame extends Application {
         SudokuSolver.solvePace[0] = oldPace;
     }
 
-    private void importGrid(String name) {
+    /**
+     * Imports a grid from a CSV file.
+     * The full path of the file is "exemples/" + name + ".csv" (located in the project resources folder).
+     *
+     * @param name the name of the file to import
+     * @see CsvUtils#importGrid(String)
+     */
+    private void importGrid(@SuppressWarnings("SameParameterValue") String name) {
         Integer[][] innerGrid;
         innerGrid = CsvUtils.importGrid("exemples/" + name + ".csv");
         var symbolSet = SymbolSets.generateSymbols(innerGrid.length);

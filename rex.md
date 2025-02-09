@@ -1,6 +1,6 @@
 ---
 title: "Projet APO Sudoku (et variantes) : résolution et génération"
-author: Thibaut Laracine, Guillaume Calderon, Eymeric Déchelette, 3AFISA
+gitauthor: Thibaut Laracine, Guillaume Calderon, Eymeric Déchelette, 3A FISA
 titlepage: true
 toc-own-page: true
 toccolor: black
@@ -763,8 +763,7 @@ Pour ce projet, nous nous sommes repartis les tâches en tirant parti des compé
 
 
 - Résolution par l'humain :
-    - L'interface ImGUI prend en charge la résolution d'un sudoku par l'utilisateur, avec une possibilité d'avoir de l'
-      aide si l'on est en difficulté.
+    - L'interface ImGUI prend en charge la résolution d'un sudoku par l'utilisateur, avec une possibilité d'avoir de l'aide si l'on est en difficulté.
 
 
 - Génération de grille optimale
@@ -774,7 +773,7 @@ Pour ce projet, nous nous sommes repartis les tâches en tirant parti des compé
 
 - Résolution de grille
     - Vous pouvez résoudre une grille de sudoku de taille avec des performances raisonnables jusqu'à 100x100.
-    - Vous pouvez également résoudre des multigrilles efficacement
+    - Vous pouvez également résoudre des multi-grilles efficacement
 
 
 - Consulter l'historique des modifications

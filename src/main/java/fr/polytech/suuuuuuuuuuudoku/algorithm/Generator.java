@@ -30,7 +30,7 @@ public class Generator {
      * Generates a multigrid with block constraints of size NxM
      *
      * @param difficulty: The difficulty of the generated grid
-     * @return A pair of multigrids, the first one is solved and the second one is unsolved
+     * @return A pair of multigrids (solved and unsolved)
      */
     public static Pair<MultiGrid, MultiGrid> generateMultigridSudoku(Difficulty difficulty) {
         List<Pair<Vec2i, Grid>> gridList = new ArrayList<>();
@@ -66,10 +66,10 @@ public class Generator {
     /**
      * Generates a random grid with block constraints of size NxM
      *
-     * @param blockRows:    The number of block rows
-     * @param blockColumns: The number of block columns
+     * @param blockRows:    The number of rows in each block
+     * @param blockColumns: The number of columns in each block
      * @param difficulty:   The difficulty of the generated grid
-     * @return A pair of grid, the first one is solved and the second one is unsolved
+     * @return A pair of grid (solved and unsolved)
      */
     public static Pair<Grid, Grid> generateSudokuWithBlockConstraints(int blockRows, int blockColumns,
                                                                       Difficulty difficulty) {
@@ -81,12 +81,12 @@ public class Generator {
     }
 
     /**
-     * Generates a grid with random block constraints (block can be of any size and any form, even not contiguous)
+     * Generates a grid with random block constraints ie blocks of any size and any form (even not contiguous)
      *
      * @param difficulty:   The difficulty of the generated grid
-     * @param blockRows:    The number of block rows
-     * @param blockColumns: The number of block columns
-     * @return A pair of grid, the first one is solved and the second one is unsolved
+     * @param blockRows:    The number of rows in each block
+     * @param blockColumns: The number of columns in each block
+     * @return A pair of grid (solved and unsolved)
      */
     public static Pair<Grid, Grid> generateSudokuWithRandomBlockConstraint(int blockRows, int blockColumns,
                                                                            Difficulty difficulty) {
@@ -103,7 +103,7 @@ public class Generator {
     }
 
     /**
-     * Removes random cells from a solved grid to generate a random Sudoku grid to solve
+     * Randomly removes cells from a solved grid
      *
      * @param solvedGrid: The solved grid
      * @param gridSize:   The length of the inner grid
@@ -148,7 +148,7 @@ public class Generator {
             }
         } while (!removableCells.isEmpty());
 
-        //undo the moves until there's only one solution
+        // Undo the moves until there is only one solution
         do {
             solvedGrid.undoLastMove(true);
         } while (SudokuSolver.hasMoreThanOneSolution(solvedGrid, true, true));

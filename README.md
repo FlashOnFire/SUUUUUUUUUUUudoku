@@ -540,7 +540,7 @@ classDiagram
 ```
 
 Il peut représenter une grille de multi sudoku tel que celle-ci dessous :
-![img.png](img.png)
+![img.png](diagram/img.png)
 
 ### Générateur :
 

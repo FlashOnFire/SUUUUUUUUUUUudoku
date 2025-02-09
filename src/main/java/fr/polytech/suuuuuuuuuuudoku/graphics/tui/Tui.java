@@ -128,6 +128,17 @@ public class Tui {
     }
 
     /**
+     * Ferme le terminal proprement.
+     *
+     * @throws IOException si une erreur d'E/S se produit
+     */
+    private void closeTerminal() throws IOException {
+        if (terminal != null) {
+            terminal.close();
+        }
+    }
+
+    /**
      * Cleans the terminal screen.
      *
      * @throws IOException if an I/O error occurs
@@ -392,6 +403,7 @@ public class Tui {
 
         // Sleep for 3 seconds
         Thread.sleep(2000);
+        closeTerminal();
         exit(0);
     }
 
@@ -618,7 +630,10 @@ public class Tui {
                             line += 3;
                             timeLinePos = -1;
                         }
-                        case 'q' -> exit(0);
+                        case 'q' -> {
+                            closeTerminal();
+                            exit(0);
+                        }
                     }
                 }
             }

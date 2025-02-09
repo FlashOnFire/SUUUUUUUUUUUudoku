@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -75,12 +76,13 @@ public class CsvUtils {
             System.out.println(files[0].getFileName());
 
             // load the grids
-            ArrayList<Grid> grids =
-                    Arrays.stream(files).filter(file -> !file.getFileName().toString().equals("offset.csv")).map(file -> {
-                        var gridValue = importGrid(folder + "/" + file.getFileName());
-                        var symbols = SymbolSets.generateSymbols(gridValue.length);
-                        return new Grid(gridValue, symbols);
-                    }).collect(Collectors.toCollection(ArrayList::new));
+            List<Grid> grids =
+                    Arrays.stream(files).filter(file -> !file.getFileName().toString().equals("offset.csv")).sorted()
+                          .map(file -> {
+                              var gridValue = importGrid(folder + "/" + file.getFileName());
+                              var symbols = SymbolSets.generateSymbols(gridValue.length);
+                              return new Grid(gridValue, symbols);
+                          }).toList();
 
             // load the offset
             try (var linesStream = Files.lines(

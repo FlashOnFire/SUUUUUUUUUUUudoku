@@ -18,10 +18,6 @@ import java.util.stream.IntStream;
  */
 public class SudokuBoard extends JPanel {
     /**
-     * The previous grid.
-     */
-    final Grid previousGrid;
-    /**
      * The table representing the Sudoku board.
      */
     final JTable table;
@@ -52,7 +48,6 @@ public class SudokuBoard extends JPanel {
 
         String[] columnNames = new String[value[0][0].length];
         Arrays.fill(columnNames, "");
-        this.previousGrid = grid;
         this.grid = grid;
         Object[][] data = new Object[value[0].length][value[0][0].length];
 

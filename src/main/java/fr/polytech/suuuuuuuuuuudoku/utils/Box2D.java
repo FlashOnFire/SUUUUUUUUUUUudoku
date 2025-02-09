@@ -132,17 +132,6 @@ public class Box2D {
         return dy - y;
     }
 
-    /**
-     * Offsets the box by the specified amount.
-     *
-     * @param offsetX the x offset
-     * @param offsetY the y offset
-     * @return the offset box
-     */
-    public Box2D offset(int offsetX, int offsetY) {
-        return new Box2D(x + offsetX, y + offsetY, dx + offsetX, dy + offsetY);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

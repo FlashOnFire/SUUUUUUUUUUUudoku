@@ -71,7 +71,7 @@ java -jar ./build/libs/swing-1.0.jar # Interface graphique avec swing
 
 #### Lancer sans compilation par un jar
 
-Vous pouvez également lancer le programme directement via gradle avec ces commandes:
+Vous pouvez également lancer le programme directement via gradle avec ces commandes :
 
 ```bash
 ./gradlew runTui # Interface en ligne de commande
@@ -327,7 +327,7 @@ Le Générateur est une classe complexe qui permet de générer des grilles de s
 En fonction de la fonction génération appelée, nous pouvons avoir une variété de sudokus :
 
 - Des sudokus avec des contraintes de blocs de taille NxM, avec la fonction `generateSudokuWithBlockConstraints`
-- Des sudokus avec des contraintes de valeurs sur des positions (contrainte de blocs déstructuré), avec la fonction `generateSudokuWithRandomBlockConstraint`
+- Des sudokus avec des contraintes de valeurs sur des positions (contrainte de blocs déstructurée), avec la fonction `generateSudokuWithRandomBlockConstraint`
 - Des multi-doku qui génère un multi-doku contenant des grilles de sudoku de taille 9x9 avec des formes prédéfinie, avec la fonction `generateMultigridSudoku`
   La forme de ces multi-doku peut facilement être enrichie en ajoutant des formes de grilles dans la fonction `getRandomOffset`.
 
@@ -615,7 +615,7 @@ sequenceDiagram
 Les résultats sont en fonction de la taille de la grille (Échantillon de 50 générations).
 
 | Taille | Moyenne | Minimum | Maximum | Médiane |
-| :----: | :-----: | :-----: | :-----: | :-----: |
+|:------:|:-------:|:-------:|:-------:|:-------:|
 |  4x4   |   4ms   |   1ms   |  33ms   |   3ms   |
 |  9x9   |  474ms  |  13ms   | 14324ms |  117ms  |
 
@@ -623,10 +623,10 @@ Les résultats sont en fonction de la taille de la grille (Échantillon de 50 g�
 
 ## Résultat de la vitesse de génération rapide actuelle
 
-Les résultats sont en fonction de la taille de la grille (Échantillon de 50 générations)
+Les résultats sont en fonction de la taille de la grille (Échantillon de 50 générations).
 
 | Taille | Moyenne | Minimum | Maximum | Médiane |
-| :----: | :-----: | :-----: | :-----: | :-----: |
+|:------:|:-------:|:-------:|:-------:|:-------:|
 |  4x4   |   5ms   |   2ms   |  79ms   |   3ms   |
 |  9x9   |  31ms   |  20ms   |  77ms   |  28ms   |
 | 16x16  |  472ms  |  390ms  |  676ms  |  465ms  |

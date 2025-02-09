@@ -109,7 +109,7 @@ public class Generator {
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
                 Vec2i position = new Vec2i(i, j);
-                if (!(solvedGrid instanceof MultiGrid) || ((MultiGrid) solvedGrid).isInGrid(position)) {
+                if (!(solvedGrid instanceof MultiGrid) || solvedGrid.isInGrid(position)) {
                     removableCells.add(new Vec2i(i, j));
                 }
             }
@@ -120,7 +120,7 @@ public class Generator {
                 removableCells.size() / (Difficulty.getValues().length - difficultyValue));
 
         // The number of cell to remove at each iteration
-        // This is divided by 2 at each iteration when the grid is not solvable to follow a dichotomic search strategy
+        // This is divided by 2 at each iteration when the grid is not solvable to follow a dichotomy search strategy
         int nCellToRemove = Math.min((int) Math.sqrt(gridSize), removableCells.size());
 
         do {

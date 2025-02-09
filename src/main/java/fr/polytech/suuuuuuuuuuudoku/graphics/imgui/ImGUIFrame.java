@@ -744,8 +744,11 @@ public class ImGUIFrame extends Application {
                 var solve = SudokuSolver.solve(
                         new ObservableMultiGrid(
                                 (MultiGrid) solvable,
-                                (index, innerGrid) -> ((MultiGrid) solvable)
-                                        .getGrids()[index].setInnerGrid(innerGrid)
+                                (grids) -> {
+                                    for (int i = 0; i < grids.length; i++) {
+                                        ((MultiGrid) solvable).getGrids()[i].setInnerGrid(grids[i]);
+                                    }
+                                }
                         ), solveDeducing, solveBacktracking, true
                 );
 

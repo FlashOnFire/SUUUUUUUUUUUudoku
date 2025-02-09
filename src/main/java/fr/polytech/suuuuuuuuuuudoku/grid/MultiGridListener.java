@@ -8,8 +8,7 @@ public interface MultiGridListener {
     /**
      * Called when the grid changes.
      *
-     * @param grid the grid that changed
-     * @param gridIndex the index of the grid that changed
+     * @param grids the new grids
      */
-    void onGridChange(final int gridIndex, final InnerGrid grid);
+    void onGridChange(final InnerGrid[] grids);
 }

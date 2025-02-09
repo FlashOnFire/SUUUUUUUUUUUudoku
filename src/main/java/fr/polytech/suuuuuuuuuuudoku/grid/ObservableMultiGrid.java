@@ -3,10 +3,7 @@ package fr.polytech.suuuuuuuuuuudoku.grid;
 import fr.polytech.suuuuuuuuuuudoku.utils.Move2i;
 import fr.polytech.suuuuuuuuuuudoku.utils.Vec2i;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Represents an observable grid that notifies a listener on changes.
@@ -102,9 +99,8 @@ public class ObservableMultiGrid extends Solvable<ObservableMultiGrid> {
      */
     @Override
     public void placeUnchecked(Vec2i pos, Integer value, boolean updatePossibilities, boolean store_move) {
-        int index = multiGrid.getGridFor(pos.getX(), pos.getY()).getFirst();
         multiGrid.placeUnchecked(pos, value, updatePossibilities, store_move);
-        listener.onGridChange(index, this.getInner().getGridFor(pos.getX(), pos.getY()).getSecond().getInnerGrid());
+        listener.onGridChange(Arrays.stream(this.getInner().getGrids()).map(Grid::getInnerGrid).toArray(InnerGrid[]::new));
     }
 
     /**
@@ -162,9 +158,7 @@ public class ObservableMultiGrid extends Solvable<ObservableMultiGrid> {
      */
     @Override
     public void undoLastMove(boolean updatePossibilities) {
-        var pos = multiGrid.getMoves().getLast().position();
-        int index = multiGrid.getGridFor(pos.getX(), pos.getY()).getFirst();
         multiGrid.undoLastMove(updatePossibilities);
-        listener.onGridChange(index, this.getInner().getGridFor(pos.getX(), pos.getY()).getSecond().getInnerGrid());
+        listener.onGridChange(Arrays.stream(this.getInner().getGrids()).map(Grid::getInnerGrid).toArray(InnerGrid[]::new));
     }
 }

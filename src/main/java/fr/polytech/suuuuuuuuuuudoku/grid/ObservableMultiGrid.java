@@ -16,7 +16,7 @@ public class ObservableMultiGrid extends Solvable<ObservableMultiGrid> {
     /**
      * The grid to observe.
      */
-    private MultiGrid multiGrid;
+    private final MultiGrid multiGrid;
 
     /**
      * Constructs an ObservableGrid with the specified MultiGrid and listener.
@@ -48,15 +48,6 @@ public class ObservableMultiGrid extends Solvable<ObservableMultiGrid> {
      */
     public MultiGrid getInner() {
         return multiGrid;
-    }
-
-    /**
-     * Sets a new grid.
-     *
-     * @param multiGrid the new MultiGrid to set
-     */
-    public void setMultiGrid(MultiGrid multiGrid) {
-        this.multiGrid = multiGrid;
     }
 
     /**

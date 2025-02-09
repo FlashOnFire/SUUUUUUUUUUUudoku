@@ -19,7 +19,7 @@ public class ObservableGrid extends Solvable<ObservableGrid> {
     /**
      * The grid to observe.
      */
-    private Grid grid;
+    private final Grid grid;
 
     /**
      * Constructs an ObservableGrid with the specified grid and listener.
@@ -51,15 +51,6 @@ public class ObservableGrid extends Solvable<ObservableGrid> {
      */
     public Grid getInner() {
         return grid;
-    }
-
-    /**
-     * Sets a new grid.
-     *
-     * @param grid the new grid to set
-     */
-    public void setGrid(Grid grid) {
-        this.grid = grid;
     }
 
     /**
